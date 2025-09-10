@@ -1,0 +1,59 @@
+:root {
+  --navbar-height: 60px;
+  --sidebar-width: 250px;
+}
+
+/* Full viewport container */
+.layout-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Navbar fixed at top */
+.custom-navbar {
+  height: var(--navbar-height);
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+}
+
+/* Sidebar fixed on left */
+.sidebar {
+  width: var(--sidebar-width);
+  height: calc(100vh - var(--navbar-height));
+  position: fixed;
+  top: var(--navbar-height);
+  left: 0;
+  background-color: var(--primary);
+  overflow-y: auto;
+  z-index: 900;
+}
+
+/* Content area */
+.layout-content {
+  margin-top: var(--navbar-height); /* below navbar */
+  margin-left: var(--sidebar-width); /* push content to the right of sidebar */
+  padding: 1rem;
+  height: calc(100vh - var(--navbar-height)); /* fill remaining height */
+  overflow-y: auto; /* content scrolls */
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .sidebar {
+    left: -var(--sidebar-width); /* hide by default */
+    transition: left 0.3s ease;
+  }
+
+  .sidebar.open {
+    left: 0; /* slide in */
+  }
+
+  .layout-content {
+    margin-left: 0; /* content full width */
+  }
+}

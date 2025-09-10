@@ -1,0 +1,32 @@
+.custom-navbar {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center; /* center content horizontally */
+  background-color: var(--primary);
+  color: var(--white);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  padding: 0 1rem; /* responsive padding */
+  border-bottom: 3px solid black; /* thin line */
+}
+
+/* Inner container to limit width on very wide screens */
+.custom-navbar .navbar-container {
+  width: 100%;
+  max-width: 1400px; /* optional: keeps content readable on huge screens */
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* space between brand and menu if needed */
+  margin: 0 auto;
+}
+
+/* Brand */
+.custom-navbar .navbar-brand {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: var(--white);
+}
