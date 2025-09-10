@@ -15,6 +15,21 @@
   box-sizing: border-box;
 }
 
+/* Sidebar main section (all normal links + dropdowns) */
+.sidebar-main {
+  flex: 1; /* push footer to bottom */
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+/* Sidebar footer (logout area) */
+.sidebar-footer {
+  margin-top: auto; /* ensures it's stuck at the bottom */
+  padding: 0.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+}
+
 /* Top-level links and dropdown button */
 .sidebar-link {
   display: flex;
@@ -110,6 +125,24 @@
 .sidebar-sublink.active-sublink:hover {
   background-color: var(--primary) !important;
   color: var(--white) !important;
+}
+
+/* Logout button */
+.logout-btn {
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--white);
+  padding: 0.8rem 1rem;
+  margin: 2px 4px;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+}
+
+.logout-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 /* Scrollbar styling (optional) */

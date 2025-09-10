@@ -1,0 +1,100 @@
+/* src/components/Recent_Applications/Recent_Applications.css */
+
+.recent-applications-container {
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  padding: 12px; /* slightly reduced padding for compact look */
+}
+
+.recent-applications-header h5 {
+  font-size: 14px; /* smaller font */
+  font-weight: 600;
+  color: #333;
+}
+
+.unread-count {
+  background-color: #dc3545;
+  color: white;
+  border-radius: 50%;
+  padding: 1px 6px; /* smaller */
+  font-size: 10px; /* smaller font */
+  margin-left: 4px; /* reduced spacing */
+}
+
+.history-button {
+  background-color: transparent;
+  border: none;
+  color: #007bff;
+  font-weight: 500;
+  cursor: pointer;
+  font-size: 12px; /* smaller font */
+}
+
+.history-button:hover {
+  text-decoration: underline;
+}
+
+.applications-table {
+  display: flex;
+  flex-direction: column;
+  gap: 6px; /* smaller gap between rows */
+}
+
+.application-row {
+  display: flex;
+  align-items: center;
+  padding: 6px 8px; /* reduced padding */
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  gap: 8px; /* smaller gap between elements */
+  font-size: 12px; /* smaller font for entire row */
+  height: 60px; /* slightly taller to fit bigger date box */
+}
+
+.application-date {
+  background-color: #007bff;
+  color: white;
+  border-radius: 6px;
+  width: 50px;       /* bigger than before */
+  height: 50px;      /* bigger than before */
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;   /* readable date text */
+  text-align: center;
+}
+
+.calendar-icon {
+  font-size: 16px;   /* comfortable icon size */
+  line-height: 1;
+  margin: 0;
+  display: block;
+}
+
+.application-col {
+  flex: 1;
+  font-size: 12px; /* smaller font */
+  color: #333;
+}
+
+/* Status Colors */
+.status.approved {
+  color: #28a745;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.status.rejected {
+  color: #dc3545;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.status.pending {
+  color: #ffc107;
+  font-weight: 600;
+  font-size: 12px;
+}

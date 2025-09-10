@@ -1,0 +1,53 @@
+/* src/components/Current_Month_Status/Current_Month_Status.css */
+
+.current-month-status {
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.status-cards-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px; /* space between cards */
+  flex-wrap: nowrap; /* ensure all cards stay in one row */
+}
+
+.status-card {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  width: 120px; /* fixed width to keep all in one row */
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.status-card:hover {
+  transform: translateY(-2px);
+}
+
+.status-icon {
+  width: 40px;
+  height: 40px;
+  background-color: #007bff;
+  color: white;
+  border-radius: 50%;
+  font-size: 18px;
+}
+
+.status-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.status-number {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.status-title-small {
+  font-size: 9px;
+  color: #555;
+}

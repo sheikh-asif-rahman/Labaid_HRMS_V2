@@ -19,6 +19,15 @@
   --white: #ffffff;
 }
 
+/* Remove scrollbars globally */
+html, body, #root {
+  overflow: hidden; /* hide both vertical and horizontal scrollbars */
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
 a {
   font-weight: 500;
   color: #646cff;
@@ -58,6 +67,11 @@ button:hover {
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
+}
+
+/* Optional: scrollable class for components that need scrollbars */
+.scrollable {
+  overflow: auto; /* only this component will show scrollbars */
 }
 
 @media (prefers-color-scheme: light) {
