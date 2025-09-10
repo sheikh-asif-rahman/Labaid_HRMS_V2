@@ -167,7 +167,7 @@ const Sidebar: React.FC = () => {
           <span>Holiday Calendar</span>
         </NavLink>
 
-        {/* Reports */}
+        {/* Reports */} 
         <NavLink
           to="/reports"
           className={({ isActive }) =>

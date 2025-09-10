@@ -7,6 +7,7 @@ import Home from "./pages/Home";
 import Employee from "./pages/Employee";
 import HolidayCalendar from "./pages/Holiday_Calendar";
 import LeaveManagement from "./pages/Leave_Management";
+import Reports from "./pages/Reports";
 
 import DepartmentSetup from "./pages/Department_Setup";
 import DesignationSetup from "./pages/Designation_Setup";
@@ -26,6 +27,7 @@ const App: React.FC = () => {
           <Route path="designationsetup" element={<DesignationSetup />} />
           <Route path="employeeapproval" element={<EmployeeApproval />} />
           <Route path="rulespermission" element={<RulesPermission />} />
+          <Route path="reports" element={<Reports />} />
         </Route>
       </Routes>
     </BrowserRouter>

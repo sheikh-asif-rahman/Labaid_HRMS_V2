@@ -3,7 +3,7 @@ import { FaUserCircle } from "react-icons/fa"; // default icon
 import "./Profile.css";
 
 const Profile: React.FC = () => {
-  const [profilePic, setProfilePic] = useState<string | null>(null);
+  const [profilePic] = useState<string | null>(null);
 
   return (
     <div className="profile-container">
