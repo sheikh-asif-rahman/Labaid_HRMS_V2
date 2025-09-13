@@ -33,7 +33,6 @@ const Profile: React.FC = () => {
 
       {/* Action Buttons */}
       <div className="profile-actions">
-        <button className="edit-btn">Edit</button>
         <button className="password-btn">Change Password</button>
       </div>
     </div>

@@ -26,10 +26,8 @@ const StatusCard: React.FC<StatusCardProps> = ({ icon, number, title }) => {
 const Current_Month_Status: React.FC = () => {
   return (
     <div className="current-month-status p-3">
-
-    {/* here we will put some code for current month status  */}
-      {/* <h5 className="mb-3">Status</h5> */}
-
+      {/* Header for this section */}
+      <h5 className="status-header mb-3">This Month Status</h5>
 
       <div className="status-cards-row d-flex">
         <StatusCard icon={<FaSun />} number={8} title="Full Day" />

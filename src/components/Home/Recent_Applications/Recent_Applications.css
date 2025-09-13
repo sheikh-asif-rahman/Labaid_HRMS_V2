@@ -5,6 +5,8 @@
   border-radius: 8px;
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
   padding: 12px; /* slightly reduced padding for compact look */
+  border: 1px solid #ddd; 
+
 }
 
 .recent-applications-header h5 {
