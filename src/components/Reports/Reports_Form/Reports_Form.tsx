@@ -1,9 +1,19 @@
-import React, { useState } from "react";
+import React from "react";
 import "./Reports_Form.css";
 
-const Reports_Form: React.FC = () => {
-  const [reportType, setReportType] = useState<string>("");
-  const [dataFetched, setDataFetched] = useState(false);
+type Props = {
+  reportType: string;
+  setReportType: (value: string) => void;
+  dataFetched: boolean;
+  setDataFetched: (value: boolean) => void;
+};
+
+const Reports_Form: React.FC<Props> = ({
+  reportType,
+  setReportType,
+  dataFetched,
+  setDataFetched,
+}) => {
 
   const handleReportChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setReportType(e.target.value);
