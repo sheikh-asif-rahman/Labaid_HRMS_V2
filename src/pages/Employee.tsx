@@ -1,16 +1,29 @@
+// src/pages/Employee.tsx
 import React from "react";
 import Search from "../components/Search/Search";
 import User_Profile_Attendance from "../components/Employee/User_Profile_Attendance/User_Profile_Attendance";
 import User_Profile from "../components/Employee/User_Profile/User_Profile";
+import Working_Day_Shift from "../components/Employee/Wroking_Day_Shift/Working_Day_Shift";
 
 const Employee: React.FC = () => {
   const handleSearch = (query: string) => console.log("Search:", query);
   const handleNew = () => console.log("New clicked");
 
   return (
-    <div className="p-6 flex flex-col items-center w-full">
-      {/* Search component */}
-      <div className="w-full max-w-6xl mb-6">
+    <div
+      style={{
+        minHeight: "100vh",       // allow content to grow
+        width: "100%",
+        padding: "20px",
+        boxSizing: "border-box",
+        display: "flex",
+        flexDirection: "column",
+        gap: "20px",
+        overflowY: "auto",        // enable vertical scrolling
+      }}
+    >
+      {/* Search */}
+      <div style={{ width: "100%", maxWidth: "1200px" }}>
         <Search
           placeholder="Search employees..."
           onSearch={handleSearch}
@@ -18,16 +31,30 @@ const Employee: React.FC = () => {
         />
       </div>
 
-      {/* Row: Profile (70%) + Attendance (30%) */}
-      <div className="w-full max-w-6xl flex flex-row gap-6 items-start">
-        {/* Left column: Profile */}
-        <div className="flex-[0_0_70%] p-2">
-          <User_Profile />
+      {/* First row: Profile full width */}
+      <div style={{ width: "100%", maxWidth: "1200px" }}>
+        <User_Profile />
+      </div>
+
+      {/* Second row: Attendance + Working Day Shift side by side */}
+      <div
+        style={{
+          width: "100%",
+          maxWidth: "1200px",
+          display: "flex",
+          flexDirection: "row",
+          gap: "20px",
+          flexWrap: "nowrap",        // prevent wrapping
+        }}
+      >
+        {/* Left: Attendance */}
+        <div style={{ width: "50%" }}>
+          <User_Profile_Attendance punchInTime="09:00" totalShiftHours={8} />
         </div>
 
-        {/* Right column: Attendance */}
-        <div className="flex-[0_0_30%] p-2">
-          <User_Profile_Attendance punchInTime="09:00" totalShiftHours={8} />
+        {/* Right: Working Day Shift */}
+        <div style={{ width: "50%" }}>
+          <Working_Day_Shift />
         </div>
       </div>
     </div>

@@ -1,0 +1,87 @@
+.working-day-shift-container {
+  background-color: #ffffff;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  text-align: center;
+  box-sizing: border-box;
+  border: 1px solid #ddd; 
+}
+
+.top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.working-days-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.update-btn {
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 0.5rem;
+  font-size: 0.65rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+.update-btn:hover {
+  background-color: #2563eb;
+}
+
+.days-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 4px;
+  margin-bottom: 1rem;
+}
+
+.day-card {
+  flex: 1;
+  min-width: 0;
+  padding: 0.5rem 0;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  font-size: 0.875rem;
+  text-align: center;
+  transition: all 0.2s ease;
+  color: white;
+}
+
+/* Active card */
+.day-card.active {
+  background-color: #22c55e !important; /* green */
+  color: white !important;
+}
+
+.dropdowns-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.dropdowns-container select {
+  width: 100%;
+  padding: 6px 8px;
+  border-radius: 0.5rem;
+  border: 1px solid #d1d5db;
+  background-color: #ffffff;
+  font-size: 0.875rem;
+  color: #111827;
+}
+
+.time-dropdowns {
+  display: flex;
+  gap: 5px;
+}
+
+.time-dropdowns select {
+  flex: 1;
+}
