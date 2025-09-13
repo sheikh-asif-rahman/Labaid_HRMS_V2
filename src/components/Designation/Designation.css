@@ -23,8 +23,8 @@
 
 .designation-header h2 {
   margin: 0;
-  font-size: 1.2rem; /* smaller title */
-  color: #0115a9;
+  font-size: 1.2rem;
+  color: #333;
 }
 
 .designation-header button {

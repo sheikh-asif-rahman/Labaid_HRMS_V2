@@ -9,6 +9,7 @@
   box-shadow: 0 4px 12px rgba(0,0,0,0.08);
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   width: 100%;
+  border: 1px solid #ccc;
   box-sizing: border-box;
   color: #333;
 }
@@ -21,9 +22,9 @@
 }
 
 .rules-permission-header h2 {
-  font-size: 18px;
-  font-weight: 600;
   margin: 0;
+  font-size: 1.2rem;
+  color: #333;
 }
 
 .update-button {

@@ -1,14 +1,29 @@
+/* Reusable Container Title */
+.container-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #0115a9;
+  margin: 0 0 12px 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Main container */
 .upf-container {
   background-color: #fff;
-  padding: 12px;
+  padding: 20px;
   border-radius: 12px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   width: 100%;
   font-size: 0.7rem;
   overflow: hidden;
-  border: 1px solid #ddd; 
+  border: 1px solid #ddd;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana;
 }
 
+/* Header */
 .upf-header {
   display: flex;
   justify-content: space-between;
@@ -16,17 +31,44 @@
   margin-bottom: 12px;
 }
 
+.upf-header h2 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+/* Buttons */
 .upf-edit-btn,
 .upf-update-btn {
   padding: 3px 8px;
-  font-size: 0.65rem;
+  font-size: 0.7rem;
   border-radius: 6px;
-  border: none;
+  border: 1px solid transparent;
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.upf-edit-btn { background-color: #007bff; color: #fff; }
-.upf-update-btn { background-color: #28a745; color: #fff; }
+.upf-edit-btn {
+  background-color: #007bff;
+  color: #fff;
+  border-color: #007bff;
+}
+
+.upf-edit-btn:hover {
+  background-color: #0069d9;
+  border-color: #0062cc;
+}
+
+.upf-update-btn {
+  background-color: #28a745;
+  color: #fff;
+  border-color: #28a745;
+}
+
+.upf-update-btn:hover {
+  background-color: #218838;
+  border-color: #1e7e34;
+}
 
 /* 2-column layout */
 .upf-content {
@@ -77,6 +119,7 @@
   max-height: 500px;
 }
 
+/* Form grid */
 .upf-form {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -91,16 +134,49 @@
 .upf-form-group label {
   margin-bottom: 2px;
   font-size: 0.65rem;
+  color: #333;
+  font-weight: 500;
 }
 
+/* Inputs */
 .upf-form-group input {
-  padding: 2px 4px;
+  padding: 4px 6px;
   font-size: 0.65rem;
   border: 1px solid #ddd;
   border-radius: 4px;
+  background-color: #fff; /* white background for active/editable fields */
+  color: #000;           /* black text */
+  transition: all 0.2s ease;
+}
+
+.upf-form-group input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 4px rgba(0,123,255,0.2);
+  outline: none;
 }
 
 .upf-form-group input:disabled {
   background-color: #f8f9fa;
+  color: #6c757d; /* gray text for disabled */
   cursor: not-allowed;
+}
+
+/* Scrollbar for long form */
+.upf-right::-webkit-scrollbar {
+  width: 6px;
+}
+
+.upf-right::-webkit-scrollbar-thumb {
+  background-color: rgba(0,0,0,0.1);
+  border-radius: 3px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .upf-content {
+    flex-direction: column;
+  }
+  .upf-form {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }

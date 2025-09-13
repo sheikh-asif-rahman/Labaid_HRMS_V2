@@ -10,8 +10,8 @@
 }
 
 .recent-applications-header h5 {
-  font-size: 14px; /* smaller font */
-  font-weight: 600;
+  margin: 0;
+  font-size: 1.2rem;
   color: #333;
 }
 

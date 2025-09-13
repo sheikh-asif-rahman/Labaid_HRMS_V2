@@ -11,9 +11,9 @@
 }
 
 .attendance-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin-bottom: 0.25rem;
+  margin: 0;
+  font-size: 1.2rem;
+  color: #333;
 }
 
 .attendance-date {
