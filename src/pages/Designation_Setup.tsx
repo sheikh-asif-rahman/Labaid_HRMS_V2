@@ -1,7 +1,12 @@
 import React from "react";
+import DesignationSetup from "../components/Designation/Designation"; // adjust path if needed
 
 const Designation_Setup: React.FC = () => {
-  return <h2>Designation_Setup Page</h2>;
+  return (
+    <div>
+      <DesignationSetup />
+    </div>
+  );
 };
 
 export default Designation_Setup;

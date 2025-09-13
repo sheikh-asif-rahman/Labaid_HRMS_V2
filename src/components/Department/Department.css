@@ -1,0 +1,230 @@
+/* Main Container */
+.department-main-container {
+  max-width: 900px;
+  margin: 20px auto;
+  padding: 15px;
+  background-color: white;
+  border-radius: 18px;
+  border: 1px solid #ddd; 
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana;
+  font-size: 0.75rem;
+}
+
+/* Header */
+.department-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.department-header h2 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #0115a9;
+}
+
+.department-header button {
+  padding: 6px 12px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.75rem;
+  transition: all 0.2s ease;
+}
+
+.active-btn {
+  background-color: #0115a9;
+  color: white;
+}
+
+.active-btn:hover {
+  background-color: #0026d1;
+  transform: translateY(-1px);
+}
+
+.disabled-btn {
+  background-color: #c4c4c4;
+  color: white;
+  cursor: not-allowed;
+}
+
+/* Form Card */
+.department-form-card {
+  padding: 12px;
+  border-radius: 12px;
+  display: flex;
+  border: 1px solid #ddd; 
+  flex-direction: column;
+  gap: 10px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+/* Side-by-side form fields */
+.form-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.form-row label {
+  display: flex;
+  flex-direction: column;
+  font-weight: 500;
+  font-size: 0.75rem;
+  color: #333;
+}
+
+/* Department Name - wide */
+.form-row label:first-child {
+  flex: 3;
+}
+
+/* Status - small */
+.form-row label:last-child {
+  flex: 1;
+}
+
+.form-row input,
+.form-row select {
+  margin-top: 4px;
+  padding: 6px 8px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  font-size: 0.75rem;
+  background-color: white;
+  color: #333;
+  transition: all 0.2s ease;
+}
+
+.form-row input:focus,
+.form-row select:focus {
+  border-color: #0115a9;
+  box-shadow: 0 0 4px rgba(1, 21, 169, 0.2);
+  outline: none;
+}
+
+/* Table Card */
+.department-table-card {
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid #ddd; 
+  background-color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  overflow-x: auto;
+}
+
+.department-table-card table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.72rem;
+}
+
+.department-table-card th,
+.department-table-card td {
+  padding: 8px 6px;
+  text-align: left;
+}
+
+.department-table-card th {
+  background-color: #0115a9;
+  color: white;
+  font-weight: 600;
+  border-radius: 0;
+  text-align: left;
+}
+
+/* Column widths */
+.department-table-card th:nth-child(1),
+.department-table-card td:nth-child(1) {
+  width: 35px;
+}
+
+.department-table-card th:nth-child(2),
+.department-table-card td:nth-child(2) {
+  width: auto;
+}
+
+.department-table-card th:nth-child(3),
+.department-table-card td:nth-child(3) {
+  width: 60px;
+}
+
+.department-table-card th:nth-child(4),
+.department-table-card td:nth-child(4) {
+  width: 60px;
+}
+
+/* Row styles */
+.department-table-card tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.department-table-card tr:hover {
+  background-color: #e2e8f0;
+  transform: scale(1.01);
+  transition: all 0.2s ease;
+}
+
+.edit-btn {
+  padding: 4px 8px;
+  background-color: #6c757d;
+  color: white;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  font-size: 0.7rem;
+  transition: all 0.2s ease;
+}
+
+.edit-btn:hover {
+  background-color: #495057;
+  transform: translateY(-1px);
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 8px;
+  gap: 3px;
+  flex-wrap: wrap;
+  font-size: 0.7rem;
+}
+
+.pagination button {
+  padding: 3px 8px;
+  border-radius: 3px;
+  border: 1px solid #ddd;
+  background-color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pagination button:hover {
+  background-color: #f0f0f0;
+}
+
+.pagination .active-page {
+  background-color: #0115a9;
+  color: white;
+  border-color: #0115a9;
+}
+
+.pagination .dots {
+  padding: 0 2px;
+  color: #555;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .form-row {
+    flex-direction: column;
+  }
+}

@@ -1,0 +1,169 @@
+/* Main container */
+.rules-permission-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  width: 100%;
+  box-sizing: border-box;
+  color: #333;
+}
+
+/* Header: Permission + Update button */
+.rules-permission-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.rules-permission-header h2 {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.update-button {
+  padding: 6px 14px;
+  font-size: 13px;
+  border-radius: 4px;
+  border: 1px solid #007bff;
+  background-color: #007bff;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.update-button:hover {
+  background-color: #0056b3;
+  border-color: #0056b3;
+}
+
+/* Section container */
+.section {
+  background: #ffffff;
+  padding: 15px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Section header for Facility Access */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* Row for user fields */
+.row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.field {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  font-size: 12px;
+  color: #555;
+}
+
+.field input {
+  padding: 5px;
+  font-size: 12px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  background-color: #f9f9f9;
+  cursor: not-allowed;
+  color: #333;
+}
+
+/* Checkbox group */
+.checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  font-size: 13px;
+  color: #333;
+}
+
+/* Permission checkboxes 2-column grid */
+.permission-group {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2 columns */
+  gap: 10px;
+}
+
+/* Facility checkboxes 5-column grid */
+.facility-group {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+}
+
+/* Checkbox styling */
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  position: relative;
+}
+
+.checkbox-group input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff;
+  cursor: pointer;
+  appearance: none;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.checkbox-group input[type="checkbox"]:checked {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.checkbox-group input[type="checkbox"]:checked::after {
+  content: "✔";
+  color: white;
+  font-size: 14px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Facility buttons */
+.facility-buttons button {
+  margin-left: 5px;
+  padding: 4px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  border-radius: 4px;
+  border: 1px solid #007bff;
+  background-color: #fff;
+  color: #007bff;
+  transition: all 0.2s ease;
+}
+
+.facility-buttons button:hover {
+  background-color: #007bff;
+  color: #fff;
+}
