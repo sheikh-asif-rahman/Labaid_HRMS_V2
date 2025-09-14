@@ -1,0 +1,79 @@
+.leave-container {
+  width: 100%;
+  background: #ffffff;
+  padding: 20px;
+  box-sizing: border-box;
+  color: #000000;
+  font-family: Arial, sans-serif;
+  border-radius: 12px; /* Rounded corners */
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+}
+
+.leave-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.leave-header h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.save-btn {
+  background-color: #0115a9;
+  color: #ffffff;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.save-btn:hover {
+  background-color: #00008b;
+}
+
+.leave-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.form-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 calc(20% - 10px);
+  min-width: 150px;
+}
+
+.form-group.large {
+  flex: 1 1 calc(50% - 10px);
+}
+
+.form-group label {
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
+.form-group input {
+  padding: 4px 6px;
+  font-size: 12px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  background: #ffffff;
+  color: #000000;
+}
+
+.form-group input[readonly] {
+  background: #f8f8f8;
+  color: #000000;
+  cursor: default;
+}

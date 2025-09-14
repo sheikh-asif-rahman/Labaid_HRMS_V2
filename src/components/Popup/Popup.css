@@ -1,0 +1,121 @@
+/* Overlay with subtle blur */
+.wc-popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+/* Popup container */
+.wc-popup-container {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 20px;
+  min-width: 250px;
+  max-width: 90%;
+}
+
+/* Loading popup */
+.wc-popup-loading {
+  height: 140px;
+}
+
+/* Status popup */
+.wc-popup-status {
+  min-height: 180px;
+}
+
+/* Loader bars */
+.wc-popup-loader {
+  width: 90px;
+  height: 50px;
+  border-radius: 6px;
+  --g1: conic-gradient(from 90deg at left 4px top 4px, #0000 90deg, #007bff 0);
+  --g2: conic-gradient(from -90deg at bottom 4px right 4px, #0000 90deg, #007bff 0);
+  background: var(--g1), var(--g1), var(--g1), var(--g2), var(--g2), var(--g2);
+  background-position: left, center, right;
+  background-repeat: no-repeat;
+  animation: wc-popup-loader-anim 1s infinite;
+  margin: 0 auto 14px auto;
+}
+
+@keyframes wc-popup-loader-anim {
+  0%   {background-size:25px 50%,25px 50%,25px 50%}
+  25%  {background-size:25px 100%,25px 50%,25px 50%}
+  50%  {background-size:25px 50%,25px 100%,25px 50%}
+  75%  {background-size:25px 50%,25px 50%,25px 100%}
+  100% {background-size:25px 50%,25px 50%,25px 50%}
+}
+
+.wc-popup-loading-text {
+  margin: 6px 0 0 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Status content */
+.wc-popup-status-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Icon styling */
+.wc-popup-status-icon {
+  font-size: 40px;
+  line-height: 1;
+  background: none;
+}
+
+/* Icon colors */
+.wc-popup-done {
+  color: #28a745;
+}
+.wc-popup-notdone {
+  color: #dc3545;
+}
+
+/* Status text */
+.wc-popup-status-text {
+  margin: 0;
+  font-size: 16px;
+  color: #333;
+  text-align: center;
+  word-break: break-word;
+}
+
+/* OK button with gradient & hover */
+.wc-popup-ok-button {
+  margin-top: 6px;
+  padding: 10px 22px;
+  background: linear-gradient(90deg,#007bff,#0056d2);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+.wc-popup-ok-button:hover {
+  background: linear-gradient(90deg,#0056d2,#007bff);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+}
+
+/* Popup appear animation */
+@keyframes wc-popup-scaleIn {
+  from { transform: scale(0.96); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}

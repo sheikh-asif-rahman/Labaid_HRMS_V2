@@ -1,0 +1,127 @@
+.leave-history-container {
+  width: 100%;
+  background: #ffffff;
+  padding: 20px;
+  box-sizing: border-box;
+  color: #000000;
+  font-family: Arial, sans-serif;
+  border-radius: 12px;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+  margin-top: 20px;
+}
+
+.leave-history-header h2 {
+  margin: 0 0 15px 0;
+  font-size: 16px;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+}
+
+.leave-history-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px; /* smaller font */
+}
+
+.leave-history-table th,
+.leave-history-table td {
+  border: 1px solid #ccc;
+  padding: 4px 6px;
+  text-align: left;
+}
+
+.leave-history-table th {
+  background-color: #f1f1f1;
+  font-weight: bold;
+}
+
+.leave-history-table tr:hover {
+  background-color: #f9f9f9;
+}
+
+/* Make Purpose column wider */
+.leave-history-table th:nth-child(3),
+.leave-history-table td:nth-child(3) {
+  min-width: 200px;
+}
+
+/* Status styles */
+.status {
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+}
+.status.approved {
+  background-color: #d4edda;
+  color: #155724;
+}
+.status.rejected {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+.status.pending {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+/* Download button styles */
+.download-btn {
+  background-color: #0115a9;
+  color: #fff;
+  border: none;
+  padding: 2px 6px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 10px;
+}
+
+.download-btn:hover {
+  background-color: #00008b;
+}
+
+/* Disabled state */
+.download-btn.disabled,
+.download-btn:disabled {
+  background-color: #ccc;
+  color: #666;
+  cursor: not-allowed; /* 🚫 cursor */
+}
+
+/* Pagination styles */
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 12px;
+  gap: 4px;
+  font-size: 12px;
+}
+
+.pagination button {
+  background: #f1f1f1;
+  border: 1px solid #ccc;
+  padding: 2px 6px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.pagination button:hover {
+  background: #ddd;
+}
+
+.pagination button.active {
+  background: #0115a9;
+  color: #fff;
+  font-weight: bold;
+}
+
+.pagination button:disabled {
+  background: #eee;
+  cursor: not-allowed;
+}
+
+.pagination .dots {
+  padding: 2px 6px;
+}

@@ -1,0 +1,179 @@
+.yearly-calender-container {
+  width: 100%;
+  height: 100%;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f4f4f4;
+  overflow: hidden;
+}
+
+.calender-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.calender-title {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.calender-actions .button {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+}
+.calender-actions .search-button {
+  margin-right: 4px;
+}
+
+.calender-main-row {
+  display: flex;
+  gap: 10px;
+  flex: 1;
+  overflow: hidden;
+}
+
+.year-overview {
+  flex: 3;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.active-month-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.bordered-container {
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 10px;
+  background-color: #fff;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+}
+
+.year-navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.year-nav-btn {
+  padding: 4px 8px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  color: #333;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.year-nav-btn:hover {
+  background-color: #f0f0f0;
+}
+
+.months-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.month-card {
+  border-radius: 6px;
+  background-color: #fff;
+  padding: 6px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  font-size: 12px;
+}
+.month-card.active {
+  border: 2px solid #0d6efd;
+}
+
+.month-name {
+  text-align: center;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.mini-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.mini-calendar-day {
+  width: 18px;
+  height: 18px;
+  font-size: 9px;
+  text-align: center;
+  line-height: 18px;
+  border-radius: 2px;
+}
+.mini-calendar-day.red {
+  background-color: #dc3545;
+  color: #fff;
+}
+.mini-calendar-day.yellow {
+  background-color: #ffc107;
+  color: #000;
+}
+.mini-calendar-day.green {
+  background-color: #198754;
+  color: #fff;
+}
+
+.active-month-card {
+  background-color: #fff;
+  padding: 10px;
+  border-radius: 6px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
+  font-size: 12px;
+  overflow: hidden;
+  transition: height 0.3s ease;
+}
+
+.event-list {
+  list-style-type: disc;
+  padding-left: 20px;
+  margin: 0;
+  font-size: 12px;
+}
+.event-list li {
+  margin-bottom: 4px;
+}
+
+.legend.vertical-legend {
+  display: flex;
+  flex-direction: column;
+  margin-top: 10px;
+  font-size: 12px;
+  gap: 4px;
+}
+.legend-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.legend-item {
+  width: 14px;
+  height: 14px;
+  border-radius: 2px;
+  display: inline-block;
+}
+.red {
+  background-color: #dc3545;
+}
+.yellow {
+  background-color: #ffc107;
+}
+.green {
+  background-color: #198754;
+}

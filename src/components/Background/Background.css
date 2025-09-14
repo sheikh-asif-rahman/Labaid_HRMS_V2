@@ -1,0 +1,35 @@
+.wc-bg-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  overflow: hidden;
+  background: linear-gradient(to bottom, #cce7ff, #e6f3ff);
+}
+
+.wc-bg-bubble {
+  position: absolute;
+  bottom: -60px; /* start below screen */
+  background-color: rgba(0, 80, 255, 0.3);
+  border-radius: 50%;
+  pointer-events: none;
+  animation-name: wc-bubble-rise;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+@keyframes wc-bubble-rise {
+  0% {
+    transform: translateY(0) translateX(0) rotate(0deg);
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(-120vh) translateX(40px) rotate(360deg);
+    opacity: 0;
+  }
+}

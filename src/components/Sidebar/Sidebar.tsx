@@ -158,13 +158,13 @@ const Sidebar: React.FC = () => {
         </NavLink>
 
         <NavLink
-          to="/holidaycalendar"
+          to="/yearlycalander"
           className={({ isActive }) =>
             `sidebar-link ${isActive ? "active-link" : ""}`
           }
         >
           <FaCalendarAlt className="sidebar-icon" />
-          <span>Holiday Calendar</span>
+          <span>Yearly Calendar</span>
         </NavLink>
 
         {/* Reports */} 
