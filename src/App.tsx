@@ -13,6 +13,7 @@ import DepartmentSetup from "./pages/Department_Setup";
 import DesignationSetup from "./pages/Designation_Setup";
 import EmployeeApproval from "./pages/Employee_Approval";
 import RulesPermission from "./pages/Rules_Permission";
+import LeaveApproval from "./pages/Leave_Approval"; // <-- new import
 
 const App: React.FC = () => {
   return (
@@ -26,6 +27,7 @@ const App: React.FC = () => {
           <Route path="departmentsetup" element={<DepartmentSetup />} />
           <Route path="designationsetup" element={<DesignationSetup />} />
           <Route path="employeeapproval" element={<EmployeeApproval />} />
+          <Route path="leaveapproval" element={<LeaveApproval />} /> {/* <-- new route */}
           <Route path="rulespermission" element={<RulesPermission />} />
           <Route path="reports" element={<Reports />} />
         </Route>

@@ -21,9 +21,11 @@ const Sidebar: React.FC = () => {
   const location = useLocation();
   const adminRef = useRef<HTMLDivElement>(null);
 
+  // Admin paths for dropdown auto-open
   const adminPaths = [
     "/rulespermission",
     "/employeeapproval",
+    "/leaveapproval",
     "/designationsetup",
     "/departmentsetup",
   ];
@@ -50,7 +52,8 @@ const Sidebar: React.FC = () => {
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    return () =>
+      document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   // Close dropdown when any dropdown link is clicked
@@ -114,6 +117,17 @@ const Sidebar: React.FC = () => {
             </NavLink>
 
             <NavLink
+              to="/leaveapproval"
+              onClick={handleDropdownLinkClick}
+              className={({ isActive }) =>
+                `sidebar-sublink ${isActive ? "active-sublink" : ""}`
+              }
+            >
+              <FaCalendarCheck className="sidebar-icon" />
+              <span>Leave Approval</span>
+            </NavLink>
+
+            <NavLink
               to="/designationsetup"
               onClick={handleDropdownLinkClick}
               className={({ isActive }) =>
@@ -167,7 +181,7 @@ const Sidebar: React.FC = () => {
           <span>Yearly Calendar</span>
         </NavLink>
 
-        {/* Reports */} 
+        {/* Reports */}
         <NavLink
           to="/reports"
           className={({ isActive }) =>
