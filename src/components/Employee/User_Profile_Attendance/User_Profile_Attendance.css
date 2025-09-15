@@ -1,25 +1,24 @@
 .attendance-container {
   background-color: #ffffff;
-  padding: 1.5rem;
-  border-radius: 1rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 1rem; /* reduced */
+  border-radius: 0.75rem;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
   width: 100%;
-  max-width: 280px;
   text-align: center;
-  margin: auto;
-  border: 1px solid #ddd; 
+  margin: 0;
+  border: 1px solid #ddd;
 }
 
 .attendance-title {
   margin: 0;
-  font-size: 1.2rem;
+  font-size: 1rem; /* smaller */
   color: #333;
 }
 
 .attendance-date {
-  font-size: 0.875rem;
-  color: #6b7280; /* gray-500 */
-  margin-bottom: 1rem;
+  font-size: 0.75rem; /* smaller */
+  color: #6b7280;
+  margin-bottom: 0.5rem;
 }
 
 .attendance-progress {
@@ -37,22 +36,22 @@
 }
 
 .total-hours-label {
-  font-size: 0.75rem;
-  color: #6b7280; /* gray-500 */
+  font-size: 0.65rem; /* smaller */
+  color: #6b7280;
 }
 
 .total-hours-value {
-  font-size: 1rem;
+  font-size: 0.85rem; /* smaller */
   font-weight: 600;
 }
 
 .punch-in-text {
-  margin-top: 1rem;
-  font-size: 0.875rem;
+  margin-top: 0.5rem;
+  font-size: 0.75rem; /* smaller */
   color: #6b7280;
 }
 
 .punch-in-time {
   font-weight: 500;
-  color: #111827; /* gray-900 */
+  color: #111827;
 }

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { PieChart, Pie, Cell } from "recharts";
-import "./User_Profile_Attendance.css"; // optional if you want separate CSS
+import "./User_Profile_Attendance.css";
 
 interface UserProfileAttendanceProps {
   punchInTime: string; // format "HH:mm", e.g., "09:00"
@@ -44,20 +44,20 @@ const User_Profile_Attendance: React.FC<UserProfileAttendanceProps> = ({
   return (
     <div className="attendance-container">
       <h2 className="attendance-title">Attendance</h2>
-      <hr className="border-gray-300 my-4" />
+      <hr className="border-gray-300 my-2" />
       <p className="attendance-date">{todayDate}</p>
 
       <div className="attendance-progress">
-        <PieChart width={160} height={160}>
+        <PieChart width={120} height={120}>
           <Pie
             data={data}
             cx="50%"
             cy="50%"
-            innerRadius={55}
-            outerRadius={75}
+            innerRadius={40}  // smaller
+            outerRadius={55}  // smaller
             startAngle={90}
             endAngle={-270}
-            paddingAngle={3}
+            paddingAngle={2}
             dataKey="value"
           >
             {data.map((_entry, index) => (
@@ -72,7 +72,8 @@ const User_Profile_Attendance: React.FC<UserProfileAttendanceProps> = ({
           </p>
         </div>
       </div>
-        <hr className="border-gray-300 my-4" />
+
+      <hr className="border-gray-300 my-2" />
       <p className="punch-in-text">
         Punch In at: <span className="punch-in-time">{punchInTime}</span>
       </p>

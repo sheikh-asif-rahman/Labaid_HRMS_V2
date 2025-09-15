@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import "./index.css"; // <-- this is required!
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
@@ -13,9 +13,24 @@ import DepartmentSetup from "./pages/Department_Setup";
 import DesignationSetup from "./pages/Designation_Setup";
 import EmployeeApproval from "./pages/Employee_Approval";
 import RulesPermission from "./pages/Rules_Permission";
-import LeaveApproval from "./pages/Leave_Approval"; // <-- new import
+import LeaveApproval from "./pages/Leave_Approval";
+
+import Login_Page from "./pages/Login_Page";
 
 const App: React.FC = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const handleLogin = () => {
+    // You can replace this with real authentication logic
+    setIsLoggedIn(true);
+  };
+
+  if (!isLoggedIn) {
+    // Show login page first
+    return <Login_Page onLogin={handleLogin} />;
+  }
+
+  // After login, show the main app
   return (
     <BrowserRouter>
       <Routes>
@@ -27,7 +42,7 @@ const App: React.FC = () => {
           <Route path="departmentsetup" element={<DepartmentSetup />} />
           <Route path="designationsetup" element={<DesignationSetup />} />
           <Route path="employeeapproval" element={<EmployeeApproval />} />
-          <Route path="leaveapproval" element={<LeaveApproval />} /> {/* <-- new route */}
+          <Route path="leaveapproval" element={<LeaveApproval />} />
           <Route path="rulespermission" element={<RulesPermission />} />
           <Route path="reports" element={<Reports />} />
         </Route>

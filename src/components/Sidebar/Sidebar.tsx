@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   FaHome,
   FaUserShield,
@@ -19,6 +19,7 @@ import "./Sidebar.css";
 
 const Sidebar: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate(); // For Logout navigation
   const adminRef = useRef<HTMLDivElement>(null);
 
   // Admin paths for dropdown auto-open
@@ -52,13 +53,18 @@ const Sidebar: React.FC = () => {
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
-    return () =>
-      document.removeEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   // Close dropdown when any dropdown link is clicked
   const handleDropdownLinkClick = () => {
     setIsAdminOpen(false);
+  };
+
+  // Logout handler
+  const handleLogout = () => {
+    // TODO: clear any authentication state if needed
+    navigate("/login"); // Redirect to login page
   };
 
   return (
@@ -151,36 +157,6 @@ const Sidebar: React.FC = () => {
           </div>
         </div>
 
-        <NavLink
-          to="/employee"
-          className={({ isActive }) =>
-            `sidebar-link ${isActive ? "active-link" : ""}`
-          }
-        >
-          <FaUsers className="sidebar-icon" />
-          <span>Employee</span>
-        </NavLink>
-
-        <NavLink
-          to="/leavemanagement"
-          className={({ isActive }) =>
-            `sidebar-link ${isActive ? "active-link" : ""}`
-          }
-        >
-          <FaCalendarCheck className="sidebar-icon" />
-          <span>Leave Management</span>
-        </NavLink>
-
-        <NavLink
-          to="/yearlycalander"
-          className={({ isActive }) =>
-            `sidebar-link ${isActive ? "active-link" : ""}`
-          }
-        >
-          <FaCalendarAlt className="sidebar-icon" />
-          <span>Yearly Calendar</span>
-        </NavLink>
-
         {/* Reports */}
         <NavLink
           to="/reports"
@@ -191,11 +167,44 @@ const Sidebar: React.FC = () => {
           <FaChartBar className="sidebar-icon" />
           <span>Reports</span>
         </NavLink>
+
+        {/* Employee */}
+        <NavLink
+          to="/employee"
+          className={({ isActive }) =>
+            `sidebar-link ${isActive ? "active-link" : ""}`
+          }
+        >
+          <FaUsers className="sidebar-icon" />
+          <span>Employee</span>
+        </NavLink>
+
+        {/* Leave Management */}
+        <NavLink
+          to="/leavemanagement"
+          className={({ isActive }) =>
+            `sidebar-link ${isActive ? "active-link" : ""}`
+          }
+        >
+          <FaCalendarCheck className="sidebar-icon" />
+          <span>Leave Management</span>
+        </NavLink>
+
+        {/* Yearly Calendar */}
+        <NavLink
+          to="/yearlycalander"
+          className={({ isActive }) =>
+            `sidebar-link ${isActive ? "active-link" : ""}`
+          }
+        >
+          <FaCalendarAlt className="sidebar-icon" />
+          <span>Yearly Calendar</span>
+        </NavLink>
       </div>
 
       {/* Logout at bottom */}
       <div className="sidebar-footer">
-        <button className="sidebar-link logout-btn">
+        <button className="sidebar-link logout-btn" onClick={handleLogout}>
           <FaSignOutAlt className="sidebar-icon" />
           <span>Logout</span>
         </button>

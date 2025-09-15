@@ -1,0 +1,83 @@
+/* Container split into left/right */
+.login-container {
+  display: flex;
+  width: 900px;
+  height: 500px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+/* Left Side: Form - 40% */
+.login-form {
+  flex: 0 0 40%; /* 40% width */
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-form .logo {
+  width: 70%;       /* fill width of left side */
+  height: 50px;      /* fixed height for cropping/zoom effect */
+  object-fit: cover; /* crop/zoom */
+  margin-bottom: 30px;
+  border-radius: 8px;
+}
+
+.form-group {
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+button[type="submit"] {
+  width: 100%;
+  padding: 12px;
+  background-color: #007bff;
+  color: white;
+  font-size: 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button[type="submit"]:hover {
+  background-color: #0056b3;
+}
+
+/* Right Side: Building Image - 60% */
+.login-image {
+  flex: 0 0 60%; /* 60% width */
+  display: flex;
+  position: relative; /* for overlay */
+  overflow: hidden;
+}
+
+.login-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* fills the space fully */
+}
+
+/* Dark overlay on image */
+.login-image::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+}

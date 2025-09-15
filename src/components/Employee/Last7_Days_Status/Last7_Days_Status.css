@@ -1,0 +1,64 @@
+.last7_days_status_container {
+  width: 100%;
+  height: 100%;
+  padding: 8px;        /* slightly smaller padding */
+  margin: 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.title {
+  margin: 0 0 6px 0;   /* smaller bottom spacing */
+  font-size: 14px;     /* smaller font */
+  font-weight: bold;
+  color: #333;
+}
+
+.attendance_list {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 4px;            /* smaller gap between rows */
+  padding: 0;
+  margin: 0;
+}
+
+.attendance_row {
+  display: flex;
+  align-items: center;
+  gap: 6px;            /* smaller gap between day, bar, and hours */
+}
+
+.day_label {
+  width: 60px;          /* slightly larger for date like "7-May" */
+  font-weight: 500;
+  font-size: 12px;      /* smaller font */
+  color: #555;
+}
+
+.progress_bar {
+  flex: 1;
+  height: 10px;         /* smaller height */
+  background-color: #e0e0e0;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.progress_fill {
+  height: 100%;
+  background-color: #4caf50;
+  border-radius: 6px 0 0 6px;
+  transition: width 0.5s ease;
+}
+
+.hours_label {
+  width: 35px;
+  text-align: right;
+  font-size: 12px;      /* smaller font */
+  color: #333;
+}
