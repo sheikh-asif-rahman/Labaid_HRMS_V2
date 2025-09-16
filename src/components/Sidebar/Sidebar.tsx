@@ -9,20 +9,23 @@ import {
   FaChevronDown,
   FaChevronUp,
   FaLock,
-  FaUserCheck,
   FaBriefcase,
   FaBuilding,
   FaChartBar,
+  FaChartLine,
   FaSignOutAlt,
 } from "react-icons/fa";
 import "./Sidebar.css";
 
-const Sidebar: React.FC = () => {
+interface SidebarProps {
+  onLogout?: () => void;
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ onLogout }) => {
   const location = useLocation();
-  const navigate = useNavigate(); // For Logout navigation
+  const navigate = useNavigate();
   const adminRef = useRef<HTMLDivElement>(null);
 
-  // Admin paths for dropdown auto-open
   const adminPaths = [
     "/rulespermission",
     "/leaveapproval",
@@ -36,15 +39,10 @@ const Sidebar: React.FC = () => {
 
   const [isAdminOpen, setIsAdminOpen] = useState(false);
 
-  // Auto-open dropdown on first load if current path is admin
   useEffect(() => {
-    if (isAdminActive) {
-      setIsAdminOpen(true);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    if (isAdminActive) setIsAdminOpen(true);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (adminRef.current && !adminRef.current.contains(e.target as Node)) {
@@ -52,16 +50,24 @@ const Sidebar: React.FC = () => {
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    return () =>
+      document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Close dropdown when any dropdown link is clicked
-  const handleDropdownLinkClick = () => {
-    setIsAdminOpen(false);
+  const handleDropdownLinkClick = () => setIsAdminOpen(false);
+
+  const handleLogoutClick = () => {
+    if (onLogout) {
+      onLogout();
+    } else {
+      navigate("/");
+      window.location.reload();
+    }
   };
 
   return (
     <aside className="sidebar">
+
       <div className="sidebar-main">
         <NavLink
           to="/"
@@ -72,6 +78,16 @@ const Sidebar: React.FC = () => {
         >
           <FaHome className="sidebar-icon" />
           <span>Home</span>
+        </NavLink>
+
+        <NavLink
+          to="/overview"
+          className={({ isActive }) =>
+            `sidebar-link ${isActive ? "active-link" : ""}`
+          }
+        >
+          <FaChartLine className="sidebar-icon" />
+          <span>Overview</span>
         </NavLink>
 
         {/* Admin dropdown */}
@@ -85,11 +101,7 @@ const Sidebar: React.FC = () => {
           >
             <FaUserShield className="sidebar-icon" />
             <span>Admin</span>
-            {isAdminOpen ? (
-              <FaChevronUp className="chevron" />
-            ) : (
-              <FaChevronDown className="chevron" />
-            )}
+            {isAdminOpen ? <FaChevronUp className="chevron" /> : <FaChevronDown className="chevron" />}
           </button>
 
           <div className={`dropdown-menu ${isAdminOpen ? "open" : ""}`}>
@@ -139,7 +151,6 @@ const Sidebar: React.FC = () => {
           </div>
         </div>
 
-        {/* Reports */}
         <NavLink
           to="/reports"
           className={({ isActive }) =>
@@ -150,7 +161,6 @@ const Sidebar: React.FC = () => {
           <span>Reports</span>
         </NavLink>
 
-        {/* Employee */}
         <NavLink
           to="/employee"
           className={({ isActive }) =>
@@ -161,7 +171,6 @@ const Sidebar: React.FC = () => {
           <span>Employee</span>
         </NavLink>
 
-        {/* Leave Management */}
         <NavLink
           to="/leavemanagement"
           className={({ isActive }) =>
@@ -172,7 +181,6 @@ const Sidebar: React.FC = () => {
           <span>Leave Management</span>
         </NavLink>
 
-        {/* Yearly Calendar */}
         <NavLink
           to="/yearlycalander"
           className={({ isActive }) =>
@@ -184,9 +192,9 @@ const Sidebar: React.FC = () => {
         </NavLink>
       </div>
 
-      {/* Logout at bottom */}
+      {/* Logout */}
       <div className="sidebar-footer">
-        <button className="sidebar-link logout-btn" >
+        <button className="sidebar-link logout-btn" onClick={handleLogoutClick}>
           <FaSignOutAlt className="sidebar-icon" />
           <span>Logout</span>
         </button>
