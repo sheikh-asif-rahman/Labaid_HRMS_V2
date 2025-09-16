@@ -14,13 +14,13 @@ const Reports_Form: React.FC<Props> = ({
   dataFetched,
   setDataFetched,
 }) => {
-
   const handleReportChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setReportType(e.target.value);
     setDataFetched(false);
   };
 
   const handleGetData = () => setDataFetched(true);
+
   const handleReset = () => {
     setReportType("");
     setDataFetched(false);
@@ -32,12 +32,12 @@ const Reports_Form: React.FC<Props> = ({
     reportType === "leave";
 
   return (
-    <div className="report-form-container">
+    <div className="reports-form-container">
       {/* Header */}
-      <div className="report-header">
-        <h3 className="report-title">Reports</h3>
+      <div className="reports-form-header">
+        <h3 className="reports-form-title">Reports</h3>
         <select
-          className="report-dropdown"
+          className="reports-form-dropdown"
           value={reportType}
           onChange={handleReportChange}
         >
@@ -50,8 +50,8 @@ const Reports_Form: React.FC<Props> = ({
       </div>
 
       {/* Options Section */}
-      <div className="report-options">
-        <div className="form-group">
+      <div className="reports-form-options">
+        <div className="reports-form-group">
           <label>Select Facility</label>
           <select disabled={!reportType}>
             <option value="">Select Facility</option>
@@ -60,27 +60,31 @@ const Reports_Form: React.FC<Props> = ({
           </select>
         </div>
 
-        <div className="form-group">
+        <div className="reports-form-group">
           <label>User ID (Optional)</label>
-          <input type="text" placeholder="Enter User ID" disabled={!isGeneralReport} />
+          <input
+            type="text"
+            placeholder="Enter User ID"
+            disabled={!isGeneralReport}
+          />
         </div>
 
-        <div className="form-group">
+        <div className="reports-form-group">
           <label>From Date</label>
           <input type="date" disabled={!isGeneralReport} />
         </div>
 
-        <div className="form-group">
+        <div className="reports-form-group">
           <label>To Date</label>
           <input type="date" disabled={!isGeneralReport} />
         </div>
       </div>
 
       {/* Buttons */}
-      <div className="report-buttons">
+      <div className="reports-form-buttons">
         {!dataFetched ? (
           <button
-            className="btn btn-blue"
+            className="reports-form-btn reports-form-btn-blue"
             onClick={handleGetData}
             disabled={!reportType}
           >
@@ -88,8 +92,13 @@ const Reports_Form: React.FC<Props> = ({
           </button>
         ) : (
           <>
-            <button className="btn btn-blue">Download</button>
-            <button className="btn btn-gray" onClick={handleReset}>
+            <button className="reports-form-btn reports-form-btn-blue">
+              Download
+            </button>
+            <button
+              className="reports-form-btn reports-form-btn-gray"
+              onClick={handleReset}
+            >
               Reset
             </button>
           </>

@@ -1,78 +1,91 @@
-.leave-container {
+.leave-app-container {
   width: 100%;
   background: #ffffff;
-  padding: 20px;
+  padding: 16px;
   box-sizing: border-box;
   color: #000000;
   font-family: Arial, sans-serif;
-  border-radius: 12px; /* Rounded corners */
+  border-radius: 10px;
   box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
 }
 
-.leave-header {
+.leave-app-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 15px;
+  margin-bottom: 12px;
 }
 
-.leave-header h2 {
+.leave-app-header h2 {
   margin: 0;
-  font-size: 18px;
+  font-size: 16px;
 }
 
-.save-btn {
+.leave-app-save-btn {
   background-color: #0115a9;
   color: #ffffff;
   border: none;
-  padding: 6px 14px;
+  padding: 5px 12px;
   border-radius: 6px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 13px;
 }
 
-.save-btn:hover {
+.leave-app-save-btn:hover {
   background-color: #00008b;
 }
 
-.leave-form {
+.leave-app-form {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
-.form-row {
+.leave-app-row {
   display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
+  gap: 8px;
+  flex-wrap: nowrap;
 }
 
-.form-group {
+.leave-app-group {
   display: flex;
   flex-direction: column;
-  flex: 1 1 calc(20% - 10px);
-  min-width: 150px;
+  flex: 1;
+  min-width: 120px;
 }
 
-.form-group.large {
-  flex: 1 1 calc(50% - 10px);
+.leave-app-group.small {
+  flex: 0.6; /* smaller for Leave Balance */
+  min-width: 80px;
 }
 
-.form-group label {
-  font-size: 12px;
-  margin-bottom: 4px;
+.leave-app-group.large {
+  flex: 2; /* wide for Purpose */
+  min-width: 200px;
 }
 
-.form-group input {
-  padding: 4px 6px;
-  font-size: 12px;
+.leave-app-group.medium {
+  flex: 1; /* medium for Alternative Person */
+  min-width: 120px;
+}
+
+.leave-app-group label {
+  font-size: 11px;
+  margin-bottom: 3px;
+}
+
+.leave-app-group input,
+.leave-app-group textarea {
+  padding: 3px 5px;
+  font-size: 11px;
   border: 1px solid #ccc;
   border-radius: 3px;
   background: #ffffff;
   color: #000000;
+  resize: none;
 }
 
-.form-group input[readonly] {
+.leave-app-group input[readonly] {
   background: #f8f8f8;
   color: #000000;
   cursor: default;

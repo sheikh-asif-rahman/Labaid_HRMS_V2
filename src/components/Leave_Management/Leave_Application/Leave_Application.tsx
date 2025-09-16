@@ -21,6 +21,7 @@ const Leave_Application: React.FC = () => {
   const userInfo = {
     userId: "EMP12345",
     userName: "Asif Rahman",
+    facility: "Head Office",
     department: "IT",
     designation: "Developer",
     dateOfJoining: "2022-01-15",
@@ -30,50 +31,54 @@ const Leave_Application: React.FC = () => {
   };
 
   return (
-    <div className="leave-container">
-      <div className="leave-header">
+    <div className="leave-app-container">
+      <div className="leave-app-header">
         <h2>Leave Form</h2>
-        <button className="save-btn" onClick={handleSave}>Save</button>
+        <button className="leave-app-save-btn" onClick={handleSave}>
+          Save
+        </button>
       </div>
 
-      <div className="leave-form">
-        <div className="form-row">
-          <div className="form-group">
+      <div className="leave-app-form">
+        {/* Row 1 */}
+        <div className="leave-app-row">
+          <div className="leave-app-group">
             <label>User ID</label>
             <input type="text" value={userInfo.userId} readOnly />
           </div>
-          <div className="form-group">
+          <div className="leave-app-group">
             <label>User Name</label>
             <input type="text" value={userInfo.userName} readOnly />
           </div>
-          <div className="form-group">
+          <div className="leave-app-group">
+            <label>Facility</label>
+            <input type="text" value={userInfo.facility} readOnly />
+          </div>
+          <div className="leave-app-group">
             <label>Department</label>
             <input type="text" value={userInfo.department} readOnly />
           </div>
-          <div className="form-group">
+          <div className="leave-app-group">
             <label>Designation</label>
             <input type="text" value={userInfo.designation} readOnly />
           </div>
-          <div className="form-group">
+        </div>
+
+        {/* Row 2 */}
+        <div className="leave-app-row">
+          <div className="leave-app-group">
             <label>Date of Joining</label>
             <input type="text" value={userInfo.dateOfJoining} readOnly />
           </div>
-        </div>
-
-        <div className="form-row">
-          <div className="form-group">
-            <label>Leave Balance</label>
-            <input type="text" value={userInfo.leaveBalance} readOnly />
-          </div>
-          <div className="form-group">
+          <div className="leave-app-group">
             <label>Leave Enjoyed</label>
             <input type="text" value={userInfo.leaveEnjoyed} readOnly />
           </div>
-          <div className="form-group">
+          <div className="leave-app-group">
             <label>Leave Required</label>
             <input type="text" value={userInfo.leaveRequired} readOnly />
           </div>
-          <div className="form-group">
+          <div className="leave-app-group">
             <label>From Date</label>
             <input
               type="date"
@@ -82,7 +87,7 @@ const Leave_Application: React.FC = () => {
               onChange={handleChange}
             />
           </div>
-          <div className="form-group">
+          <div className="leave-app-group">
             <label>To Date</label>
             <input
               type="date"
@@ -93,8 +98,13 @@ const Leave_Application: React.FC = () => {
           </div>
         </div>
 
-        <div className="form-row">
-          <div className="form-group large">
+        {/* Row 3 */}
+        <div className="leave-app-row">
+          <div className="leave-app-group small">
+            <label>Leave Balance</label>
+            <input type="text" value={userInfo.leaveBalance} readOnly />
+          </div>
+          <div className="leave-app-group large">
             <label>Purpose of Leave</label>
             <input
               type="text"
@@ -103,7 +113,7 @@ const Leave_Application: React.FC = () => {
               onChange={handleChange}
             />
           </div>
-          <div className="form-group large">
+          <div className="leave-app-group medium">
             <label>Alternative Person</label>
             <input
               type="text"

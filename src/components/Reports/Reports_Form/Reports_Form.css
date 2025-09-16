@@ -1,13 +1,13 @@
-/* Main Container - Full Width */
-.report-form-container {
+/* Main Container */
+.reports-form-container {
   width: 100%;
   max-width: 100%;
   margin: 0;
   padding: 20px 40px;
   background: var(--white);
   border-radius: 8px;
-  border: 1px solid #ccc;   
-  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   font-size: 13px;
   color: var(--dark);
@@ -15,20 +15,20 @@
 }
 
 /* Header */
-.report-header {
+.reports-form-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 15px;
 }
 
-.report-title {
+.reports-form-title {
   font-size: 1.25rem;
   font-weight: 600;
   color: #333;
 }
 
-.report-dropdown {
+.reports-form-dropdown {
   padding: 5px 8px;
   border-radius: 5px;
   border: 1px solid var(--secondary);
@@ -37,28 +37,28 @@
   color: var(--dark);
 }
 
-/* Options Section - Single Row Layout */
-.report-options {
+/* Options Section */
+.reports-form-options {
   display: flex;
   gap: 12px;
   margin-bottom: 15px;
 }
 
-.form-group {
+.reports-form-group {
   display: flex;
   flex-direction: column;
-  flex: 1; /* equal width for all fields */
+  flex: 1;
 }
 
-.form-group label {
+.reports-form-group label {
   font-size: 11px;
   font-weight: 500;
   margin-bottom: 2px;
   color: var(--secondary);
 }
 
-.form-group input,
-.form-group select {
+.reports-form-group input,
+.reports-form-group select {
   padding: 4px 8px;
   border-radius: 4px;
   border: 1px solid var(--secondary);
@@ -68,75 +68,71 @@
   transition: background 0.2s ease, border 0.2s ease;
 }
 
-.form-group input:focus,
-.form-group select:focus {
+.reports-form-group input:focus,
+.reports-form-group select:focus {
   border-color: var(--primary);
   outline: none;
   box-shadow: 0 0 4px rgba(1, 21, 169, 0.25);
 }
 
-.form-group input:disabled,
-.form-group select:disabled {
+.reports-form-group input:disabled,
+.reports-form-group select:disabled {
   background: var(--light);
   color: var(--secondary);
   cursor: not-allowed;
   opacity: 0.9;
 }
 
-/* Buttons Section */
-.report-buttons {
+/* Buttons */
+.reports-form-buttons {
   display: flex;
   gap: 8px;
   justify-content: flex-end;
   flex-wrap: wrap;
 }
 
-/* Blue Buttons (Get Data & Download) */
-.btn.btn-blue {
+/* General Button Styles */
+.reports-form-btn {
   padding: 6px 14px;
   font-size: 12px;
   font-weight: 500;
   border-radius: 0.5rem;
-  border: none; /* active state has no border */
+  cursor: pointer;
+  min-width: 100px;
+  transition: background-color 0.2s, border 0.2s;
+  border: none;
+}
+
+/* Blue Button */
+.reports-form-btn-blue {
   background-color: var(--primary);
   color: var(--white);
-  cursor: pointer;
-  transition: background-color 0.2s, border 0.2s;
-  min-width: 100px;
 }
 
-.btn.btn-blue:hover {
-  background-color: #010f8c; /* slightly darker blue */
+.reports-form-btn-blue:hover {
+  background-color: #010f8c;
 }
 
-/* Disabled Blue Button (Get Data inactive) */
-.btn.btn-blue:disabled {
-  background-color: var(--white);       /* white background */
-  color: var(--secondary);              /* gray text */
-  border: 1px solid var(--secondary);   /* subtle border */
+/* Disabled Blue Button */
+.reports-form-btn-blue:disabled {
+  background-color: var(--white);
+  color: var(--secondary);
+  border: 1px solid var(--secondary);
   cursor: not-allowed;
 }
 
-/* Gray Button (Reset) */
-.btn.btn-gray {
-  padding: 6px 14px;
-  font-size: 12px;
-  font-weight: 500;
-  border-radius: 0.5rem;
-  border: none;
+/* Gray Button */
+.reports-form-btn-gray {
   background-color: var(--secondary);
   color: var(--white);
-  cursor: pointer;
-  transition: background-color 0.2s;
-  min-width: 100px;
 }
 
-.btn.btn-gray:hover {
-  background-color: #5a6268; /* slightly darker gray */
+.reports-form-btn-gray:hover {
+  background-color: #5a6268;
 }
 
-/* Disabled Buttons */
-.btn:disabled {
+/* Disabled General Buttons */
+.reports-form-btn:disabled {
   background-color: var(--light);
   color: var(--secondary);
   cursor: not-allowed;

@@ -11,7 +11,6 @@ import Reports from "./pages/Reports";
 
 import DepartmentSetup from "./pages/Department_Setup";
 import DesignationSetup from "./pages/Designation_Setup";
-import EmployeeApproval from "./pages/Employee_Approval";
 import RulesPermission from "./pages/Rules_Permission";
 import LeaveApproval from "./pages/Leave_Approval";
 
@@ -41,7 +40,6 @@ const App: React.FC = () => {
           <Route path="leavemanagement" element={<LeaveManagement />} />
           <Route path="departmentsetup" element={<DepartmentSetup />} />
           <Route path="designationsetup" element={<DesignationSetup />} />
-          <Route path="employeeapproval" element={<EmployeeApproval />} />
           <Route path="leaveapproval" element={<LeaveApproval />} />
           <Route path="rulespermission" element={<RulesPermission />} />
           <Route path="reports" element={<Reports />} />

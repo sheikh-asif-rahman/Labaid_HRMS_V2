@@ -25,7 +25,6 @@ const Sidebar: React.FC = () => {
   // Admin paths for dropdown auto-open
   const adminPaths = [
     "/rulespermission",
-    "/employeeapproval",
     "/leaveapproval",
     "/designationsetup",
     "/departmentsetup",
@@ -59,12 +58,6 @@ const Sidebar: React.FC = () => {
   // Close dropdown when any dropdown link is clicked
   const handleDropdownLinkClick = () => {
     setIsAdminOpen(false);
-  };
-
-  // Logout handler
-  const handleLogout = () => {
-    // TODO: clear any authentication state if needed
-    navigate("/login"); // Redirect to login page
   };
 
   return (
@@ -109,17 +102,6 @@ const Sidebar: React.FC = () => {
             >
               <FaLock className="sidebar-icon" />
               <span>Rules & Permission</span>
-            </NavLink>
-
-            <NavLink
-              to="/employeeapproval"
-              onClick={handleDropdownLinkClick}
-              className={({ isActive }) =>
-                `sidebar-sublink ${isActive ? "active-sublink" : ""}`
-              }
-            >
-              <FaUserCheck className="sidebar-icon" />
-              <span>Employee Approval</span>
             </NavLink>
 
             <NavLink
@@ -204,7 +186,7 @@ const Sidebar: React.FC = () => {
 
       {/* Logout at bottom */}
       <div className="sidebar-footer">
-        <button className="sidebar-link logout-btn" onClick={handleLogout}>
+        <button className="sidebar-link logout-btn" >
           <FaSignOutAlt className="sidebar-icon" />
           <span>Logout</span>
         </button>
