@@ -11,7 +11,9 @@ interface Facility {
   absent: number;
 }
 
-const COLORS = ["#4caf50", "#ff9800", "#f44336", "#d3d3d3"];
+// Updated COLORS according to your theme
+const COLORS = ["#0115a9ff", "#9b59b6", "#ff3399", "#c5c5c5"]; 
+// order: attendance, leave, absent, remaining
 
 const Overview_Cards: React.FC = () => {
   const [facilities, setFacilities] = useState<Facility[]>([]);
@@ -77,9 +79,9 @@ const Overview_Cards: React.FC = () => {
             </div>
 
             <div className="legend-custom">
-              <div><span className="dot green"></span> Attendance: {facility.attendance}</div>
-              <div><span className="dot orange"></span> Leave: {facility.leave}</div>
-              <div><span className="dot red"></span> Absent: {facility.absent}</div>
+              <div><span className="dot attendance"></span> Attendance: {facility.attendance}</div>
+              <div><span className="dot on-leave"></span> Leave: {facility.leave}</div>
+              <div><span className="dot absent"></span> Absent: {facility.absent}</div>
               <div><span className="dot gray"></span> Remaining: {remaining}</div>
             </div>
           </div>

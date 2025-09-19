@@ -44,14 +44,14 @@
 .progress_bar {
   flex: 1;
   height: 10px;         /* smaller height */
-  background-color: #e0e0e0;
+  background-color: #c5c5c5;
   border-radius: 6px;
   overflow: hidden;
 }
 
 .progress_fill {
   height: 100%;
-  background-color: #4caf50;
+  background-color: #0115a9ff;
   border-radius: 6px 0 0 6px;
   transition: width 0.5s ease;
 }

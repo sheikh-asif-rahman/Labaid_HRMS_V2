@@ -1,49 +1,61 @@
+/* -----------------------------
+   Leave Approval Card Styles
+   ----------------------------- */
 .leave-approval-card {
   background: var(--white);
-  padding: 16px;
+  padding: 12px;
   border-radius: 12px;
   box-shadow: 0 4px 15px rgba(0,0,0,0.08);
   font-family: "Segoe UI", sans-serif;
-  font-size: 12px;
+  font-size: 11px; /* smaller overall font */
   color: var(--dark);
   border: 1px solid #ddd;
 }
 
+/* Header */
 .leave-approval-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .leave-approval-header h2 {
   margin: 0;
-  font-size: 1.2rem;
+  font-size: 1rem; /* smaller header font */
   color: #333;
 }
 
+/* Header Actions */
 .leave-approval-actions {
   display: flex;
-  gap: 8px;
+  gap: 6px;
+}
+
+.leave-approval-actions input[type="date"] {
+  padding: 2px 6px;
+  font-size: 11px;
+  border-radius: 6px;
+  border: 1px solid var(--secondary);
 }
 
 .leave-approval-actions select {
-  padding: 4px 8px;
+  padding: 2px 6px; /* reduced padding */
   border-radius: 6px;
   border: 1px solid var(--secondary);
   background: var(--light);
-  font-size: 12px;
+  font-size: 11px; /* smaller font */
   color: var(--dark);
   cursor: pointer;
 }
 
 .leave-approval-actions button {
-  padding: 4px 10px;
+  padding: 2px 8px; /* smaller button padding */
   border-radius: 6px;
   border: none;
   cursor: pointer;
   font-weight: 500;
-  font-size: 12px;
+  font-size: 11px; /* smaller font */
   transition: 0.2s;
 }
 
@@ -65,6 +77,9 @@
   background: #c82333;
 }
 
+/* -----------------------------
+   Table Styles
+   ----------------------------- */
 .leave-approval-table-wrapper {
   overflow-x: auto;
 }
@@ -73,14 +88,14 @@
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  border-radius: 10px;
-  font-size: 12px;
+  border-radius: 8px;
+  font-size: 11px; /* smaller table font */
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
 .leave-approval-table th,
 .leave-approval-table td {
-  padding: 10px 14px;
+  padding: 6px 10px; /* smaller padding */
   text-align: left;
 }
 
@@ -88,7 +103,7 @@
   background: linear-gradient(90deg, var(--primary), #2a33c7);
   color: var(--white);
   font-weight: 600;
-  font-size: 12px;
+  font-size: 11px; /* smaller header font */
 }
 
 .leave-approval-table tbody tr {
@@ -100,16 +115,17 @@
 
 .leave-approval-table tbody tr:hover {
   background-color: #e0e7ff;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
 }
 
+/* Checkbox Styling */
 .leave-approval-table input[type="checkbox"] {
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
-  width: 16px;
-  height: 16px;
+  width: 14px; /* smaller */
+  height: 14px; /* smaller */
   border: 2px solid var(--secondary);
   border-radius: 4px;
   background-color: var(--white);
@@ -139,35 +155,29 @@
   transform: rotate(45deg);
 }
 
-/* Pagination */
+/* -----------------------------
+   Pagination
+   ----------------------------- */
 .leave-approval-pagination {
-  margin-top: 16px;
+  margin-top: 12px;
   display: flex;
-  justify-content: flex-end; /* align pagination to right */
+  justify-content: center; /* center horizontally */
   gap: 6px;
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .leave-approval-pagination button {
-  padding: 4px 10px;
+  padding: 2px 6px; /* smaller buttons */
   border-radius: 50px;
   border: 1px solid var(--secondary);
   background: var(--white);
   cursor: pointer;
   transition: 0.2s;
-  font-size: 11px;
+  font-size: 10px; /* smaller font */
   color: var(--dark);
 }
 
 .leave-approval-pagination button:hover {
   background: var(--primary);
   color: var(--white);
-}
-
-.leave-approval-pagination {
-  margin-top: 16px;
-  display: flex;
-  justify-content: center; /* <-- center it horizontally */
-  gap: 6px;
-  font-size: 12px;
 }

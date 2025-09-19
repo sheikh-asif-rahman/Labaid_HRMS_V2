@@ -1,3 +1,4 @@
+/* Container for all overview cards */
 .overview-container {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -26,7 +27,7 @@
 /* Facility 5: light lavender-blue + periodic bounce + primary border */
 .my-facility {
   background: rgba(230, 230, 250, 0.6); /* light lavender-blue */
-  border: 2px solid var(--primary);   /* primary blue border */
+  border: 2px solid var(--primary);      /* primary blue border */
   animation: periodic-bounce 4s ease-in-out infinite;
 }
 
@@ -70,7 +71,7 @@
   font-size: 16px;
 }
 
-/* Legend dots */
+/* Legend styling */
 .legend-custom {
   margin-top: 12px;
   font-size: 12px; /* slightly smaller */
@@ -84,10 +85,11 @@
   margin-right: 6px;
 }
 
-.green { background-color: #4caf50; }
-.orange { background-color: #ff9800; }
-.red { background-color: #f44336; }
-.gray { background-color: #d3d3d3; }
+/* Legend colors */
+.attendance { background-color: #0115a9ff; } /* primary blue */
+.on-leave   { background-color: #9b59b6; }   /* stronger lavender/purple */
+.absent     { background-color: #ff3399; }   /* hot red-pink */
+.gray       { background-color: #c5c5c5; }   /* default gray */
 
 /* Hover effect for all cards */
 .overview-card:hover {

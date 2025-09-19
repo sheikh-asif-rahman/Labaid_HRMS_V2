@@ -39,7 +39,7 @@ const User_Profile_Attendance: React.FC<UserProfileAttendanceProps> = ({
     { name: "Remaining", value: Math.max(totalShiftHours - workedHours, 0) },
   ];
 
-  const COLORS = ["#4CAF50", "#E0E0E0"];
+  const COLORS = ["#0115a9ff", "#c5c5c5"];
 
   return (
     <div className="attendance-container">

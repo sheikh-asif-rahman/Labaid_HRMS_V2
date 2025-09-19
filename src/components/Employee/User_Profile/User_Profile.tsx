@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { FaUserCircle } from "react-icons/fa";
 import "./User_Profile.css";
 
 const User_Profile: React.FC = () => {
@@ -65,7 +66,9 @@ const User_Profile: React.FC = () => {
             {profilePic ? (
               <img src={profilePic} alt="Profile" className="upf-pic" />
             ) : (
-              <div className="upf-placeholder">👤</div>
+              <div className="upf-placeholder">
+                <FaUserCircle size={80} color="#ccc" />
+              </div>
             )}
             <input
               type="file"
