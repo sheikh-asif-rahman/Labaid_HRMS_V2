@@ -15,6 +15,7 @@ import {
   FaChartLine,
   FaSignOutAlt,
 } from "react-icons/fa";
+import { useAuth } from "../../context/AuthContext"; // context import
 import "./Sidebar.css";
 
 interface SidebarProps {
@@ -24,6 +25,7 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ onLogout }) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { logout } = useAuth(); // context থেকে logout
   const adminRef = useRef<HTMLDivElement>(null);
 
   const adminPaths = [
@@ -58,16 +60,15 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout }) => {
 
   const handleLogoutClick = () => {
     if (onLogout) {
-      onLogout();
+      onLogout(); // parent থেকে provided logout
     } else {
-      navigate("/");
-      window.location.reload();
+      logout();        // context logout, localStorage clear
+      navigate("/");   // redirect login page
     }
   };
 
   return (
     <aside className="sidebar">
-
       <div className="sidebar-main">
         <NavLink
           to="/"

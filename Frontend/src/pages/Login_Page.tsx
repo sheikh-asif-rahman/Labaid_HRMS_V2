@@ -1,41 +1,31 @@
 import React from "react";
-import Login from "../components/Login/Login"; // Adjust path if needed
-import Background from "../components/Background/Background"; // Import the bubble background
+import { useNavigate } from "react-router-dom";
+import Login from "../components/Login/Login";
+import Background from "../components/Background/Background";
 
-interface LoginPageProps {
-  onLogin?: () => void;
-}
+const Login_Page: React.FC = () => {
+  const navigate = useNavigate();
 
-const Login_Page: React.FC<LoginPageProps> = ({ onLogin }) => {
+  const handleLogin = () => {
+    // সবসময় home page redirect
+    navigate("/", { replace: true });
+  };
+
   return (
-    <div
-      style={{
-        position: "relative",   // allow absolute background
-        width: "100%",
-        height: "100vh",
-        fontFamily: "Arial, sans-serif",
-        overflow: "hidden",
-      }}
-    >
-      {/* Background Bubbles */}
+    <div style={{ position: "relative", width: "100%", height: "100vh", overflow: "hidden" }}>
       <Background />
-
-      {/* Login Form centered */}
       <div
         style={{
-          position: "absolute",  // float above background
+          position: "absolute",
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
           width: "100%",
           maxWidth: "900px",
-          zIndex: 1,            // ensure it is above bubbles
+          zIndex: 1,
         }}
       >
-        <Login onLogin={onLogin || (() => {})} />
+        <Login onLogin={handleLogin} />
       </div>
     </div>
   );

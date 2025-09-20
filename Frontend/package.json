@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "axios": "^1.12.2",
     "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.13.1",
     "framer-motion": "^12.23.12",
@@ -22,8 +23,8 @@
   "devDependencies": {
     "@eslint/js": "^9.33.0",
     "@types/bootstrap": "^5.2.10",
-    "@types/react": "^19.1.10",
-    "@types/react-dom": "^19.1.7",
+    "@types/react": "^19.1.13",
+    "@types/react-dom": "^19.1.9",
     "@vitejs/plugin-react-swc": "^4.0.0",
     "eslint": "^9.33.0",
     "eslint-plugin-react-hooks": "^5.2.0",
