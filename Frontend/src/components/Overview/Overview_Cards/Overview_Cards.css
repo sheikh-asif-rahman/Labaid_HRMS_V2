@@ -1,4 +1,3 @@
-/* Container for all overview cards */
 .overview-container {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -6,7 +5,6 @@
   padding: 24px;
 }
 
-/* Base card */
 .overview-card {
   background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(10px);
@@ -15,38 +13,39 @@
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease, border 0.3s ease;
   position: relative;
-  border: 2px solid transparent; /* default */
-  cursor: pointer; /* cursor for the card */
+  border: 2px solid transparent;
+  cursor: pointer;
 }
 
-/* Apply pointer cursor to all child elements */
 .overview-card * {
   cursor: pointer;
 }
 
-/* Facility 5: light lavender-blue + periodic bounce + primary border */
-.my-facility {
-  background: rgba(230, 230, 250, 0.6); /* light lavender-blue */
-  border: 2px solid var(--primary);      /* primary blue border */
-  animation: periodic-bounce 4s ease-in-out infinite;
+.overview-card.highlight-card.my-facility {
+  animation: pulse 1.5s infinite, periodic-bounce 4s ease-in-out infinite;
+  border: 2px solid #ff9800;
+  box-shadow: 0 0 15px rgba(255, 152, 0, 0.6);
 }
 
-/* Bounce once per 4 seconds */
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+  100% { transform: scale(1); }
+}
+
 @keyframes periodic-bounce {
   0%, 80%, 100% { transform: translateY(0); }
   10% { transform: translateY(-10px); }
   20% { transform: translateY(0); }
 }
 
-/* Card header (facility name) */
 .overview-card h3 {
-  font-size: 14px; /* smaller font */
+  font-size: 14px;
   margin: 0 0 8px 0;
   text-align: center;
   font-weight: 600;
 }
 
-/* Chart center */
 .chart-wrapper {
   position: relative;
   display: flex;
@@ -54,9 +53,8 @@
   align-items: center;
 }
 
-/* Disable chart clicks */
 .chart-wrapper svg {
-  pointer-events: none; /* chart is not clickable */
+  pointer-events: none;
 }
 
 .chart-center {
@@ -71,10 +69,9 @@
   font-size: 16px;
 }
 
-/* Legend styling */
 .legend-custom {
   margin-top: 12px;
-  font-size: 12px; /* slightly smaller */
+  font-size: 12px;
 }
 
 .dot {
@@ -85,13 +82,11 @@
   margin-right: 6px;
 }
 
-/* Legend colors */
-.attendance { background-color: #0115a9ff; } /* primary blue */
-.on-leave   { background-color: #9b59b6; }   /* stronger lavender/purple */
-.absent     { background-color: #ff3399; }   /* hot red-pink */
-.gray       { background-color: #c5c5c5; }   /* default gray */
+.attendance { background-color: #0115a9ff; }
+.on-leave   { background-color: #9b59b6; }
+.absent     { background-color: #ff3399; }
+.gray       { background-color: #c5c5c5; }
 
-/* Hover effect for all cards */
 .overview-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);

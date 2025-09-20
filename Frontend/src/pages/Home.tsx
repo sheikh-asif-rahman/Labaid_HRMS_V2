@@ -25,7 +25,6 @@ const Home: React.FC = () => {
       try {
         setLoading(true);
 
-        // Fetch all APIs in parallel
         const [recentLeave, userProfile, todaysAttendance, monthStatus] =
           await Promise.all([
             axios.post(`${API_BASE_URL}recentleaveapplication`, { EmployeeId }),
@@ -43,26 +42,25 @@ const Home: React.FC = () => {
 
         setHomeData(allData);
 
-        // Log data in console
+        // Store in localStorage for Overview page
+        localStorage.setItem("homeData", JSON.stringify(allData));
+
         console.log("Recent Leave Applications:", recentLeave.data);
         console.log("User Profile:", userProfile.data);
         console.log("Today's Attendance:", todaysAttendance.data);
         console.log("This Month Status:", monthStatus.data);
 
-        setLoading(false); // only close loading when all APIs succeed
+        setLoading(false);
       } catch (err) {
-        console.error("Error fetching one or more home APIs:", err);
-        // loading stays true; popup never closes
+        console.error("Error fetching home APIs:", err);
       }
     };
 
     fetchData();
   }, []);
 
-  // Show loading popup until all 4 APIs succeed
   if (loading || !homeData) return <Popup isOpen={true} type="loading" />;
 
-  // Render all components
   return (
     <div
       style={{
@@ -87,7 +85,6 @@ const Home: React.FC = () => {
         }}
       >
         <Current_Month_Status />
-
         <div
           style={{
             display: "flex",
@@ -99,7 +96,6 @@ const Home: React.FC = () => {
           <div style={{ width: "35%" }}>
             <User_Profile_Attendance punchInTime="09:00" totalShiftHours={8} />
           </div>
-
           <div style={{ width: "65%" }}>
             <Recent_Applications />
           </div>
