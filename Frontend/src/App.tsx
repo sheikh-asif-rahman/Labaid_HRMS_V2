@@ -1,7 +1,12 @@
 import React, { type ReactNode } from "react";
-import "./index.css"
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
-import { AuthProvider, useAuth } from "./context/AuthContext";
+import "./index.css";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+} from "react-router-dom";
 import Login_Page from "./pages/Login_Page";
 import Home from "./pages/Home";
 import Overview from "./pages/Overview";
@@ -21,15 +26,17 @@ interface RequireAuthProps {
 }
 
 const RequireAuth: React.FC<RequireAuthProps> = ({ children }) => {
-  const { user } = useAuth();
   const location = useLocation();
 
+  // Check if user exists in localStorage
+  const user = localStorage.getItem("user");
+
   if (!user) {
-    // যদি login না থাকে → redirect to /login এবং original path state এ save হবে
+    // Not logged in → go to login
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  return <>{children}</>; // children render
+  return <>{children}</>; // Render protected content
 };
 
 // ---------------- App ----------------
@@ -49,78 +56,15 @@ const AppRoutes: React.FC = () => {
         }
       >
         <Route index element={<Home />} />
-        <Route
-          path="overview"
-          element={
-            <RequireAuth>
-              <Overview />
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="employee"
-          element={
-            <RequireAuth>
-              <Employee />
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="yearlycalander"
-          element={
-            <RequireAuth>
-              <YearlyCalander />
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="leavemanagement"
-          element={
-            <RequireAuth>
-              <LeaveManagement />
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="departmentsetup"
-          element={
-            <RequireAuth>
-              <DepartmentSetup />
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="designationsetup"
-          element={
-            <RequireAuth>
-              <DesignationSetup />
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="leaveapproval"
-          element={
-            <RequireAuth>
-              <LeaveApproval />
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="rulespermission"
-          element={
-            <RequireAuth>
-              <RulesPermission />
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="reports"
-          element={
-            <RequireAuth>
-              <Reports />
-            </RequireAuth>
-          }
-        />
+        <Route path="overview" element={<Overview />} />
+        <Route path="employee" element={<Employee />} />
+        <Route path="yearlycalander" element={<YearlyCalander />} />
+        <Route path="leavemanagement" element={<LeaveManagement />} />
+        <Route path="departmentsetup" element={<DepartmentSetup />} />
+        <Route path="designationsetup" element={<DesignationSetup />} />
+        <Route path="leaveapproval" element={<LeaveApproval />} />
+        <Route path="rulespermission" element={<RulesPermission />} />
+        <Route path="reports" element={<Reports />} />
       </Route>
 
       {/* Catch-all: redirect unknown routes to home */}
@@ -132,11 +76,9 @@ const AppRoutes: React.FC = () => {
 // ---------------- Main App ----------------
 const App: React.FC = () => {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <AppRoutes />
-      </BrowserRouter>
-    </AuthProvider>
+    <BrowserRouter>
+      <AppRoutes />
+    </BrowserRouter>
   );
 };
 

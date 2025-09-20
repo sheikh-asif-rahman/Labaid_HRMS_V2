@@ -15,7 +15,6 @@ import {
   FaChartLine,
   FaSignOutAlt,
 } from "react-icons/fa";
-import { useAuth } from "../../context/AuthContext"; // context import
 import "./Sidebar.css";
 
 interface SidebarProps {
@@ -25,7 +24,6 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ onLogout }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { logout } = useAuth(); // context থেকে logout
   const adminRef = useRef<HTMLDivElement>(null);
 
   const adminPaths = [
@@ -60,10 +58,10 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout }) => {
 
   const handleLogoutClick = () => {
     if (onLogout) {
-      onLogout(); // parent থেকে provided logout
+      onLogout(); // optional parent logout
     } else {
-      logout();        // context logout, localStorage clear
-      navigate("/");   // redirect login page
+      localStorage.removeItem("user"); // remove login info
+      navigate("/login", { replace: true }); // redirect to login
     }
   };
 
@@ -102,7 +100,11 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout }) => {
           >
             <FaUserShield className="sidebar-icon" />
             <span>Admin</span>
-            {isAdminOpen ? <FaChevronUp className="chevron" /> : <FaChevronDown className="chevron" />}
+            {isAdminOpen ? (
+              <FaChevronUp className="chevron" />
+            ) : (
+              <FaChevronDown className="chevron" />
+            )}
           </button>
 
           <div className={`dropdown-menu ${isAdminOpen ? "open" : ""}`}>
@@ -195,7 +197,10 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout }) => {
 
       {/* Logout */}
       <div className="sidebar-footer">
-        <button className="sidebar-link logout-btn" onClick={handleLogoutClick}>
+        <button
+          className="sidebar-link logout-btn"
+          onClick={handleLogoutClick}
+        >
           <FaSignOutAlt className="sidebar-icon" />
           <span>Logout</span>
         </button>

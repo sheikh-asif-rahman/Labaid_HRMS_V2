@@ -2,24 +2,20 @@ import React, { useState } from "react";
 import "./Login.css";
 import buildingImg from "../../assets/Labaid_Building.jpg";
 import labaidLogo from "../../assets/LabaidLogo.png";
-import { useAuth } from "../../context/AuthContext";
 
 interface LoginProps {
-  onLogin?: () => void;
+  onLogin: (employeeId: string, password: string) => void;
+  loading?: boolean;
+  message?: string;
 }
 
-const Login: React.FC<LoginProps> = ({ onLogin }) => {
-  const { loginUser } = useAuth();
+const Login: React.FC<LoginProps> = ({ onLogin, loading, message }) => {
   const [employeeId, setEmployeeId] = useState("");
   const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const msg = await loginUser(employeeId, password);
-    setMessage(msg);
-
-    if (msg === "Login successful" && onLogin) onLogin();
+    onLogin(employeeId, password);
   };
 
   return (
@@ -45,8 +41,8 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
               required
             />
           </div>
-          <button type="submit" className="login-app-submit-btn">
-            Login
+          <button type="submit" className="login-app-submit-btn" disabled={loading}>
+            {loading ? "Logging in..." : "Login"}
           </button>
           {message && <p className="login-message">{message}</p>}
         </form>

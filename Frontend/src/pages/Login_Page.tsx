@@ -1,14 +1,53 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Login from "../components/Login/Login";
 import Background from "../components/Background/Background";
+import axios from "axios";
+import { API_BASE_URL } from "../constants/apiBase";
 
 const Login_Page: React.FC = () => {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
 
-  const handleLogin = () => {
-    // সবসময় home page redirect
-    navigate("/", { replace: true });
+  const handleLogin = async (employeeId: string, password: string) => {
+    if (!employeeId || !password) {
+      setMessage("Please fill in both fields");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await axios.post(`${API_BASE_URL}login`, {
+        EmployeeId: employeeId,
+        Password: password,
+      });
+
+      const data = response.data;
+      console.log("Login Response:", data);
+
+      if (data.Status === "active") {
+        localStorage.setItem(
+          "user",
+          JSON.stringify({
+            EmployeeId: data.EmployeeId,
+            Permission: data.Permission,
+            Status: data.Status,
+          })
+        );
+        localStorage.setItem("isLoggedIn", "true");
+
+        setMessage("Login successful ✅");
+        navigate("/", { replace: true }); // go to Home
+      } else {
+        setMessage(data.message || "Login failed ❌");
+      }
+    } catch (err: any) {
+      console.error("Login Error:", err);
+      setMessage(err.response?.data?.message || "Login failed ❌");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -25,7 +64,7 @@ const Login_Page: React.FC = () => {
           zIndex: 1,
         }}
       >
-        <Login onLogin={handleLogin} />
+        <Login onLogin={handleLogin} loading={loading} message={message} />
       </div>
     </div>
   );
