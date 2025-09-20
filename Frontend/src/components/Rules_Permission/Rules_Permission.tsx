@@ -1,102 +1,153 @@
 import React, { useState } from "react";
 import "./Rules_Permission.css";
 
-type PermissionKeys = "a" | "b" | "c" | "d" | "e";
+type PermissionMap = Record<string, boolean>;
 
 const Rules_Permission: React.FC = () => {
-  const [permissions, setPermissions] = useState<Record<PermissionKeys, boolean>>({
-    a: false,
-    b: false,
-    c: false,
-    d: false,
-    e: false,
-  });
+  // --- Data Sources ---
+  const accessList = [
+    "Overview",
+    "Rules & Permission",
+    "Leave Approval",
+    "Designation Setup",
+    "Department Setup",
+    "Reports",
+    "Employee",
+    "Leave Management",
+    "Yearly Calendar",
+  ];
 
-  const [facilities, setFacilities] = useState<Record<PermissionKeys, boolean>>({
-    a: false,
-    b: false,
-    c: false,
-    d: false,
-    e: false,
-  });
+  const specialPermissions = [
+    "Can Access Attendance Report",
+    "Can Access Absent Report",
+    "Can Access Leave Report",
+    "Can Access Employee List",
+    "Can Access To Edit Employee Profile",
+    "Can Access to Upload Year Calendar Plan",
+  ];
 
-  const handlePermissionChange = (key: PermissionKeys) => {
-    setPermissions(prev => ({ ...prev, [key]: !prev[key] }));
-  };
+  const facilityAccess = [
+    "Attendance Report",
+    "Absent Report",
+    "Leave Report",
+    "Employee List",
+    "Year Calendar Plan",
+  ];
 
-  const handleFacilityChange = (key: PermissionKeys) => {
-    setFacilities(prev => ({ ...prev, [key]: !prev[key] }));
-  };
+  // --- States ---
+  const [access, setAccess] = useState<PermissionMap>(
+    Object.fromEntries(accessList.map((item) => [item, false]))
+  );
 
-  const checkAllFacilities = () => {
-    setFacilities({ a: true, b: true, c: true, d: true, e: true });
-  };
+  const [special, setSpecial] = useState<PermissionMap>(
+    Object.fromEntries(specialPermissions.map((item) => [item, false]))
+  );
 
-  const uncheckAllFacilities = () => {
-    setFacilities({ a: false, b: false, c: false, d: false, e: false });
-  };
+  const [facilities, setFacilities] = useState<PermissionMap>(
+    Object.fromEntries(facilityAccess.map((item) => [item, false]))
+  );
+
+  // --- Toggle Handlers ---
+  const toggleAccess = (key: string) =>
+    setAccess((prev) => ({ ...prev, [key]: !prev[key] }));
+
+  const toggleSpecial = (key: string) =>
+    setSpecial((prev) => ({ ...prev, [key]: !prev[key] }));
+
+  const toggleFacility = (key: string) =>
+    setFacilities((prev) => ({ ...prev, [key]: !prev[key] }));
+
+  // --- Bulk Actions ---
+  const checkAll = (list: string[], setter: React.Dispatch<React.SetStateAction<PermissionMap>>) =>
+    setter(Object.fromEntries(list.map((i) => [i, true])));
+
+  const uncheckAll = (list: string[], setter: React.Dispatch<React.SetStateAction<PermissionMap>>) =>
+    setter(Object.fromEntries(list.map((i) => [i, false])));
 
   return (
     <div className="rules-permission-container">
-      {/* Header: Permission title + Update button */}
+      {/* Header */}
       <div className="rules-permission-header">
         <h2>Permission</h2>
         <button className="update-button">Update</button>
       </div>
 
-      {/* First Section */}
+      {/* User Info */}
+      <div className="row">
+        <div className="field">
+          <label>User ID:</label>
+          <input type="text" value="12345" readOnly />
+        </div>
+        <div className="field">
+          <label>User Name:</label>
+          <input type="text" value="John Doe" readOnly />
+        </div>
+      </div>
+
+      {/* Access Section */}
       <div className="section">
-        {/* User Info */}
-        <div className="row">
-          <div className="field">
-            <label>User ID:</label>
-            <input type="text" value="12345" readOnly />
-          </div>
-          <div className="field">
-            <label>User Name:</label>
-            <input type="text" value="John Doe" readOnly />
+        <div className="section-header">
+          <h3 className="section-title">Access</h3>
+          <div className="facility-buttons">
+            <button onClick={() => checkAll(accessList, setAccess)}>Check All</button>
+            <button onClick={() => uncheckAll(accessList, setAccess)}>Uncheck All</button>
           </div>
         </div>
-
-        {/* Permission Checkboxes in 2-column grid */}
         <div className="checkbox-group permission-group">
-          {Object.keys(permissions).map((key) => (
-            <label key={key}>
+          {accessList.map((item) => (
+            <label key={item}>
               <input
                 type="checkbox"
-                checked={permissions[key as PermissionKeys]}
-                onChange={() => handlePermissionChange(key as PermissionKeys)}
+                checked={access[item]}
+                onChange={() => toggleAccess(item)}
               />
-              {key.toUpperCase()}
+              {item}
             </label>
           ))}
         </div>
       </div>
 
-      {/* Second Section: Facility Access */}
+      {/* Special Permission Section */}
       <div className="section">
         <div className="section-header">
-          <h3 className="section-title">Facility Access</h3>
+          <h3 className="section-title">Special Permission</h3>
           <div className="facility-buttons">
-            <button type="button" onClick={checkAllFacilities}>
-              Check All
-            </button>
-            <button type="button" onClick={uncheckAllFacilities}>
-              Uncheck All
-            </button>
+            <button onClick={() => checkAll(specialPermissions, setSpecial)}>Check All</button>
+            <button onClick={() => uncheckAll(specialPermissions, setSpecial)}>Uncheck All</button>
           </div>
         </div>
-
-        {/* Facility Checkboxes in 5-column grid */}
-        <div className="checkbox-group facility-group">
-          {Object.keys(facilities).map((key) => (
-            <label key={key}>
+        <div className="checkbox-group permission-group">
+          {specialPermissions.map((item) => (
+            <label key={item}>
               <input
                 type="checkbox"
-                checked={facilities[key as PermissionKeys]}
-                onChange={() => handleFacilityChange(key as PermissionKeys)}
+                checked={special[item]}
+                onChange={() => toggleSpecial(item)}
               />
-              {key.toUpperCase()} Facility
+              {item}
+            </label>
+          ))}
+        </div>
+      </div>
+
+      {/* Facility Access Section */}
+      <div className="section">
+        <div className="section-header">
+          <h3 className="section-title">Facility Access For Report</h3>
+          <div className="facility-buttons">
+            <button onClick={() => checkAll(facilityAccess, setFacilities)}>Check All</button>
+            <button onClick={() => uncheckAll(facilityAccess, setFacilities)}>Uncheck All</button>
+          </div>
+        </div>
+        <div className="checkbox-group facility-group">
+          {facilityAccess.map((item) => (
+            <label key={item}>
+              <input
+                type="checkbox"
+                checked={facilities[item]}
+                onChange={() => toggleFacility(item)}
+              />
+              {item}
             </label>
           ))}
         </div>

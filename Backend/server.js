@@ -9,7 +9,9 @@ const thismonthstatus = require("./routes/HomePageRoutes/ThisMonthStatusRoute");
 const todaysattendance = require("./routes/HomePageRoutes/TodaysAttendanceRoute");
 const usershortprofile = require("./routes/HomePageRoutes/UserShortProfileRoute");
 const recentleaveapplication = require("./routes/HomePageRoutes/RecentLeaveApplicationRoute");
-const overviewRoute = require("./routes/OverViewRoute"); // ✅ Match filename exactly
+const overviewRoute = require("./routes/OverViewRoute");
+const employeeAccessRoute = require("./routes/Rules&Permission/GetEmployeeAccessDataRoute");
+
 
 const app = express();
 const port = 3000;
@@ -24,7 +26,9 @@ app.use("/api", thismonthstatus);
 app.use("/api", todaysattendance);
 app.use("/api", usershortprofile);
 app.use("/api", recentleaveapplication);
-app.use("/api", overviewRoute); // ✅ Overview route
+app.use("/api", overviewRoute);
+app.use("/api", employeeAccessRoute);
+
 
 // Database connection
 connectDB()

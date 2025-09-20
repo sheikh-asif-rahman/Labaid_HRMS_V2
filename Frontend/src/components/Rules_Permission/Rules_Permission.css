@@ -54,7 +54,7 @@
   gap: 15px;
 }
 
-/* Section header for Facility Access */
+/* Section header (Access / Special Permission / Facility Access) */
 .section-header {
   display: flex;
   justify-content: space-between;
@@ -82,6 +82,10 @@
   color: #555;
 }
 
+.field label {
+  margin-bottom: 4px;
+}
+
 .field input {
   padding: 5px;
   font-size: 12px;
@@ -92,7 +96,7 @@
   color: #333;
 }
 
-/* Checkbox group */
+/* Checkbox group shared style */
 .checkbox-group {
   display: flex;
   flex-wrap: wrap;
@@ -101,14 +105,14 @@
   color: #333;
 }
 
-/* Permission checkboxes 2-column grid */
+/* Permission & Special checkboxes in 2-column grid */
 .permission-group {
   display: grid;
-  grid-template-columns: repeat(2, 1fr); /* 2 columns */
+  grid-template-columns: repeat(2, 1fr);
   gap: 10px;
 }
 
-/* Facility checkboxes 5-column grid */
+/* Facility checkboxes in 5-column grid */
 .facility-group {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -151,9 +155,13 @@
   transform: translate(-50%, -50%);
 }
 
-/* Facility buttons */
+/* Action buttons (Check All / Uncheck All) */
+.facility-buttons {
+  display: flex;
+  gap: 8px;
+}
+
 .facility-buttons button {
-  margin-left: 5px;
   padding: 4px 10px;
   font-size: 12px;
   cursor: pointer;
