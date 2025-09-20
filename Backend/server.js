@@ -2,6 +2,12 @@ const express = require("express");
 const cors = require("cors");
 const { connectDB } = require("./config/dbConfig");
 const loginRoute = require("./routes/LoginRoute");
+const thismonthstatus = require("./routes/HomePageRoutes/ThisMonthStatusRoute");
+const todaysattendance = require("./routes/HomePageRoutes/TodaysAttendanceRoute");
+const usershortprofile = require("./routes/HomePageRoutes/UserShortProfileRoute");
+const recentleaveapplication = require("./routes/HomePageRoutes/RecentLeaveApplicationRoute");
+
+
 
 const app = express();
 const port = 3000;
@@ -12,6 +18,13 @@ app.use(express.json()); // ✅ Must be before routes
 
 // Routes
 app.use("/api", loginRoute);
+app.use("/api", thismonthstatus);
+app.use("/api", todaysattendance);
+app.use("/api", usershortprofile);
+app.use("/api", recentleaveapplication);
+
+
+
 
 // DB connection
 connectDB()
