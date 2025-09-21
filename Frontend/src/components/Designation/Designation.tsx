@@ -1,80 +1,166 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./Designation.css";
+import axios from "axios";
+import { API_BASE_URL } from "../../constants/apiBase";
+import Popup from "../Popup/Popup";
 
-interface DesignationItem {
+interface DesignationData {
   id: number;
   name: string;
-  status: "Active" | "Inactive";
+  status: number; // 1 = Active, 0 = Inactive
 }
 
 const Designation_Setup: React.FC = () => {
-  // Example data: 80 items for demo
-  const initialList: DesignationItem[] = Array.from({ length: 80 }, (_, i) => ({
-    id: i + 1,
-    name: `Designation ${i + 1}`,
-    status: i % 2 === 0 ? "Active" : "Inactive",
-  }));
-
-  const [designationList, setDesignationList] = useState<DesignationItem[]>(initialList);
-  const [formData, setFormData] = useState({ id: 0, name: "", status: "Active" });
-  const [isEdit, setIsEdit] = useState(false);
+  const [designationList, setDesignationList] = useState<DesignationData[]>([]);
+  const [formData, setFormData] = useState({ name: "", status: "Active" });
+  const [editId, setEditId] = useState<number | null>(null);
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
-  const totalPages = Math.ceil(designationList.length / itemsPerPage);
+  const rowsPerPage = 10;
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  // Popup
+  const [popupType, setPopupType] = useState<"loading" | "done" | "notdone" | null>(null);
+  const [popupMessage, setPopupMessage] = useState<string>("");
+
+  const getEmployeeId = (): string | null => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      try {
+        const user = JSON.parse(storedUser);
+        return user.EmployeeId || null;
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  };
+
+  const convertStatus = (status: number) => (status === 1 ? "Active" : "Inactive");
+
+  const fetchDesignations = async () => {
+    try {
+      setPopupType("loading");
+      setPopupMessage("Loading designations...");
+
+      const response = await axios.get(`${API_BASE_URL}getDesignationList`);
+
+      if (response.data.success && Array.isArray(response.data.data)) {
+        const data = response.data.data.map((des: any) => ({
+          id: des.id || des.DesignationID,
+          name: des.name || des.DesignationName,
+          status: Number(des.status ?? des.Status),
+        }));
+        setDesignationList(data);
+      } else {
+        setDesignationList([]);
+      }
+
+      setPopupType(null);
+    } catch (err) {
+      console.error("Failed to fetch designations", err);
+      // Loading popup stays until success
+    }
+  };
+
+  useEffect(() => {
+    fetchDesignations();
+  }, []);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSave = () => {
-    if (!formData.name.trim()) return;
-    const newDesignation = {
-      id: designationList.length + 1,
-      name: formData.name,
-      status: formData.status as "Active" | "Inactive",
-    };
-    setDesignationList([...designationList, newDesignation]);
-    setFormData({ id: 0, name: "", status: "Active" });
-    setCurrentPage(totalPages); // go to last page
+  const handleSave = async () => {
+    if (!formData.name) return;
+
+    const employeeId = getEmployeeId();
+    if (!employeeId) {
+      alert("Employee ID not found. Please login again.");
+      return;
+    }
+
+    try {
+      setPopupType("loading");
+      setPopupMessage(editId ? "Updating designation..." : "Saving designation...");
+
+      const payload: any = {
+        type: editId ? "update" : "save",
+        name: formData.name.trim(),
+        user: employeeId,
+      };
+
+      if (editId) {
+        payload.id = editId;
+        payload.status = formData.status === "Active" ? 1 : 0;
+      }
+
+      const response = await axios.post(`${API_BASE_URL}updateDesignationList`, payload);
+
+      if (response.data.success) {
+        await fetchDesignations();
+        setFormData({ name: "", status: "Active" });
+        setEditId(null);
+
+        // show done popup
+        setPopupType("done");
+        setPopupMessage(editId ? "Designation updated successfully!" : "Designation saved successfully!");
+      } else {
+        setPopupType("notdone");
+        setPopupMessage(response.data.message || "Operation failed!");
+      }
+    } catch (err: any) {
+      console.error("Failed to save/update designation", err);
+      setPopupType("notdone");
+      setPopupMessage(err.response?.data?.message || "Error saving/updating designation");
+    }
   };
 
-  const handleUpdate = () => {
-    setDesignationList(
-      designationList.map((item) =>
-        item.id === formData.id ? { ...item, name: formData.name, status: formData.status as "Active" | "Inactive" } : item
-      )
-    );
-    setFormData({ id: 0, name: "", status: "Active" });
-    setIsEdit(false);
+  const handleEdit = (des: DesignationData) => {
+    setFormData({ name: des.name, status: convertStatus(des.status) });
+    setEditId(des.id);
   };
 
-  const handleEdit = (item: DesignationItem) => {
-    setFormData(item);
-    setIsEdit(true);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+  // Pagination
+  const totalPages = Math.ceil(designationList.length / rowsPerPage);
+  const indexOfLastRow = currentPage * rowsPerPage;
+  const indexOfFirstRow = indexOfLastRow - rowsPerPage;
+  const currentRows = designationList.slice(indexOfFirstRow, indexOfLastRow);
+
+  const changePage = (page: number) => {
+    if (page < 1 || page > totalPages) return;
+    setCurrentPage(page);
   };
 
-  // Pagination helpers
-  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
-  const currentItems = designationList.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const renderPagination = () => {
+    const pages = [];
+    for (let i = 1; i <= totalPages; i++) {
+      pages.push(
+        <button
+          key={i}
+          className={i === currentPage ? "active-page" : ""}
+          onClick={() => changePage(i)}
+        >
+          {i}
+        </button>
+      );
+    }
+    return pages;
+  };
 
   return (
     <div className="designation-main-container">
-      {/* Header */}
       <div className="designation-header">
         <h2>Designation Setup</h2>
         <button
-          onClick={isEdit ? handleUpdate : handleSave}
-          disabled={!formData.name.trim()}
-          className={formData.name.trim() ? "active-btn" : "disabled-btn"}
+          className={formData.name ? "active-btn" : "disabled-btn"}
+          onClick={handleSave}
+          disabled={!formData.name}
         >
-          {isEdit ? "Update" : "Save"}
+          {editId !== null ? "Update" : "Save"}
         </button>
       </div>
 
-      {/* Form */}
       <div className="designation-form-card">
         <div className="form-row">
           <label>
@@ -83,14 +169,13 @@ const Designation_Setup: React.FC = () => {
               type="text"
               name="name"
               value={formData.name}
-              onChange={handleInputChange}
-              placeholder="Enter designation"
+              onChange={handleChange}
+              placeholder="Enter designation name"
             />
           </label>
-
           <label>
             Status
-            <select name="status" value={formData.status} onChange={handleInputChange}>
+            <select name="status" value={formData.status} onChange={handleChange}>
               <option value="Active">Active</option>
               <option value="Inactive">Inactive</option>
             </select>
@@ -98,58 +183,53 @@ const Designation_Setup: React.FC = () => {
         </div>
       </div>
 
-      {/* Table */}
       <div className="designation-table-card">
-        <table>
-          <thead>
-            <tr>
-              <th>SL</th>
-              <th>Designation Name</th>
-              <th>Status</th>
-              <th>Edit</th>
-            </tr>
-          </thead>
-          <tbody>
-            {currentItems.map((item, index) => (
-              <tr key={item.id}>
-                <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
-                <td>{item.name}</td>
-                <td>{item.status}</td>
-                <td>
-                  <button className="edit-btn" onClick={() => handleEdit(item)}>
-                    Edit
-                  </button>
-                </td>
+        {currentRows.length === 0 ? (
+          <p>No designations found.</p>
+        ) : (
+          <table>
+            <thead>
+              <tr>
+                <th>SL</th>
+                <th>Designation Name</th>
+                <th>Status</th>
+                <th>Edit</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-
-        {/* Pagination */}
-        <div className="pagination">
-          <button onClick={() => paginate(Math.max(1, currentPage - 1))} disabled={currentPage === 1}>
-            &lt;
-          </button>
-
-          {Array.from({ length: totalPages }, (_, i) => i + 1)
-            .filter((page) => page === 1 || page === totalPages || (page >= currentPage - 1 && page <= currentPage + 1))
-            .map((page, index, arr) => (
-              <React.Fragment key={page}>
-                {index > 0 && page - arr[index - 1] > 1 && <span className="dots">...</span>}
-                <button
-                  onClick={() => paginate(page)}
-                  className={currentPage === page ? "active-page" : ""}
-                >
-                  {page}
-                </button>
-              </React.Fragment>
-            ))}
-
-          <button onClick={() => paginate(Math.min(totalPages, currentPage + 1))} disabled={currentPage === totalPages}>
-            &gt;
-          </button>
-        </div>
+            </thead>
+            <tbody>
+              {currentRows.map((des, index) => (
+                <tr key={`${des.id}-${index}`}>
+                  <td>{indexOfFirstRow + index + 1}</td>
+                  <td>{des.name}</td>
+                  <td>{convertStatus(des.status)}</td>
+                  <td>
+                    <button className="edit-btn" onClick={() => handleEdit(des)}>
+                      Edit
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
+
+      {totalPages > 1 && (
+        <div className="pagination">
+          <button onClick={() => changePage(currentPage - 1)}>{"<"}</button>
+          {renderPagination()}
+          <button onClick={() => changePage(currentPage + 1)}>{">"}</button>
+        </div>
+      )}
+
+      {popupType && (
+        <Popup
+          isOpen={true}
+          type={popupType}
+          message={popupMessage}
+          onClose={() => setPopupType(null)}
+        />
+      )}
     </div>
   );
 };
