@@ -4,7 +4,7 @@ import Popup from "../Popup/Popup";
 
 interface SearchProps {
   placeholder?: string;
-  onSearch: (query: string) => void;
+  onSearch?: (query: string) => void; // only returns the query
   onNew: () => void;
 }
 
@@ -14,20 +14,13 @@ const Search: React.FC<SearchProps> = ({ placeholder = "Search...", onSearch, on
   const [popupMessage, setPopupMessage] = useState<string>("");
 
   const handleSearch = () => {
-    setPopupType("loading");
-    onSearch(query);
+    if (!query) {
+      setPopupType("notdone");
+      setPopupMessage("Please enter a search value");
+      return;
+    }
 
-    // simulate async API
-    setTimeout(() => {
-      const success = Math.random() > 0.5;
-      if (success) {
-        setPopupMessage("Search completed!");
-        setPopupType("done");
-      } else {
-        setPopupMessage("Search failed!");
-        setPopupType("notdone");
-      }
-    }, 2000);
+    if (onSearch) onSearch(query);
   };
 
   return (
@@ -42,8 +35,19 @@ const Search: React.FC<SearchProps> = ({ placeholder = "Search...", onSearch, on
         />
       </div>
 
-      <button className="button search-button" onClick={handleSearch}>Search</button>
-      <button className="button new-button" onClick={onNew}>New</button>
+      <button className="button search-button" onClick={handleSearch}>
+        Search
+      </button>
+
+      <button
+        className="button new-button"
+        onClick={() => {
+          setQuery("");
+          if (onNew) onNew();
+        }}
+      >
+        New
+      </button>
 
       {popupType && (
         <Popup

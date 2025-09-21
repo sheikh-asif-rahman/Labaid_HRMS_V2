@@ -1,37 +1,65 @@
-import React from "react";
+import React, { useState } from "react";
 import Search from "../components/Search/Search";
-import RulesPermissionForm from "../components/Rules_Permission/Rules_Permission"; // adjust the path if needed
+import Rules_Permission_Form from "../components/Rules_Permission/Rules_Permission";
+import axios from "axios";
+import { API_BASE_URL } from "../constants/apiBase";
+import Popup from "../components/Popup/Popup";
 
 const Rules_Permission: React.FC = () => {
-  const handleSearch = (query: string) => console.log("Search:", query);
-  const handleNew = () => console.log("New clicked");
+  const [employeeData, setEmployeeData] = useState<any>(null);
+  const [popupType, setPopupType] = useState<"loading" | "done" | "notdone" | null>(null);
+  const [popupMessage, setPopupMessage] = useState<string>("");
+
+  const handleNew = () => {
+    setEmployeeData(null);
+  };
+
+  const handleSearch = async (employeeId: string) => {
+    try {
+      setPopupType("loading");
+      setPopupMessage("Searching...");
+
+      const response = await axios.get(`${API_BASE_URL}getEmployeeAccessData?employeeId=${employeeId}`);
+      setEmployeeData(response.data);
+
+      setPopupType("done");
+      setPopupMessage("Search completed!");
+    } catch (error) {
+      console.error(error);
+      setPopupType("notdone");
+      setPopupMessage("Search failed!");
+    }
+  };
 
   return (
     <div
       style={{
-        minHeight: "100vh",       // allow content to grow
+        minHeight: "100vh",
         width: "100%",
         padding: "20px",
         boxSizing: "border-box",
         display: "flex",
         flexDirection: "column",
         gap: "20px",
-        overflowY: "auto",        // enable vertical scrolling
+        overflowY: "auto",
       }}
     >
-      {/* Search */}
-      <div style={{ width: "100%", maxWidth: "1200px" }}>
-        <Search
-          placeholder="Search employees..."
-          onSearch={handleSearch}
-          onNew={handleNew}
-        />
-      </div>
+      <Search
+        placeholder="Search employees..."
+        onNew={handleNew}
+        onSearch={handleSearch}
+      />
 
-      {/* Rules & Permission Form */}
-      <div style={{ width: "100%", maxWidth: "1200px" }}>
-        <RulesPermissionForm />
-      </div>
+      <Rules_Permission_Form employeeData={employeeData} />
+
+      {popupType && (
+        <Popup
+          isOpen={true}
+          type={popupType}
+          message={popupMessage}
+          onClose={() => setPopupType(null)}
+        />
+      )}
     </div>
   );
 };
