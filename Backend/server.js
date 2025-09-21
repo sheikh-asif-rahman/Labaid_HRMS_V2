@@ -12,6 +12,8 @@ const recentleaveapplication = require("./routes/HomePageRoutes/RecentLeaveAppli
 const overviewRoute = require("./routes/OverViewRoute");
 const employeeAccessRoute = require("./routes/Rules&Permission/GetEmployeeAccessDataRoute");
 const updateEmployeeAccessData = require("./routes/Rules&Permission/UpdateEmployeeAccessDataRoute");
+const facilityRoute = require("./routes/GetAllFacilityRoute");
+
 
 
 const app = express();
@@ -30,6 +32,8 @@ app.use("/api", recentleaveapplication);
 app.use("/api", overviewRoute);
 app.use("/api", employeeAccessRoute);
 app.use("/api", updateEmployeeAccessData);
+app.use("/api", facilityRoute);
+
 
 
 

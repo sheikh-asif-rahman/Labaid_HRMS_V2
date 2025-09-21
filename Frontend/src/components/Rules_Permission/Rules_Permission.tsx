@@ -6,6 +6,11 @@ import { API_BASE_URL } from "../../constants/apiBase";
 
 type PermissionMap = Record<string, boolean>;
 
+interface Facility {
+  id: string;
+  name: string;
+}
+
 interface Rules_PermissionProps {
   employeeData?: any;
 }
@@ -32,23 +37,14 @@ const Rules_Permission: React.FC<Rules_PermissionProps> = ({ employeeData }) => 
     "Can Access to Upload Year Calendar Plan",
   ];
 
-  const facilityAccess = [
-    "Attendance Report",
-    "Absent Report",
-    "Leave Report",
-    "Employee List",
-    "Year Calendar Plan",
-  ];
-
   const [access, setAccess] = useState<PermissionMap>(
     Object.fromEntries(accessList.map((item) => [item, false]))
   );
   const [special, setSpecial] = useState<PermissionMap>(
     Object.fromEntries(specialPermissions.map((item) => [item, false]))
   );
-  const [facilities, setFacilities] = useState<PermissionMap>(
-    Object.fromEntries(facilityAccess.map((item) => [item, false]))
-  );
+  const [facilities, setFacilities] = useState<PermissionMap>({});
+  const [facilityList, setFacilityList] = useState<Facility[]>([]);
 
   const [userId, setUserId] = useState("");
   const [userName, setUserName] = useState("");
@@ -56,13 +52,28 @@ const Rules_Permission: React.FC<Rules_PermissionProps> = ({ employeeData }) => 
   const [popupType, setPopupType] = useState<"loading" | "done" | "notdone" | null>(null);
   const [popupMessage, setPopupMessage] = useState<string>("");
 
-  // Fill checkboxes from employeeData
+  // Fetch facilities from API
+  useEffect(() => {
+    const fetchFacilities = async () => {
+      try {
+        const response = await axios.get(`${API_BASE_URL}facilities`);
+        const data: Facility[] = response.data.data;
+        setFacilityList(data);
+        setFacilities(Object.fromEntries(data.map((f) => [f.id, false])));
+      } catch (error) {
+        console.error("Failed to fetch facilities:", error);
+      }
+    };
+    fetchFacilities();
+  }, []);
+
+  // Fill checkboxes from employeeData after search
   useEffect(() => {
     if (employeeData) {
       setUserId(employeeData.EmployeeId);
       setUserName(employeeData.EmployeeName);
 
-      // Parse Permission JSON if it is a string
+      // Parse Permission JSON
       let permObj: any = {};
       if (employeeData.Permission) {
         try {
@@ -76,6 +87,7 @@ const Rules_Permission: React.FC<Rules_PermissionProps> = ({ employeeData }) => 
         }
       }
 
+      // Fill access and special permissions
       setAccess(
         Object.fromEntries(accessList.map((i) => [i, permObj.Access?.includes(i) || false]))
       );
@@ -84,10 +96,14 @@ const Rules_Permission: React.FC<Rules_PermissionProps> = ({ employeeData }) => 
           specialPermissions.map((i) => [i, permObj.Special_Permission?.includes(i) || false])
         )
       );
-      setFacilities(
-        Object.fromEntries(
-          facilityAccess.map((i) => [i, permObj.Facility_Access?.includes(i) || false])
-        )
+
+      // Fill Facility Access based on AccessToBranchId CSV
+      const branchIds: string[] = employeeData.AccessToBranchId
+        ? employeeData.AccessToBranchId.split(",").map((id: string) => id.trim())
+        : [];
+
+      setFacilities((prev) =>
+        Object.fromEntries(Object.keys(prev).map((id) => [id, branchIds.includes(id)]))
       );
     } else {
       // Clear all
@@ -95,13 +111,13 @@ const Rules_Permission: React.FC<Rules_PermissionProps> = ({ employeeData }) => 
       setUserName("");
       setAccess(Object.fromEntries(accessList.map((item) => [item, false])));
       setSpecial(Object.fromEntries(specialPermissions.map((item) => [item, false])));
-      setFacilities(Object.fromEntries(facilityAccess.map((item) => [item, false])));
+      setFacilities((prev) => Object.fromEntries(Object.keys(prev).map((id) => [id, false])));
     }
-  }, [employeeData]);
+  }, [employeeData, facilityList]);
 
   const toggleAccess = (key: string) => setAccess((prev) => ({ ...prev, [key]: !prev[key] }));
   const toggleSpecial = (key: string) => setSpecial((prev) => ({ ...prev, [key]: !prev[key] }));
-  const toggleFacility = (key: string) => setFacilities((prev) => ({ ...prev, [key]: !prev[key] }));
+  const toggleFacility = (id: string) => setFacilities((prev) => ({ ...prev, [id]: !prev[id] }));
 
   const checkAll = (list: string[], setter: React.Dispatch<React.SetStateAction<PermissionMap>>) =>
     setter(Object.fromEntries(list.map((i) => [i, true])));
@@ -117,9 +133,11 @@ const Rules_Permission: React.FC<Rules_PermissionProps> = ({ employeeData }) => 
       Permission: {
         Access: accessList.filter((item) => access[item]),
         Special_Permission: specialPermissions.filter((item) => special[item]),
-        Facility_Access: facilityAccess.filter((item) => facilities[item]),
+        Facility_Access: Object.keys(facilities).filter((id) => facilities[id]), // send IDs
       },
-      AccessToBranchId: employeeData?.AccessToBranchId || "",
+      AccessToBranchId: Object.keys(facilities)
+        .filter((id) => facilities[id])
+        .join(","), // send updated CSV for AccessToBranchId
     };
 
     try {
@@ -200,21 +218,25 @@ const Rules_Permission: React.FC<Rules_PermissionProps> = ({ employeeData }) => 
         <div className="section-header">
           <h3 className="section-title">Facility Access For Report</h3>
           <div className="facility-buttons">
-            <button onClick={() => checkAll(facilityAccess, setFacilities)}>Check All</button>
-            <button onClick={() => uncheckAll(facilityAccess, setFacilities)}>Uncheck All</button>
+            <button onClick={() => checkAll(Object.keys(facilities), setFacilities)}>Check All</button>
+            <button onClick={() => uncheckAll(Object.keys(facilities), setFacilities)}>Uncheck All</button>
           </div>
         </div>
         <div className="checkbox-group facility-group">
-          {facilityAccess.map((item) => (
-            <label key={item}>
-              <input type="checkbox" checked={facilities[item]} onChange={() => toggleFacility(item)} />
-              {item}
+          {facilityList.map((f) => (
+            <label key={f.id}>
+              <input
+                type="checkbox"
+                checked={facilities[f.id] || false}
+                onChange={() => toggleFacility(f.id)}
+              />
+              {f.name}
             </label>
           ))}
         </div>
       </div>
 
-      {/* Popup for update */}
+      {/* Popup */}
       {popupType && (
         <Popup
           isOpen={true}
