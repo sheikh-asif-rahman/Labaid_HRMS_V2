@@ -13,6 +13,10 @@ const overviewRoute = require("./routes/OverViewRoute");
 const employeeAccessRoute = require("./routes/Rules&Permission/GetEmployeeAccessDataRoute");
 const updateEmployeeAccessData = require("./routes/Rules&Permission/UpdateEmployeeAccessDataRoute");
 const facilityRoute = require("./routes/GetAllFacilityRoute");
+const getDepartmentList = require("./routes/DepartmentRoute/GetDepartmentListRoute");
+const updateDepartmentRoute = require("./routes/DepartmentRoute/UpdateDepartmentListRoute");
+const getDesignationRoute = require("./routes/DesignationRoute/GetDesignationListRoute");
+const updateDesignationRoute = require("./routes/DesignationRoute/UpdateDesignationListRoute");
 
 
 
@@ -33,6 +37,10 @@ app.use("/api", overviewRoute);
 app.use("/api", employeeAccessRoute);
 app.use("/api", updateEmployeeAccessData);
 app.use("/api", facilityRoute);
+app.use("/api", getDepartmentList);
+app.use("/api", updateDepartmentRoute);
+app.use("/api", getDesignationRoute);
+app.use("/api", updateDesignationRoute);
 
 
 
