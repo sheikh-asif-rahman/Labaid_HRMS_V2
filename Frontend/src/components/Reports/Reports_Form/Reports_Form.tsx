@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import "./Reports_Form.css";
 
 type Props = {
@@ -14,9 +16,14 @@ const Reports_Form: React.FC<Props> = ({
   dataFetched,
   setDataFetched,
 }) => {
+  const [fromDate, setFromDate] = useState<Date | null>(null);
+  const [toDate, setToDate] = useState<Date | null>(null);
+
   const handleReportChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setReportType(e.target.value);
     setDataFetched(false);
+    setFromDate(null);
+    setToDate(null);
   };
 
   const handleGetData = () => setDataFetched(true);
@@ -24,6 +31,8 @@ const Reports_Form: React.FC<Props> = ({
   const handleReset = () => {
     setReportType("");
     setDataFetched(false);
+    setFromDate(null);
+    setToDate(null);
   };
 
   const isGeneralReport =
@@ -71,12 +80,25 @@ const Reports_Form: React.FC<Props> = ({
 
         <div className="reports-form-group">
           <label>From Date</label>
-          <input type="date" disabled={!isGeneralReport} />
+          <DatePicker
+            selected={fromDate}
+            onChange={(date: Date | null) => setFromDate(date)}
+            disabled={!isGeneralReport}
+            placeholderText="Select From Date"
+            dateFormat="yyyy-MM-dd"
+          />
         </div>
 
         <div className="reports-form-group">
           <label>To Date</label>
-          <input type="date" disabled={!isGeneralReport} />
+          <DatePicker
+            selected={toDate}
+            onChange={(date: Date | null) => setToDate(date)}
+            disabled={!isGeneralReport}
+            placeholderText="Select To Date"
+            dateFormat="yyyy-MM-dd"
+            minDate={fromDate || undefined} // Prevent selecting a date before "From Date"
+          />
         </div>
       </div>
 
