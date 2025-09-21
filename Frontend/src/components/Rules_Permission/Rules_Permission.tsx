@@ -52,67 +52,76 @@ const Rules_Permission: React.FC<Rules_PermissionProps> = ({ employeeData }) => 
   const [popupType, setPopupType] = useState<"loading" | "done" | "notdone" | null>(null);
   const [popupMessage, setPopupMessage] = useState<string>("");
 
-  // Fetch facilities from API
+  // Fetch facilities from API with loading popup
   useEffect(() => {
     const fetchFacilities = async () => {
       try {
+        setPopupType("loading");
+        setPopupMessage("Loading facilities...");
+
         const response = await axios.get(`${API_BASE_URL}facilities`);
         const data: Facility[] = response.data.data;
         setFacilityList(data);
         setFacilities(Object.fromEntries(data.map((f) => [f.id, false])));
+
+        setPopupType(null); // hide popup after success
       } catch (error) {
         console.error("Failed to fetch facilities:", error);
+        // popup stays forever if failed
       }
     };
     fetchFacilities();
   }, []);
 
-  // Fill checkboxes from employeeData after search
+  // Fill checkboxes from employeeData after search with loading popup
   useEffect(() => {
-    if (employeeData) {
-      setUserId(employeeData.EmployeeId);
-      setUserName(employeeData.EmployeeName);
+    const fillEmployeeData = async () => {
+      if (!employeeData) return;
 
-      // Parse Permission JSON
-      let permObj: any = {};
-      if (employeeData.Permission) {
-        try {
-          permObj =
-            typeof employeeData.Permission === "string"
-              ? JSON.parse(employeeData.Permission)
-              : employeeData.Permission;
-        } catch (e) {
-          console.error("Failed to parse Permission:", e);
-          permObj = {};
+      try {
+        setPopupType("loading");
+        setPopupMessage("Loading employee data...");
+
+        setUserId(employeeData.EmployeeId);
+        setUserName(employeeData.EmployeeName);
+
+        let permObj: any = {};
+        if (employeeData.Permission) {
+          try {
+            permObj =
+              typeof employeeData.Permission === "string"
+                ? JSON.parse(employeeData.Permission)
+                : employeeData.Permission;
+          } catch (e) {
+            console.error("Failed to parse Permission:", e);
+            permObj = {};
+          }
         }
+
+        setAccess(
+          Object.fromEntries(accessList.map((i) => [i, permObj.Access?.includes(i) || false]))
+        );
+        setSpecial(
+          Object.fromEntries(
+            specialPermissions.map((i) => [i, permObj.Special_Permission?.includes(i) || false])
+          )
+        );
+
+        const branchIds: string[] = employeeData.AccessToBranchId
+          ? employeeData.AccessToBranchId.split(",").map((id: string) => id.trim())
+          : [];
+
+        setFacilities((prev) =>
+          Object.fromEntries(Object.keys(prev).map((id) => [id, branchIds.includes(id)]))
+        );
+
+        setPopupType(null); // hide popup after success
+      } catch (error) {
+        console.error("Failed to load employee data:", error);
+        // popup stays open forever if failed
       }
-
-      // Fill access and special permissions
-      setAccess(
-        Object.fromEntries(accessList.map((i) => [i, permObj.Access?.includes(i) || false]))
-      );
-      setSpecial(
-        Object.fromEntries(
-          specialPermissions.map((i) => [i, permObj.Special_Permission?.includes(i) || false])
-        )
-      );
-
-      // Fill Facility Access based on AccessToBranchId CSV
-      const branchIds: string[] = employeeData.AccessToBranchId
-        ? employeeData.AccessToBranchId.split(",").map((id: string) => id.trim())
-        : [];
-
-      setFacilities((prev) =>
-        Object.fromEntries(Object.keys(prev).map((id) => [id, branchIds.includes(id)]))
-      );
-    } else {
-      // Clear all
-      setUserId("");
-      setUserName("");
-      setAccess(Object.fromEntries(accessList.map((item) => [item, false])));
-      setSpecial(Object.fromEntries(specialPermissions.map((item) => [item, false])));
-      setFacilities((prev) => Object.fromEntries(Object.keys(prev).map((id) => [id, false])));
-    }
+    };
+    fillEmployeeData();
   }, [employeeData, facilityList]);
 
   const toggleAccess = (key: string) => setAccess((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -133,11 +142,11 @@ const Rules_Permission: React.FC<Rules_PermissionProps> = ({ employeeData }) => 
       Permission: {
         Access: accessList.filter((item) => access[item]),
         Special_Permission: specialPermissions.filter((item) => special[item]),
-        Facility_Access: Object.keys(facilities).filter((id) => facilities[id]), // send IDs
+        Facility_Access: Object.keys(facilities).filter((id) => facilities[id]),
       },
       AccessToBranchId: Object.keys(facilities)
         .filter((id) => facilities[id])
-        .join(","), // send updated CSV for AccessToBranchId
+        .join(","),
     };
 
     try {
