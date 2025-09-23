@@ -144,8 +144,8 @@
   font-size: 0.65rem;
   border: 1px solid #ddd;
   border-radius: 4px;
-  background-color: #fff; /* white background for active/editable fields */
-  color: #000;           /* black text */
+  background-color: #fff;
+  color: #000;
   transition: all 0.2s ease;
 }
 
@@ -157,9 +157,62 @@
 
 .upf-form-group input:disabled {
   background-color: #f8f9fa;
-  color: #6c757d; /* gray text for disabled */
+  color: #6c757d;
   cursor: not-allowed;
 }
+/* Custom dropdown wrapper */
+.upf-form-group .custom-select {
+  position: relative;
+  width: 100%;
+  cursor: pointer;
+  font-size: 0.65rem;
+}
+
+.upf-form-group .custom-select .selected {
+  padding: 4px 6px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #fff;
+  color: #000;
+  height: 30px; /* same as input fields */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.upf-form-group .custom-select.open .selected {
+  border-color: #007bff;
+  box-shadow: 0 0 4px rgba(0,123,255,0.2);
+}
+
+.upf-form-group .custom-select .options {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  max-height: 150px; /* shows ~5 items */
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+/* Remove number input spinner */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.upf-form-group .custom-select .options div {
+  padding: 4px 6px;
+  cursor: pointer;
+}
+
+.upf-form-group .custom-select .options div:hover {
+  background-color: #f1f1f1;
+}
+
 
 /* Scrollbar for long form */
 .upf-right::-webkit-scrollbar {
@@ -172,11 +225,23 @@
 }
 
 /* Responsive */
+@media (max-width: 1024px) {
+  .upf-form {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
 @media (max-width: 768px) {
   .upf-content {
     flex-direction: column;
   }
   .upf-form {
     grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .upf-form {
+    grid-template-columns: 1fr;
   }
 }
