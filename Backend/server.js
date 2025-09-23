@@ -18,6 +18,7 @@ const updateDepartmentRoute = require("./routes/DepartmentRoute/UpdateDepartment
 const getDesignationRoute = require("./routes/DesignationRoute/GetDesignationListRoute");
 const updateDesignationRoute = require("./routes/DesignationRoute/UpdateDesignationListRoute");
 const searchEmployee = require("./routes/EmployeeProfileRoute/EmployeeSearchRoute");
+const updateEmployeeRoute = require("./routes/EmployeeProfileRoute/EmployeeUpdateRoute")
 
 
 const getAttendanceReport = require("./routes/ReportsRoute/AttendanceReportRoute");
@@ -52,6 +53,7 @@ app.use("/api", updateDepartmentRoute);
 app.use("/api", getDesignationRoute);
 app.use("/api", updateDesignationRoute);
 app.use("/api", searchEmployee);
+app.use("/api", updateEmployeeRoute);
 
 
 app.use("/api", getAttendanceReport);

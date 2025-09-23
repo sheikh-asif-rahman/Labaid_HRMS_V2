@@ -97,7 +97,10 @@ const Employee: React.FC = () => {
           <Last7_Days_Status data={last7DaysStatus} />
         </div>
         <div style={{ flex: 1 }}>
-          <Working_Day_Shift />
+<Working_Day_Shift
+    shiftSchedule={employeeData?.ShiftSchedule || ""} // dynamically from API
+  />
+
         </div>
       </div>
 
