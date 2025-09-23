@@ -3,7 +3,9 @@ import "./Last7_Days_Status.css";
 
 interface DailyAttendance {
   day: string;
-  hoursWorked: number; // 0 to 8
+  hoursWorked: number;
+  firstPunch?: string;
+  lastPunch?: string;
 }
 
 interface Last7_Days_StatusProps {
@@ -16,7 +18,7 @@ const Last7_Days_Status: React.FC<Last7_Days_StatusProps> = ({ data }) => {
       <h3 className="title">Last 7 Days Status</h3>
       <div className="attendance_list">
         {data.map((dayData) => {
-          const percentage = (dayData.hoursWorked / 8) * 100;
+          const percentage = Math.min((dayData.hoursWorked / 8) * 100, 100);
           return (
             <div key={dayData.day} className="attendance_row">
               <div className="day_label">{dayData.day}</div>

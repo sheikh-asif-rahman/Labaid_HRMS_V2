@@ -9,6 +9,7 @@ import axios from "axios";
 
 const Employee: React.FC = () => {
   const [employeeData, setEmployeeData] = useState<any>(null);
+  const [last7DaysStatus, setLast7DaysStatus] = useState<any[]>([]); // NEW
   const [showEdit, setShowEdit] = useState(false);
 
   // Popup state
@@ -28,21 +29,42 @@ const Employee: React.FC = () => {
       if (response.data?.data) {
         setEmployeeData(response.data.data);
 
+        // --- NEW: Map last 7 days data ---
+        const last7Days = (response.data.last7DaysPunch || []).map((day: any) => {
+          let hoursWorked = 0;
+
+          if (day.duration) {
+            const match = day.duration.match(/(\d+)\s*hrs?\s*(\d+)?\s*mins?/);
+            const hours = parseInt(match?.[1] || "0");
+            const mins = parseInt(match?.[2] || "0");
+            hoursWorked = +(hours + mins / 60).toFixed(2); // decimal hours
+          }
+
+          return {
+            day: day.date || "N/A",
+            hoursWorked,
+            firstPunch: day.firstPunch || null,
+            lastPunch: day.lastPunch || null,
+          };
+        });
+
+        setLast7DaysStatus(last7Days); // send to component
+
         // Show success popup
         setPopupType("done");
         setPopupMessage("Employee found!");
-
-        // Show edit button
         setShowEdit(true);
       } else {
         setEmployeeData(null);
-
+        setLast7DaysStatus([]);
         setPopupType("notdone");
         setPopupMessage("Employee not found!");
         setShowEdit(false);
       }
     } catch (error) {
       console.error(error);
+      setEmployeeData(null);
+      setLast7DaysStatus([]);
       setPopupType("notdone");
       setPopupMessage("Error fetching employee data!");
       setShowEdit(false);
@@ -51,6 +73,7 @@ const Employee: React.FC = () => {
 
   const handleNew = () => {
     setEmployeeData(null);
+    setLast7DaysStatus([]);
     setShowEdit(false);
   };
 
@@ -65,10 +88,13 @@ const Employee: React.FC = () => {
       {/* Row: Attendance, Last 7 Days, Working Shift */}
       <div style={{ display: "flex", flexDirection: "row", gap: "20px", flexWrap: "nowrap", padding: "10px 0" }}>
         <div style={{ flex: 1 }}>
-          <User_Profile_Attendance punchInTime="09:00" totalShiftHours={8} />
+<User_Profile_Attendance 
+  punchInTime={employeeData?.firstPunchToday || "N/A"} 
+  totalShiftHours={8} 
+/>
         </div>
         <div style={{ flex: 1 }}>
-          <Last7_Days_Status data={[]} />
+          <Last7_Days_Status data={last7DaysStatus} />
         </div>
         <div style={{ flex: 1 }}>
           <Working_Day_Shift />
