@@ -19,6 +19,12 @@ const getDesignationRoute = require("./routes/DesignationRoute/GetDesignationLis
 const updateDesignationRoute = require("./routes/DesignationRoute/UpdateDesignationListRoute");
 
 
+const getAttendanceReport = require("./routes/ReportsRoute/AttendanceReportRoute");
+const getAbsentReport = require("./routes/ReportsRoute/AbsentReportRoute");
+
+
+
+
 
 const app = express();
 const port = 3000;
@@ -41,6 +47,10 @@ app.use("/api", getDepartmentList);
 app.use("/api", updateDepartmentRoute);
 app.use("/api", getDesignationRoute);
 app.use("/api", updateDesignationRoute);
+
+
+app.use("/api", getAttendanceReport);
+app.use("/api", getAbsentReport);
 
 
 
