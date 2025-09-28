@@ -3,6 +3,10 @@ import { FaUserCircle } from "react-icons/fa";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "./User_Profile.css";
+import axios from "axios"; // <- added for API
+import Popup from "../../Popup/Popup";
+
+import { API_BASE_URL } from "../../../constants/apiBase"; // <- add your constants file path
 
 interface OptionType {
   id: string | number;
@@ -34,9 +38,11 @@ interface FormDataType {
 }
 
 interface UserProfileProps {
-  employeeData?: any;
+  employeeData: any;
   showEditButton: boolean;
+  onUpdate?: (updatedProfile: any) => void; // <-- add this
 }
+
 
 const User_Profile: React.FC<UserProfileProps> = ({ employeeData, showEditButton }) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -44,6 +50,12 @@ const User_Profile: React.FC<UserProfileProps> = ({ employeeData, showEditButton
   const [departments, setDepartments] = useState<OptionType[]>([]);
   const [designations, setDesignations] = useState<OptionType[]>([]);
   const [branches, setBranches] = useState<OptionType[]>([]);
+const [popup, setPopup] = useState<{ isOpen: boolean; type: "loading" | "done" | "notdone"; message: string }>({
+  isOpen: false,
+  type: "loading",
+  message: "",
+});
+
 
   const [formData, setFormData] = useState<FormDataType>({
     employeeId: "",
@@ -116,39 +128,40 @@ const User_Profile: React.FC<UserProfileProps> = ({ employeeData, showEditButton
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Fetch Departments
-  useEffect(() => {
-    fetch("http://localhost:3000/api/getDepartmentList")
-      .then(res => res.json())
-      .then(data => {
-        if (data.success && Array.isArray(data.data)) {
-          setDepartments(data.data.filter((d: any) => d.Status).map((d: any) => ({ id: d.DepartmentID, name: d.DepartmentName })));
-        }
-      });
-  }, []);
+// Fetch Departments
+useEffect(() => {
+  axios.get(`${API_BASE_URL}getDepartmentList`).then(res => {
+    const data = res.data;
+    if (data.success && Array.isArray(data.data)) {
+      setDepartments(data.data
+        .filter((d: any) => d.Status)
+        .map((d: any) => ({ id: d.DepartmentID, name: d.DepartmentName })));
+    }
+  });
+}, []);
 
-  // Fetch Designations
-  useEffect(() => {
-    fetch("http://localhost:3000/api/getDesignationList")
-      .then(res => res.json())
-      .then(data => {
-        if (data.success && Array.isArray(data.data)) {
-          setDesignations(data.data.filter((d: any) => d.Status).map((d: any) => ({ id: d.id, name: d.name })));
-        }
-      });
-  }, []);
+// Fetch Designations
+useEffect(() => {
+  axios.get(`${API_BASE_URL}getDesignationList`).then(res => {
+    const data = res.data;
+    if (data.success && Array.isArray(data.data)) {
+      setDesignations(data.data
+        .filter((d: any) => d.Status)
+        .map((d: any) => ({ id: d.id, name: d.name })));
+    }
+  });
+}, []);
 
-  // Fetch Branches (Facilities)
-  useEffect(() => {
-    fetch("http://localhost:3000/api/facilities")
-      .then(res => res.json())
-      .then(data => {
-        if (data.success && Array.isArray(data.data)) {
-          const branchOptions = data.data.map((b: any) => ({ id: b.id, name: b.name }));
-          setBranches(branchOptions);
-        }
-      });
-  }, []);
+// Fetch Branches
+useEffect(() => {
+  axios.get(`${API_BASE_URL}facilities`).then(res => {
+    const data = res.data;
+    if (data.success && Array.isArray(data.data)) {
+      setBranches(data.data.map((b: any) => ({ id: b.id, name: b.name })));
+    }
+  });
+}, []);
+
 
   // Populate formData when employeeData changes
   useEffect(() => {
@@ -193,7 +206,53 @@ const User_Profile: React.FC<UserProfileProps> = ({ employeeData, showEditButton
   };
 
   const handleEdit = () => setIsEditing(true);
-  const handleUpdate = () => setIsEditing(false);
+
+  // ---------- UPDATED: handleUpdate with API call ----------
+const handleUpdate = async () => {
+  try {
+    const loggedInUser = JSON.parse(localStorage.getItem("user") || "{}");
+
+    const payload = {
+      EmployeeId: formData.employeeId,
+      UserId: loggedInUser.EmployeeId || "ADMIN",
+      EmployeeName: formData.name,
+      DepartmentId: String(formData.departmentId),
+      DesignationId: String(formData.designationId),
+      BranchId: String(branches.find(b => b.name === formData.branch)?.id || ""),
+      DateOfJoin: formData.joiningDate ? formData.joiningDate.toISOString().split("T")[0] : null,
+      DateOfResign: formData.resignDate ? formData.resignDate.toISOString().split("T")[0] : null,
+      NID: formData.nid,
+      PersonalContactNumber: formData.personalPhone,
+      OfficalContactNumber: formData.officialPhone,
+      Email: formData.email,
+      EmployeeType: formData.employeeType,
+      Gender: formData.gender,
+      MaritalStatus: formData.maritalStatus,
+      BloodGroup: formData.bloodGroup,
+      FatherName: formData.fatherName,
+      MotherName: formData.motherName,
+      PresentAddress: formData.presentAddress,
+      PermanentAddress: formData.permanentAddress,
+      Status: formData.status,
+      type: "profile",
+    };
+
+    // Show loading popup
+    setPopup({ isOpen: true, type: "loading", message: "Updating profile..." });
+
+    const response = await axios.put(`${API_BASE_URL}employeeupdate`, payload);
+    console.log("Update Response:", response.data);
+
+    // Success popup
+    setPopup({ isOpen: true, type: "done", message: "Profile updated successfully" });
+    setIsEditing(false);
+  } catch (err: any) {
+    console.error("Error updating profile:", err);
+    setPopup({ isOpen: true, type: "notdone", message: "Failed to update profile" });
+  }
+};
+
+  // --------------------------------------------------------
 
   const handleProfilePicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -385,8 +444,15 @@ const User_Profile: React.FC<UserProfileProps> = ({ employeeData, showEditButton
               )
             })}
           </form>
+          <Popup
+        isOpen={popup.isOpen}
+        type={popup.type}
+        message={popup.message}
+        onClose={() => setPopup({ ...popup, isOpen: false })}
+      />
         </div>
       </div>
+      
     </div>
   );
 };

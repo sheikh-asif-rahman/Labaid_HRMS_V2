@@ -26,19 +26,20 @@ const Login_Page: React.FC = () => {
       const data = response.data;
       console.log("Login Response:", data);
 
-      if (data.Status === "active") {
-        localStorage.setItem(
-          "user",
-          JSON.stringify({
-            EmployeeId: data.EmployeeId,
-            Permission: data.Permission,
-            Status: data.Status,
-          })
-        );
+      // ✅ Case-insensitive check
+      if (data.Status.toLowerCase() === "active") {
+        const userData = {
+          EmployeeId: data.EmployeeId,
+          Permission: data.Permission,
+          Status: data.Status,
+        };
+        localStorage.setItem("user", JSON.stringify(userData));
         localStorage.setItem("isLoggedIn", "true");
 
         setMessage("Login successful ✅");
-        navigate("/", { replace: true }); // go to Home
+
+        // Navigate to home
+        navigate("/", { replace: true });
       } else {
         setMessage(data.message || "Login failed ❌");
       }
