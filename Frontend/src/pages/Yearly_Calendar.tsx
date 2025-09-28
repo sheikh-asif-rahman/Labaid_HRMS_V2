@@ -1,5 +1,6 @@
 import React from "react";
 import Yearly_Calender from "../components/Yearly_Calender/Yearly_Calender"; // adjust path if needed
+import Popup from "../components/Popup/Popup";
 
 const Yearly_Calendar: React.FC = () => {
   return (
@@ -17,6 +18,9 @@ const Yearly_Calendar: React.FC = () => {
     >
       {/* Call the full Yearly_Calender component */}
       <Yearly_Calender />
+
+      <Popup isOpen={true} type="underdev" />
+
     </div>
   );
 };

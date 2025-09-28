@@ -114,6 +114,28 @@
   box-shadow: 0 6px 18px rgba(0,0,0,0.15);
 }
 
+
+/* Under Development popup */
+.wc-popup-underdev {
+  min-height: 220px;
+  padding: 35px 25px;
+}
+
+.wc-popup-underdev-gif {
+  width: 120px;
+  height: auto;
+  margin-bottom: 16px;
+}
+
+.wc-popup-underdev-text {
+  font-size: 18px;
+  font-weight: 700;
+  color: #222;
+  text-align: center;
+}
+
+
+
 /* Popup appear animation */
 @keyframes wc-popup-scaleIn {
   from { transform: scale(0.96); opacity: 0; }
