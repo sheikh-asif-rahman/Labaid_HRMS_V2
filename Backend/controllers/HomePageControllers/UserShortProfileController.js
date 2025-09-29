@@ -10,7 +10,9 @@ const usershortprofile = async (req, res) => {
 
     // Connect to DB
     const pool = await sql.connect();
-    const result = await pool.request()
+
+    // Get employee info
+    const empResult = await pool.request()
       .input("EmployeeId", sql.NVarChar, EmployeeId)
       .query(`
         SELECT 
@@ -23,17 +25,51 @@ const usershortprofile = async (req, res) => {
         WHERE EmployeeId = @EmployeeId
       `);
 
-    const user = result.recordset[0];
+    const user = empResult.recordset[0];
 
     if (!user) {
       return res.status(404).json({ message: "Employee not found" });
     }
 
-    // Add default values for fields not ready yet
-    user.Shift = "morning";
-    user.LeaveBalance = 20;
+    // Fetch Department Name
+    let departmentName = null;
+    if (user.DepartmentId) {
+      const depResult = await pool.request()
+        .input("DepartmentId", sql.Int, user.DepartmentId)
+        .query(`SELECT DepartmentName FROM [TA].[dbo].[Department] WHERE DepartmentId = @DepartmentId`);
+      departmentName = depResult.recordset[0]?.DepartmentName || null;
+    }
 
-    return res.json(user);
+    // Fetch Designation Name
+    let designationName = null;
+    if (user.DesignationId) {
+      const desResult = await pool.request()
+        .input("DesignationId", sql.Int, user.DesignationId)
+        .query(`SELECT DesignationName FROM [TA].[dbo].[Designation] WHERE DesignationId = @DesignationId`);
+      designationName = desResult.recordset[0]?.DesignationName || null;
+    }
+
+    // Fetch Branch Name
+    let branchName = null;
+    if (user.BranchId) {
+      const branchResult = await pool.request()
+        .input("BranchId", sql.NVarChar, user.BranchId)
+        .query(`SELECT name FROM [TA].[dbo].[Device] WHERE id = @BranchId`);
+      branchName = branchResult.recordset[0]?.name || null;
+    }
+
+    // Build final response
+    const response = {
+      EmployeeName: user.EmployeeName,
+      EmployeeId: user.EmployeeId,
+      DepartmentName: departmentName,
+      DesignationName: designationName,
+      BranchName: branchName,
+      Shift: "morning",         // default
+      LeaveBalance: 20          // default
+    };
+
+    return res.json(response);
 
   } catch (err) {
     console.error(err);

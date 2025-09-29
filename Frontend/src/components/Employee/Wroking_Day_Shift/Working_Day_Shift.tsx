@@ -71,17 +71,29 @@ const Working_Day_Shift: React.FC<ShiftScheduleProps> = ({ shiftSchedule, employ
     setSchedule(parseShiftSchedule(shiftSchedule));
   }, [shiftSchedule]);
 
+  // Clicking a day highlights it and sets the dropdown
   const handleDayClick = (day: Day) => {
     setActiveDay(day);
     setDayType(schedule[day].type);
   };
 
+  // Dropdown change updates schedule immediately
+  const handleDayTypeChange = (newType: DayType) => {
+    if (!activeDay) return;
+
+    setSchedule(prev => ({
+      ...prev,
+      [activeDay]: { type: newType }
+    }));
+
+    setDayType(newType);
+  };
+
+  // Update button propagates current schedule to parent
   const handleUpdate = () => {
-    if (!activeDay || !employeeId) return;
-    const updatedSchedule = { ...schedule, [activeDay]: { type: dayType } };
-    setSchedule(updatedSchedule);
-    const updatedString = scheduleToString(updatedSchedule);
-    if (onChange) onChange(updatedString); // propagate to parent
+    if (onChange) {
+      onChange(scheduleToString(schedule));
+    }
   };
 
   const getCardColor = (day: Day) => {
@@ -113,7 +125,7 @@ const Working_Day_Shift: React.FC<ShiftScheduleProps> = ({ shiftSchedule, employ
         <select
           disabled={!activeDay}
           value={activeDay ? dayType : ""}
-          onChange={(e) => setDayType(e.target.value as DayType)}
+          onChange={(e) => handleDayTypeChange(e.target.value as DayType)}
         >
           {!activeDay && <option value="">Select Day Type</option>}
           <option value="Full Day">Full Day</option>

@@ -21,20 +21,19 @@ const Report_Preview: React.FC<Props> = ({ reportType, dataFetched }) => {
       return;
     }
 
-    if (reportType === "employee") {
-      const cols = Array.from({ length: 20 }, (_, i) => `Col ${i + 1}`);
-      const rows = Array.from({ length: 50 }, (_, r) =>
-        Array.from({ length: 20 }, (_, c) => `R${r + 1}C${c + 1}`)
-      );
-      setColumns(cols);
-      setData(rows);
-    } else if (["attendance", "leave", "absent"].includes(reportType)) {
+    if (reportType === "attendance") {
+      // Keep the format: 10 columns, but no data rows
       const cols = Array.from({ length: 10 }, (_, i) => `Col ${i + 1}`);
-      const rows = Array.from({ length: 50 }, (_, r) =>
-        Array.from({ length: 10 }, (_, c) => `R${r + 1}C${c + 1}`)
-      );
       setColumns(cols);
-      setData(rows);
+      setData([]); // No rows, will be filled by API later
+    } else if (reportType === "employee") {
+      const cols = Array.from({ length: 20 }, (_, i) => `Col ${i + 1}`);
+      setColumns(cols);
+      setData([]);
+    } else if (reportType === "absent") {
+      const cols = Array.from({ length: 10 }, (_, i) => `Col ${i + 1}`);
+      setColumns(cols);
+      setData([]);
     }
   }, [reportType, dataFetched]);
 
@@ -77,6 +76,14 @@ const Report_Preview: React.FC<Props> = ({ reportType, dataFetched }) => {
               </tbody>
             </table>
           </div>
+
+          {/* Download button only visible after Get Data */}
+          <button
+            className="report-preview-download-btn"
+            style={{ display: dataFetched ? "inline-block" : "none" }}
+          >
+            Download
+          </button>
 
           {totalPages > 1 && (
             <div className="pagination">

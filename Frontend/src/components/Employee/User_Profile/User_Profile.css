@@ -160,12 +160,14 @@
   color: #6c757d;
   cursor: not-allowed;
 }
+
 /* Custom dropdown wrapper */
 .upf-form-group .custom-select {
   position: relative;
   width: 100%;
   cursor: pointer;
   font-size: 0.65rem;
+  user-select: none;
 }
 
 .upf-form-group .custom-select .selected {
@@ -196,6 +198,28 @@
   max-height: 150px; /* shows ~5 items */
   overflow-y: auto;
   z-index: 1000;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  opacity: 0;
+  transform: scaleY(0);
+  transform-origin: top;
+  pointer-events: none;
+}
+
+.upf-form-group .custom-select.open .options {
+  opacity: 1;
+  transform: scaleY(1);
+  pointer-events: auto;
+}
+
+/* Dropdown option */
+.upf-form-group .custom-select .options div {
+  padding: 4px 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.upf-form-group .custom-select .options div:hover {
+  background-color: #f1f1f1;
 }
 
 /* Remove number input spinner */
@@ -204,15 +228,6 @@ input[type=number]::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
-.upf-form-group .custom-select .options div {
-  padding: 4px 6px;
-  cursor: pointer;
-}
-
-.upf-form-group .custom-select .options div:hover {
-  background-color: #f1f1f1;
-}
-
 
 /* Scrollbar for long form */
 .upf-right::-webkit-scrollbar {

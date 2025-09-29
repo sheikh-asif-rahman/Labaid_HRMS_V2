@@ -5,9 +5,10 @@ import Popup from "../Popup/Popup";
 interface SearchProps {
   placeholder?: string;
   onSearch?: (query: string) => void;
+  onNew?: () => void;
 }
 
-const Search: React.FC<SearchProps> = ({ placeholder = "Search...", onSearch }) => {
+const Search: React.FC<SearchProps> = ({ placeholder = "Search...", onSearch, onNew }) => {
   const [query, setQuery] = useState("");
   const [popupType, setPopupType] = useState<"loading" | "done" | "notdone" | null>(null);
   const [popupMessage, setPopupMessage] = useState<string>("");
@@ -18,13 +19,16 @@ const Search: React.FC<SearchProps> = ({ placeholder = "Search...", onSearch }) 
       setPopupMessage("Please enter a search value");
       return;
     }
-
     if (onSearch) onSearch(query);
   };
 
   const handleNew = () => {
-    // Refresh the entire page
-    window.location.href = window.location.href;
+    if (onNew) {
+      onNew();
+    } else {
+      // Default behavior: refresh page
+      window.location.href = window.location.href;
+    }
   };
 
   return (

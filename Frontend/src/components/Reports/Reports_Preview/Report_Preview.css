@@ -11,6 +11,7 @@
   border: 1px solid #ddd;
     width: 100%;
   max-width: 100%;
+  position: relative; /* Added for absolute positioning of download button */
 }
 
 .report-preview-header {
@@ -28,8 +29,9 @@
 
 /* Table wrapper with horizontal scroll */
 .table-wrapper-scroll {
-  overflow-x: auto; /* horizontal scroll for wide tables */
+  overflow-x: auto;
   max-width: 100%;
+  margin-top: 30px; /* Add top margin to push table below the download button */
 }
 
 /* Table styles */
@@ -111,4 +113,33 @@
   background: #f8f9fa;
   border-radius: 6px;
   border: 1px dashed #ccc;
+}
+
+/* Download button - top right corner, using Reports_Form blue button style */
+.report-preview-download-btn {
+  position: absolute;
+  top: 24px;
+  right: 32px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  min-width: 100px;
+  background-color: var(--primary);
+  color: var(--white);
+  border: none;
+  transition: background-color 0.2s, border 0.2s;
+  z-index: 2;
+}
+
+.report-preview-download-btn:hover {
+  background-color: #010f8c;
+}
+
+.report-preview-download-btn:disabled {
+  background-color: var(--white);
+  color: var(--secondary);
+  border: 1px solid var(--secondary);
+  cursor: not-allowed;
 }

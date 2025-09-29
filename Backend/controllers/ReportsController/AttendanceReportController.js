@@ -1,4 +1,5 @@
 const { sql } = require("../../config/dbConfig");
+
 // helper: format time in AM/PM
 function formatTime(date) {
   if (!date) return null;
@@ -33,14 +34,22 @@ const getAttendanceReport = async (req, res) => {
       return res.status(400).json({ message: "facilityId, fromDate, and toDate are required" });
     }
 
-    // 1. Get employees
+    // 1. Get employees with DepartmentName, DesignationName, BranchName
     let employeeQuery = `
-      SELECT EmployeeId, EmployeeName, DepartmentId, DesignationId, BranchId
-      FROM [TA].[dbo].[Employee]
-      WHERE BranchId = @facilityId
+      SELECT 
+        e.EmployeeId, 
+        e.EmployeeName, 
+        d.DepartmentName, 
+        dg.DesignationName, 
+        b.name AS BranchName
+      FROM [TA].[dbo].[Employee] e
+      LEFT JOIN [TA].[dbo].[Department] d ON e.DepartmentId = d.DepartmentId
+      LEFT JOIN [TA].[dbo].[Designation] dg ON e.DesignationId = dg.DesignationId
+      LEFT JOIN [TA].[dbo].[Device] b ON e.BranchId = b.id
+      WHERE e.BranchId = @facilityId
     `;
     if (userId) {
-      employeeQuery += " AND EmployeeId = @userId";
+      employeeQuery += " AND e.EmployeeId = @userId";
     }
 
     const empRequest = new sql.Request();
@@ -49,7 +58,6 @@ const getAttendanceReport = async (req, res) => {
 
     const employeeResult = await empRequest.query(employeeQuery);
 
-    // Case 1: UserId given but not in facility
     if (userId && employeeResult.recordset.length === 0) {
       return res.status(404).json({ message: "User not found in this facility" });
     }
@@ -84,10 +92,13 @@ const getAttendanceReport = async (req, res) => {
     const finalData = employeeResult.recordset.map(emp => {
       const punches = punchResult.recordset.filter(p => p.EmployeeId === emp.EmployeeId);
       return {
-        ...emp,
+        EmployeeId: emp.EmployeeId,
+        EmployeeName: emp.EmployeeName,
+        DepartmentName: emp.DepartmentName || null,
+        DesignationName: emp.DesignationName || null,
+        BranchName: emp.BranchName || null,
         Attendance: punches.map(p => {
           if (p.InTime.getTime() === p.OutTime.getTime()) {
-            // Single punch → no Out
             return {
               Date: p.PunchDate,
               In: formatTime(p.InTime),

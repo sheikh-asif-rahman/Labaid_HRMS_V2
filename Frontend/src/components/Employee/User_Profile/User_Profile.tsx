@@ -43,7 +43,6 @@ interface UserProfileProps {
   onUpdate?: (updatedProfile: any) => void; // <-- add this
 }
 
-
 const User_Profile: React.FC<UserProfileProps> = ({ employeeData, showEditButton }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [profilePic, setProfilePic] = useState<string | null>(null);
@@ -200,10 +199,18 @@ useEffect(() => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSelect = (field: keyof FormDataType, value: any, dropdownKey: keyof typeof dropdowns) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    setDropdowns(prev => ({ ...prev, [dropdownKey]: false }));
-  };
+const handleSelect = (
+  field: keyof FormDataType,
+  value: any,
+  dropdownKey: keyof typeof dropdowns
+) => {
+  // Update the form value
+  setFormData(prev => ({ ...prev, [field]: value }));
+
+  // Close the dropdown immediately after selection
+  setDropdowns(prev => ({ ...prev, [dropdownKey]: false }));
+};
+
 
   const handleEdit = () => setIsEditing(true);
 
@@ -308,7 +315,15 @@ const handleUpdate = async () => {
                 {dropdowns.branch && (
                   <div className="options">
                     {branches.map(b => (
-                      <div key={b.id} onClick={() => handleSelect("branch", b.name, "branch")}>{b.name}</div>
+                      <div
+                        key={b.id}
+                        onClick={e => {
+                          e.stopPropagation();
+                          handleSelect("branch", b.name, "branch");
+                        }}
+                      >
+                        {b.name}
+                      </div>
                     ))}
                   </div>
                 )}
@@ -324,7 +339,17 @@ const handleUpdate = async () => {
                 </div>
                 {dropdowns.dept && (
                   <div className="options">
-                    {departments.map(d => <div key={d.id} onClick={() => handleSelect("departmentId", d.id, "dept")}>{d.name}</div>)}
+                    {departments.map(d => (
+                      <div
+                        key={d.id}
+                        onClick={e => {
+                          e.stopPropagation();
+                          handleSelect("departmentId", d.id, "dept");
+                        }}
+                      >
+                        {d.name}
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
@@ -339,7 +364,17 @@ const handleUpdate = async () => {
                 </div>
                 {dropdowns.des && (
                   <div className="options">
-                    {designations.map(d => <div key={d.id} onClick={() => handleSelect("designationId", d.id, "des")}>{d.name}</div>)}
+                    {designations.map(d => (
+                      <div
+                        key={d.id}
+                        onClick={e => {
+                          e.stopPropagation();
+                          handleSelect("designationId", d.id, "des");
+                        }}
+                      >
+                        {d.name}
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
@@ -354,7 +389,17 @@ const handleUpdate = async () => {
                 </div>
                 {dropdowns.empType && (
                   <div className="options">
-                    {employeeTypes.map((type, idx) => <div key={idx} onClick={() => handleSelect("employeeType", type, "empType")}>{type}</div>)}
+                    {employeeTypes.map((type, idx) => (
+                      <div
+                        key={idx}
+                        onClick={e => {
+                          e.stopPropagation();
+                          handleSelect("employeeType", type, "empType");
+                        }}
+                      >
+                        {type}
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
@@ -392,7 +437,19 @@ const handleUpdate = async () => {
               <div className={`custom-select ${dropdowns.gender ? "open" : ""}`} onClick={() => isEditing && setDropdowns(prev => ({ ...prev, gender: !prev.gender }))}>
                 <div className="selected">{formData.gender || "Select Gender"} <span style={{ float: "right" }}>▾</span></div>
                 {dropdowns.gender && (
-                  <div className="options">{genderOptions.map((g, idx) => <div key={idx} onClick={() => handleSelect("gender", g, "gender")}>{g}</div>)}</div>
+                  <div className="options">
+                    {genderOptions.map((g, idx) => (
+                      <div
+                        key={idx}
+                        onClick={e => {
+                          e.stopPropagation();
+                          handleSelect("gender", g, "gender");
+                        }}
+                      >
+                        {g}
+                      </div>
+                    ))}
+                  </div>
                 )}
               </div>
             </div>
@@ -403,7 +460,19 @@ const handleUpdate = async () => {
               <div className={`custom-select ${dropdowns.maritalStatus ? "open" : ""}`} onClick={() => isEditing && setDropdowns(prev => ({ ...prev, maritalStatus: !prev.maritalStatus }))}>
                 <div className="selected">{formData.maritalStatus || "Select Marital Status"} <span style={{ float: "right" }}>▾</span></div>
                 {dropdowns.maritalStatus && (
-                  <div className="options">{maritalStatusOptions.map((m, idx) => <div key={idx} onClick={() => handleSelect("maritalStatus", m, "maritalStatus")}>{m}</div>)}</div>
+                  <div className="options">
+                    {maritalStatusOptions.map((m, idx) => (
+                      <div
+                        key={idx}
+                        onClick={e => {
+                          e.stopPropagation();
+                          handleSelect("maritalStatus", m, "maritalStatus");
+                        }}
+                      >
+                        {m}
+                      </div>
+                    ))}
+                  </div>
                 )}
               </div>
             </div>
@@ -414,7 +483,19 @@ const handleUpdate = async () => {
               <div className={`custom-select ${dropdowns.bloodGroup ? "open" : ""}`} onClick={() => isEditing && setDropdowns(prev => ({ ...prev, bloodGroup: !prev.bloodGroup }))}>
                 <div className="selected">{formData.bloodGroup || "Select Blood Group"} <span style={{ float: "right" }}>▾</span></div>
                 {dropdowns.bloodGroup && (
-                  <div className="options">{bloodGroupOptions.map((b, idx) => <div key={idx} onClick={() => handleSelect("bloodGroup", b, "bloodGroup")}>{b}</div>)}</div>
+                  <div className="options">
+                    {bloodGroupOptions.map((b, idx) => (
+                      <div
+                        key={idx}
+                        onClick={e => {
+                          e.stopPropagation();
+                          handleSelect("bloodGroup", b, "bloodGroup");
+                        }}
+                      >
+                        {b}
+                      </div>
+                    ))}
+                  </div>
                 )}
               </div>
             </div>
@@ -425,7 +506,19 @@ const handleUpdate = async () => {
               <div className={`custom-select ${dropdowns.status ? "open" : ""}`} onClick={() => isEditing && setDropdowns(prev => ({ ...prev, status: !prev.status }))}>
                 <div className="selected">{formData.status || "Select Status"} <span style={{ float: "right" }}>▾</span></div>
                 {dropdowns.status && (
-                  <div className="options">{statusOptions.map((s, idx) => <div key={idx} onClick={() => handleSelect("status", s, "status")}>{s}</div>)}</div>
+                  <div className="options">
+                    {statusOptions.map((s, idx) => (
+                      <div
+                        key={idx}
+                        onClick={e => {
+                          e.stopPropagation();
+                          handleSelect("status", s, "status");
+                        }}
+                      >
+                        {s}
+                      </div>
+                    ))}
+                  </div>
                 )}
               </div>
             </div>

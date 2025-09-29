@@ -1,7 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "./Reports_Form.css";
+import axios from "axios"; // Add this import
+
+type Facility = {
+  id: string;
+  name: string;
+};
 
 type Props = {
   reportType: string;
@@ -18,12 +24,38 @@ const Reports_Form: React.FC<Props> = ({
 }) => {
   const [fromDate, setFromDate] = useState<Date | null>(null);
   const [toDate, setToDate] = useState<Date | null>(null);
+  const [facilities, setFacilities] = useState<Facility[]>([]);
+  const [selectedFacility, setSelectedFacility] = useState<string>("");
+
+  // Fetch facilities from API
+  useEffect(() => {
+    axios
+      .get("http://localhost:3000/api/facilities")
+      .then((res) => {
+        if (res.data.success && Array.isArray(res.data.data)) {
+          setFacilities(
+            res.data.data.map((f: any) => ({
+              id: f.id,
+              name: f.name,
+            }))
+          );
+        } else {
+          setFacilities([]);
+        }
+      })
+      .catch(() => setFacilities([]));
+  }, []);
 
   const handleReportChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setReportType(e.target.value);
     setDataFetched(false);
     setFromDate(null);
     setToDate(null);
+    setSelectedFacility("");
+  };
+
+  const handleFacilityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedFacility(e.target.value);
   };
 
   const handleGetData = () => setDataFetched(true);
@@ -33,12 +65,11 @@ const Reports_Form: React.FC<Props> = ({
     setDataFetched(false);
     setFromDate(null);
     setToDate(null);
+    setSelectedFacility("");
   };
 
   const isGeneralReport =
-    reportType === "attendance" ||
-    reportType === "absent" ||
-    reportType === "leave";
+    reportType === "attendance" || reportType === "absent";
 
   return (
     <div className="reports-form-container">
@@ -53,7 +84,6 @@ const Reports_Form: React.FC<Props> = ({
           <option value="">Select Report Type</option>
           <option value="attendance">Attendance Report</option>
           <option value="absent">Absent Report</option>
-          <option value="leave">Leave Report</option>
           <option value="employee">Employee List</option>
         </select>
       </div>
@@ -62,10 +92,19 @@ const Reports_Form: React.FC<Props> = ({
       <div className="reports-form-options">
         <div className="reports-form-group">
           <label>Select Facility</label>
-          <select disabled={!reportType}>
+          <select
+            disabled={!reportType}
+            value={selectedFacility}
+            onChange={handleFacilityChange}
+          >
             <option value="">Select Facility</option>
-            <option value="facility1">Facility 1</option>
-            <option value="facility2">Facility 2</option>
+            {facilities.map((facility) =>
+              facility.name ? (
+                <option key={facility.id} value={facility.id}>
+                  {facility.name}
+                </option>
+              ) : null
+            )}
           </select>
         </div>
 
@@ -97,7 +136,7 @@ const Reports_Form: React.FC<Props> = ({
             disabled={!isGeneralReport}
             placeholderText="Select To Date"
             dateFormat="yyyy-MM-dd"
-            minDate={fromDate || undefined} // Prevent selecting a date before "From Date"
+            minDate={fromDate || undefined}
           />
         </div>
       </div>
@@ -108,23 +147,11 @@ const Reports_Form: React.FC<Props> = ({
           <button
             className="reports-form-btn reports-form-btn-blue"
             onClick={handleGetData}
-            disabled={!reportType}
+            disabled={!reportType || !selectedFacility}
           >
             Get Data
           </button>
-        ) : (
-          <>
-            <button className="reports-form-btn reports-form-btn-blue">
-              Download
-            </button>
-            <button
-              className="reports-form-btn reports-form-btn-gray"
-              onClick={handleReset}
-            >
-              Reset
-            </button>
-          </>
-        )}
+        ) : null}
       </div>
     </div>
   );

@@ -4,48 +4,57 @@ const { sql } = require("../../config/dbConfig");
 function generateDateRange(from, to) {
   const dates = [];
   let current = new Date(from);
-  while (current <= to) {
+  const end = new Date(to);
+  end.setHours(0, 0, 0, 0);
+  while (current <= end) {
     dates.push(new Date(current));
     current.setDate(current.getDate() + 1);
   }
   return dates;
 }
 
+// helper: format YYYY-MM-DD
+function formatDateLocal(date) {
+  return date.toISOString().split("T")[0];
+}
+
+// map JS getDay() to abbreviations
+const weekdayMap = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+
 const getAbsentReport = async (req, res) => {
   try {
     const { facilityId, userId, fromDate, toDate } = req.body;
-
     if (!facilityId || !fromDate || !toDate) {
       return res.status(400).json({ message: "facilityId, fromDate, and toDate are required" });
     }
 
-    // 1. Get employees
+    // 1. Get employees with names and ShiftSchedule
     let employeeQuery = `
-      SELECT EmployeeId, EmployeeName, DepartmentId, DesignationId, BranchId
-      FROM [TA].[dbo].[Employee]
-      WHERE BranchId = @facilityId
+      SELECT 
+        e.EmployeeId, 
+        e.EmployeeName, 
+        d.DepartmentName, 
+        dg.DesignationName, 
+        b.name AS BranchName,
+        e.ShiftSchedule
+      FROM [TA].[dbo].[Employee] e
+      LEFT JOIN [TA].[dbo].[Department] d ON e.DepartmentId = d.DepartmentId
+      LEFT JOIN [TA].[dbo].[Designation] dg ON e.DesignationId = dg.DesignationId
+      LEFT JOIN [TA].[dbo].[Device] b ON e.BranchId = b.id
+      WHERE e.BranchId = @facilityId
     `;
-    if (userId) {
-      employeeQuery += " AND EmployeeId = @userId";
-    }
+    if (userId) employeeQuery += " AND e.EmployeeId = @userId";
 
     const empRequest = new sql.Request();
     empRequest.input("facilityId", sql.NVarChar, facilityId);
     if (userId) empRequest.input("userId", sql.NVarChar, userId);
 
     const employeeResult = await empRequest.query(employeeQuery);
-
-    if (userId && employeeResult.recordset.length === 0) {
-      return res.status(404).json({ message: "User not found in this facility" });
-    }
-
-    if (employeeResult.recordset.length === 0) {
-      return res.status(404).json({ message: "No employees found" });
-    }
+    if (employeeResult.recordset.length === 0) return res.status(404).json({ message: "No employees found" });
 
     const employeeIds = employeeResult.recordset.map(emp => emp.EmployeeId);
 
-    // 2. Get punch dates
+    // 2. Get punches
     let punchQuery = `
       SELECT user_id AS EmployeeId,
              CONVERT(DATE, devdt) AS PunchDate
@@ -65,22 +74,39 @@ const getAbsentReport = async (req, res) => {
     // make map of punches
     const punchMap = {};
     punchResult.recordset.forEach(p => {
-      const key = `${p.EmployeeId}_${p.PunchDate.toISOString().split("T")[0]}`;
-      punchMap[key] = true;
+      punchMap[`${p.EmployeeId}_${formatDateLocal(p.PunchDate)}`] = true;
     });
 
-    // 3. Generate full absent report
     const allDates = generateDateRange(new Date(fromDate), new Date(toDate));
+
     const finalData = employeeResult.recordset.map(emp => {
-      const absentDays = allDates
-        .filter(d => !punchMap[`${emp.EmployeeId}_${d.toISOString().split("T")[0]}`])
-        .map(d => ({
-          Date: d.toISOString().split("T")[0],
-          Status: "Absent"
-        }));
+      // Parse ShiftSchedule robustly
+      const shiftMap = {};
+      if (emp.ShiftSchedule && typeof emp.ShiftSchedule === "string") {
+        emp.ShiftSchedule.split(",").forEach(entry => {
+          const cleaned = entry.replace(/\s/g, '').toUpperCase();
+          const match = cleaned.match(/([A-Z]{3})\[(FULLDAY|HALFDAY|OFFDAY)\]/);
+          if (match) shiftMap[match[1]] = match[2];
+        });
+      }
+
+      const absentDays = allDates.filter(d => {
+        const dayAbbr = weekdayMap[d.getDay()];
+        const schedule = shiftMap[dayAbbr];
+
+        if (!schedule) return false;        // skip if no schedule defined
+        if (schedule === "OFFDAY" || schedule === "HALFDAY") return false; // skip off/half days
+
+        const punchKey = `${emp.EmployeeId}_${formatDateLocal(d)}`;
+        return !punchMap[punchKey]; // absent only if no punch
+      }).map(d => ({ Date: formatDateLocal(d), Status: "Absent" }));
 
       return {
-        ...emp,
+        EmployeeId: emp.EmployeeId,
+        EmployeeName: emp.EmployeeName,
+        DepartmentName: emp.DepartmentName || null,
+        DesignationName: emp.DesignationName || null,
+        BranchName: emp.BranchName || null,
         AbsentDays: absentDays
       };
     });
