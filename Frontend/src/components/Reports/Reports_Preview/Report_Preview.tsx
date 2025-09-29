@@ -4,15 +4,15 @@ import "./Report_Preview.css";
 type Props = {
   reportType: string;
   dataFetched: boolean;
+  reportData: any[]; // passed from parent
 };
 
-const Report_Preview: React.FC<Props> = ({ reportType, dataFetched }) => {
+const Report_Preview: React.FC<Props> = ({ reportType, dataFetched, reportData }) => {
   const [columns, setColumns] = useState<string[]>([]);
-  const [data, setData] = useState<string[][]>([]);
+  const [data, setData] = useState<any[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 15;
 
-  // Dynamically set table columns and data when Get Data is clicked
   useEffect(() => {
     if (!dataFetched) {
       setColumns([]);
@@ -22,20 +22,68 @@ const Report_Preview: React.FC<Props> = ({ reportType, dataFetched }) => {
     }
 
     if (reportType === "attendance") {
-      // Keep the format: 10 columns, but no data rows
-      const cols = Array.from({ length: 10 }, (_, i) => `Col ${i + 1}`);
-      setColumns(cols);
-      setData([]); // No rows, will be filled by API later
-    } else if (reportType === "employee") {
-      const cols = Array.from({ length: 20 }, (_, i) => `Col ${i + 1}`);
-      setColumns(cols);
-      setData([]);
-    } else if (reportType === "absent") {
-      const cols = Array.from({ length: 10 }, (_, i) => `Col ${i + 1}`);
-      setColumns(cols);
-      setData([]);
+      setColumns([
+        "SL",
+        "EmployeeId",
+        "EmployeeName",
+        "BranchName",
+        "DepartmentName",
+        "DesignationName",
+        "Date",
+        "InTime",
+        "OutTime",
+        "Duration",
+      ]);
+
+      // Flatten API response
+      const rows: any[] = [];
+      reportData.forEach((emp, idx) => {
+        emp.Attendance.forEach((att: any, attIdx: number) => {
+          rows.push({
+            sl: rows.length + 1,
+            id: emp.EmployeeId,
+            name: emp.EmployeeName,
+            branch: emp.BranchName,
+            dept: emp.DepartmentName,
+            desg: emp.DesignationName,
+            date: att.Date.split("T")[0],
+            inTime: att.In,
+            outTime: att.Out,
+            duration: att.Duration,
+          });
+        });
+      });
+      setData(rows);
     }
-  }, [reportType, dataFetched]);
+    else if (reportType === "absent") {
+    setColumns([
+      "SL",
+      "EmployeeId",
+      "EmployeeName",
+      "BranchName",
+      "DepartmentName",
+      "DesignationName",
+      "Date",
+      "Remark",
+    ]);
+    const rows: any[] = [];
+    reportData.forEach((emp) => {
+      emp.AbsentDays.forEach((abs: any) => {
+        rows.push({
+          sl: rows.length + 1,
+          id: emp.EmployeeId,
+          name: emp.EmployeeName,
+          branch: emp.BranchName,
+          dept: emp.DepartmentName,
+          desg: emp.DesignationName,
+          date: abs.Date.split("T")[0],
+          remark: "Absent",
+        });
+      });
+    });
+    setData(rows);
+  }
+  }, [reportType, dataFetched, reportData]);
 
   const totalPages = Math.ceil(data.length / rowsPerPage);
   const displayedData = data.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
@@ -57,7 +105,7 @@ const Report_Preview: React.FC<Props> = ({ reportType, dataFetched }) => {
       ) : (
         <>
           <div className="table-wrapper-scroll">
-            <table className="futuristic-table" style={{ minWidth: reportType === "employee" ? "1200px" : "auto" }}>
+            <table className="futuristic-table">
               <thead>
                 <tr>
                   {columns.map((col) => (
@@ -66,24 +114,33 @@ const Report_Preview: React.FC<Props> = ({ reportType, dataFetched }) => {
                 </tr>
               </thead>
               <tbody>
-                {displayedData.map((row, rowIndex) => (
-                  <tr key={rowIndex}>
-                    {row.map((cell, cellIndex) => (
-                      <td key={cellIndex}>{cell}</td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
+  {displayedData.map((row, rowIndex) => (
+    <tr key={rowIndex}>
+      <td>{row.sl}</td>
+      <td>{row.id}</td>
+      <td>{row.name}</td>
+      <td>{row.branch}</td>
+      <td>{row.dept}</td>
+      <td>{row.desg}</td>
+      <td>{row.date}</td>
+
+      {reportType === "attendance" ? (
+        <>
+          <td>{row.inTime}</td>
+          <td>{row.outTime}</td>
+          <td>{row.duration}</td>
+        </>
+      ) : reportType === "absent" ? (
+        <td>{row.remark}</td>
+      ) : null}
+    </tr>
+  ))}
+</tbody>
+
             </table>
           </div>
 
-          {/* Download button only visible after Get Data */}
-          <button
-            className="report-preview-download-btn"
-            style={{ display: dataFetched ? "inline-block" : "none" }}
-          >
-            Download
-          </button>
+          <button className="report-preview-download-btn">Download</button>
 
           {totalPages > 1 && (
             <div className="pagination">

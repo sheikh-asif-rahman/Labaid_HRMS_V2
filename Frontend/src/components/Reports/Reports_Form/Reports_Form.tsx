@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "./Reports_Form.css";
-import axios from "axios"; // Add this import
+import axios from "axios";
 
 type Facility = {
   id: string;
@@ -14,6 +14,7 @@ type Props = {
   setReportType: (value: string) => void;
   dataFetched: boolean;
   setDataFetched: (value: boolean) => void;
+  setReportData: (value: any[]) => void;
 };
 
 const Reports_Form: React.FC<Props> = ({
@@ -21,24 +22,21 @@ const Reports_Form: React.FC<Props> = ({
   setReportType,
   dataFetched,
   setDataFetched,
+  setReportData,
 }) => {
   const [fromDate, setFromDate] = useState<Date | null>(null);
   const [toDate, setToDate] = useState<Date | null>(null);
   const [facilities, setFacilities] = useState<Facility[]>([]);
   const [selectedFacility, setSelectedFacility] = useState<string>("");
+  const [userId, setUserId] = useState<string>("");
 
-  // Fetch facilities from API
+  // Fetch facilities
   useEffect(() => {
     axios
       .get("http://localhost:3000/api/facilities")
       .then((res) => {
         if (res.data.success && Array.isArray(res.data.data)) {
-          setFacilities(
-            res.data.data.map((f: any) => ({
-              id: f.id,
-              name: f.name,
-            }))
-          );
+          setFacilities(res.data.data.map((f: any) => ({ id: f.id, name: f.name })));
         } else {
           setFacilities([]);
         }
@@ -52,24 +50,44 @@ const Reports_Form: React.FC<Props> = ({
     setFromDate(null);
     setToDate(null);
     setSelectedFacility("");
+    setUserId("");
+    setReportData([]);
   };
 
   const handleFacilityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedFacility(e.target.value);
   };
 
-  const handleGetData = () => setDataFetched(true);
+  const handleGetData = async () => {
+    const payload: any = {
+      facilityId: selectedFacility,
+      fromDate: fromDate ? fromDate.toISOString().split("T")[0] : null,
+      toDate: toDate ? toDate.toISOString().split("T")[0] : null,
+    };
+    if (userId.trim()) payload.userId = userId;
 
-  const handleReset = () => {
-    setReportType("");
-    setDataFetched(false);
-    setFromDate(null);
-    setToDate(null);
-    setSelectedFacility("");
+    try {
+      let res;
+      if (reportType === "attendance") {
+        res = await axios.post("http://localhost:3000/api/attendancereport", payload);
+      } else if (reportType === "absent") {
+        res = await axios.post("http://localhost:3000/api/absentreport", payload);
+      } else {
+        res = { data: [] };
+      }
+
+      if (Array.isArray(res.data)) {
+        setReportData(res.data);
+        setDataFetched(true);
+      } else {
+        setReportData([]);
+      }
+    } catch (err) {
+      setReportData([]);
+    }
   };
 
-  const isGeneralReport =
-    reportType === "attendance" || reportType === "absent";
+  const isGeneralReport = reportType === "attendance" || reportType === "absent";
 
   return (
     <div className="reports-form-container">
@@ -112,6 +130,8 @@ const Reports_Form: React.FC<Props> = ({
           <label>User ID (Optional)</label>
           <input
             type="text"
+            value={userId}
+            onChange={(e) => setUserId(e.target.value)}
             placeholder="Enter User ID"
             disabled={!isGeneralReport}
           />
@@ -141,7 +161,7 @@ const Reports_Form: React.FC<Props> = ({
         </div>
       </div>
 
-      {/* Buttons */}
+      {/* Get Data Button */}
       <div className="reports-form-buttons">
         {!dataFetched ? (
           <button
