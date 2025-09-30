@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import "./Popup.css";
 import underdevGif from "../../assets/underdev.gif"; // adjust path
 import axios from "axios";
+import { API_BASE_URL } from "../../constants/apiBase";
+
 
 type PopupProps = {
   isOpen: boolean;
@@ -35,7 +37,7 @@ const Popup: React.FC<PopupProps> = ({
     try {
       setLoading(true);
 
-      const res = await axios.post("http://localhost:3000/api/changePassword", {
+      const res = await axios.post(`${API_BASE_URL}changePassword`, {
         EmployeeId: employeeId,
         oldPassword,
         newPassword,

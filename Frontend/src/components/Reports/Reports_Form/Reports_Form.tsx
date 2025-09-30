@@ -4,6 +4,8 @@ import "react-datepicker/dist/react-datepicker.css";
 import "./Reports_Form.css";
 import axios from "axios";
 import Popup from "../../Popup/Popup";
+import { API_BASE_URL } from "../../../constants/apiBase";
+
 
 type Facility = { id: string; name: string };
 
@@ -39,7 +41,7 @@ const Reports_Form: React.FC<Props> = ({
     setPopupType("loading");
 
     axios
-      .get("http://localhost:3000/api/facilities")
+      .get(`${API_BASE_URL}facilities`)
       .then((res) => {
         if (res.data.success && Array.isArray(res.data.data)) {
           setFacilities(res.data.data.map((f: any) => ({ id: f.id, name: f.name })));
@@ -90,11 +92,11 @@ const handleGetData = async () => {
   try {
     let res;
     if (reportType === "attendance") {
-      res = await axios.post("http://localhost:3000/api/attendancereport", payload);
+      res = await axios.post(`${API_BASE_URL}attendancereport`, payload);
     } else if (reportType === "absent") {
-      res = await axios.post("http://localhost:3000/api/absentreport", payload);
+      res = await axios.post(`${API_BASE_URL}absentreport`, payload);
     } else if (reportType === "employee") {
-      res = await axios.post("http://localhost:3000/api/employeelist", { facilityId: selectedFacility });
+      res = await axios.post(`${API_BASE_URL}employeelist`, { facilityId: selectedFacility });
     } else {
       res = { data: [] };
     }
