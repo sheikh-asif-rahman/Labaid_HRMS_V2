@@ -17,7 +17,7 @@ interface LeaveForm {
 }
 
 const Leave_Approval: React.FC = () => {
-  const [leaveForms, setLeaveForms] = useState<LeaveForm[]>(
+  const [leaveForms] = useState<LeaveForm[]>(
     Array.from({ length: 15 }, (_, i) => ({
       id: i + 1,
       employeeId: `EMP00${i + 1}`,

@@ -81,14 +81,7 @@ const Employee: React.FC = () => {
       setPopupType("loading");
       setPopupMessage("Updating profile...");
 
-      const loggedInUser = JSON.parse(localStorage.getItem("user") || "{}");
-      const payload = {
-        ...updatedProfile,
-        UserId: loggedInUser?.EmployeeId || "ADMIN",
-        type: "profile"
-      };
 
-      const response = await axios.put(`${API_BASE_URL}employeeupdate`, payload);
 
       // update local state
       setEmployeeData({
@@ -113,15 +106,7 @@ const Employee: React.FC = () => {
       setPopupType("loading");
       setPopupMessage("Updating shift...");
 
-      const loggedInUser = JSON.parse(localStorage.getItem("user") || "{}");
-      const payload = {
-        EmployeeId: employeeData.EmployeeId,
-        UserId: loggedInUser?.EmployeeId || "ADMIN",
-        ShiftSchedule: updatedSchedule,
-        type: "shift"
-      };
 
-      const response = await axios.put(`${API_BASE_URL}employeeupdate`, payload);
 
       setEmployeeData({
         ...employeeData,
