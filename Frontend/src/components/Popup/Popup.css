@@ -141,3 +141,65 @@
   from { transform: scale(0.96); opacity: 0; }
   to   { transform: scale(1); opacity: 1; }
 }
+
+
+
+/* ----------------- Change Password Styling ----------------- */
+.wc-popup-status-content h3 {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: #222;
+  text-align: center;
+}
+
+.wc-popup-status-content input[type="password"] {
+  width: 100%;
+  max-width: 260px;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 15px;
+  outline: none;
+  transition: border 0.2s, box-shadow 0.2s;
+}
+
+.wc-popup-status-content input[type="password"]:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 6px rgba(0,123,255,0.3);
+}
+
+.wc-popup-status-content button.wc-popup-ok-button {
+  width: 100%;
+  max-width: 260px;
+  padding: 12px 0;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 10px;
+  background: linear-gradient(90deg,#007bff,#0056d2);
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.wc-popup-status-content button.wc-popup-ok-button:hover {
+  background: linear-gradient(90deg,#0056d2,#007bff);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+}
+
+.wc-popup-status-content p {
+  font-size: 15px;
+  color: #444;
+  text-align: center;
+  margin-bottom: 12px;
+  word-break: break-word;
+}
+
+/* Reduce popup width for password */
+.wc-popup-container.wc-popup-status {
+  min-width: 280px;
+  max-width: 320px;
+  padding: 28px 22px;
+}

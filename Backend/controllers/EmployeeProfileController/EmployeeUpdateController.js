@@ -1,5 +1,11 @@
 const { sql } = require("../../config/dbConfig");
 const moment = require("moment");
+const crypto = require("crypto");
+
+// Helper function to hash password
+const hashPassword = (password) => {
+  return crypto.createHash("sha256").update(password).digest("hex");
+};
 
 const updateEmployee = async (req, res) => {
   try {
@@ -51,6 +57,10 @@ const updateEmployee = async (req, res) => {
       insertRequest.input("PermanentAddress", sql.NVarChar, data.PermanentAddress || null);
       insertRequest.input("Status", sql.NVarChar, data.Status || "Active");
 
+      // Hash password if provided
+      const hashedPassword = data.Password ? hashPassword(data.Password) : null;
+      insertRequest.input("Password", sql.NVarChar, hashedPassword);
+
       // Default permission for first-time user
       const defaultPermission = JSON.stringify({
         Access: ["Overview", "Leave Management", "Yearly Calendar"],
@@ -69,9 +79,9 @@ const updateEmployee = async (req, res) => {
 
       await insertRequest.query(`
         INSERT INTO [TA].[dbo].[Employee] 
-        (EmployeeId, EmployeeName, DepartmentId, DesignationId, BranchId, DateOfJoin, DateOfResign, NID, PersonalContactNumber, OfficalContactNumber, Email, EmployeeType, Gender, MaritalStatus, BloodGroup, FatherName, MotherName, PresentAddress, PermanentAddress, Status, Permission, ShiftSchedule, CreatedBy, CreatedDate, UpdatedBy, UpdatedDate)
+        (EmployeeId, EmployeeName, DepartmentId, DesignationId, BranchId, DateOfJoin, DateOfResign, NID, PersonalContactNumber, OfficalContactNumber, Email, EmployeeType, Gender, MaritalStatus, BloodGroup, FatherName, MotherName, PresentAddress, PermanentAddress, Status, Password, Permission, ShiftSchedule, CreatedBy, CreatedDate, UpdatedBy, UpdatedDate)
         VALUES
-        (@EmployeeId, @EmployeeName, @DepartmentId, @DesignationId, @BranchId, @DateOfJoin, @DateOfResign, @NID, @PersonalContactNumber, @OfficalContactNumber, @Email, @EmployeeType, @Gender, @MaritalStatus, @BloodGroup, @FatherName, @MotherName, @PresentAddress, @PermanentAddress, @Status, @Permission, @ShiftSchedule, @CreatedBy, @CreatedDate, @UpdatedBy, @UpdatedDate)
+        (@EmployeeId, @EmployeeName, @DepartmentId, @DesignationId, @BranchId, @DateOfJoin, @DateOfResign, @NID, @PersonalContactNumber, @OfficalContactNumber, @Email, @EmployeeType, @Gender, @MaritalStatus, @BloodGroup, @FatherName, @MotherName, @PresentAddress, @PermanentAddress, @Status, @Password, @Permission, @ShiftSchedule, @CreatedBy, @CreatedDate, @UpdatedBy, @UpdatedDate)
       `);
 
       return res.json({ message: "Employee created successfully with default permissions and shift schedule" });
@@ -104,32 +114,65 @@ const updateEmployee = async (req, res) => {
         updateRequest.input("UpdatedBy", sql.NVarChar, updatedBy);
         updateRequest.input("UpdatedDate", sql.DateTime, now);
 
-        await updateRequest.query(`
-          UPDATE [TA].[dbo].[Employee]
-          SET 
-            EmployeeName = @EmployeeName,
-            DepartmentId = @DepartmentId,
-            DesignationId = @DesignationId,
-            BranchId = @BranchId,
-            DateOfJoin = @DateOfJoin,
-            DateOfResign = @DateOfResign,
-            NID = @NID,
-            PersonalContactNumber = @PersonalContactNumber,
-            OfficalContactNumber = @OfficalContactNumber,
-            Email = @Email,
-            EmployeeType = @EmployeeType,
-            Gender = @Gender,
-            MaritalStatus = @MaritalStatus,
-            BloodGroup = @BloodGroup,
-            FatherName = @FatherName,
-            MotherName = @MotherName,
-            PresentAddress = @PresentAddress,
-            PermanentAddress = @PermanentAddress,
-            Status = @Status,
-            UpdatedBy = @UpdatedBy,
-            UpdatedDate = @UpdatedDate
-          WHERE EmployeeId = @EmployeeId
-        `);
+        // If password is provided, hash it and include in update
+        if (data.Password) {
+          const hashedPassword = hashPassword(data.Password);
+          updateRequest.input("Password", sql.NVarChar, hashedPassword);
+          await updateRequest.query(`
+            UPDATE [TA].[dbo].[Employee]
+            SET 
+              EmployeeName = @EmployeeName,
+              DepartmentId = @DepartmentId,
+              DesignationId = @DesignationId,
+              BranchId = @BranchId,
+              DateOfJoin = @DateOfJoin,
+              DateOfResign = @DateOfResign,
+              NID = @NID,
+              PersonalContactNumber = @PersonalContactNumber,
+              OfficalContactNumber = @OfficalContactNumber,
+              Email = @Email,
+              EmployeeType = @EmployeeType,
+              Gender = @Gender,
+              MaritalStatus = @MaritalStatus,
+              BloodGroup = @BloodGroup,
+              FatherName = @FatherName,
+              MotherName = @MotherName,
+              PresentAddress = @PresentAddress,
+              PermanentAddress = @PermanentAddress,
+              Status = @Status,
+              Password = @Password,
+              UpdatedBy = @UpdatedBy,
+              UpdatedDate = @UpdatedDate
+            WHERE EmployeeId = @EmployeeId
+          `);
+        } else {
+          await updateRequest.query(`
+            UPDATE [TA].[dbo].[Employee]
+            SET 
+              EmployeeName = @EmployeeName,
+              DepartmentId = @DepartmentId,
+              DesignationId = @DesignationId,
+              BranchId = @BranchId,
+              DateOfJoin = @DateOfJoin,
+              DateOfResign = @DateOfResign,
+              NID = @NID,
+              PersonalContactNumber = @PersonalContactNumber,
+              OfficalContactNumber = @OfficalContactNumber,
+              Email = @Email,
+              EmployeeType = @EmployeeType,
+              Gender = @Gender,
+              MaritalStatus = @MaritalStatus,
+              BloodGroup = @BloodGroup,
+              FatherName = @FatherName,
+              MotherName = @MotherName,
+              PresentAddress = @PresentAddress,
+              PermanentAddress = @PermanentAddress,
+              Status = @Status,
+              UpdatedBy = @UpdatedBy,
+              UpdatedDate = @UpdatedDate
+            WHERE EmployeeId = @EmployeeId
+          `);
+        }
 
         return res.json({ message: "Employee profile updated successfully" });
       }

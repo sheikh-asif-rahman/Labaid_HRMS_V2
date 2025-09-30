@@ -1,13 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import "./Popup.css";
-import underdevGif from "../../assets/underdev.gif"; // ✅ use your GIF here
+import underdevGif from "../../assets/underdev.gif"; // adjust path
+import axios from "axios";
 
 type PopupProps = {
   isOpen: boolean;
-  type?: "loading" | "done" | "notdone" | "underdev";
+  type?: "loading" | "done" | "notdone" | "underdev" | "changePassword";
   message?: string;
   onClose?: () => void;
+  employeeId?: string;
 };
 
 const Popup: React.FC<PopupProps> = ({
@@ -15,7 +17,50 @@ const Popup: React.FC<PopupProps> = ({
   type = "loading",
   message = "",
   onClose,
+  employeeId,
 }) => {
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState<"done" | "notdone" | null>(null);
+  const [statusMessage, setStatusMessage] = useState("");
+
+  const handlePasswordChange = async () => {
+    if (!oldPassword || !newPassword) {
+      setStatus("notdone");
+      setStatusMessage("Please fill both fields");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const res = await axios.post("http://localhost:3000/api/changePassword", {
+        EmployeeId: employeeId,
+        oldPassword,
+        newPassword,
+      });
+
+      setStatus("done");
+      setStatusMessage(res.data.message || "Password updated successfully");
+    } catch (error: any) {
+      setStatus("notdone");
+      setStatusMessage(
+        error?.response?.data?.message || "Password change failed"
+      );
+    } finally {
+      setLoading(false);
+      setOldPassword("");
+      setNewPassword("");
+    }
+  };
+
+  const closePopup = () => {
+    setStatus(null);
+    setStatusMessage("");
+    onClose && onClose();
+  };
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -34,7 +79,7 @@ const Popup: React.FC<PopupProps> = ({
             exit={{ scale: 0.8, opacity: 0 }}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
           >
-            {/* Loading */}
+            {/* Existing Loading */}
             {type === "loading" && (
               <>
                 <div className="wc-popup-loader" aria-hidden="true"></div>
@@ -90,9 +135,58 @@ const Popup: React.FC<PopupProps> = ({
                   alt="Under Development"
                   className="wc-popup-underdev-gif"
                 />
-                <p className="wc-popup-underdev-text">
-                  Under Development!
-                </p>
+                <p className="wc-popup-underdev-text">Under Development!</p>
+              </motion.div>
+            )}
+
+            {/* Change Password */}
+            {type === "changePassword" && (
+              <motion.div
+                className="wc-popup-status-content"
+                initial={{ scale: 0.5, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ type: "spring", stiffness: 400, damping: 25 }}
+              >
+                <h3>Change Password</h3>
+
+                {status ? (
+                  <>
+                    <i
+                      className={`bi ${
+                        status === "done"
+                          ? "bi-check-circle wc-popup-status-icon wc-popup-done"
+                          : "bi-x-circle-fill wc-popup-status-icon wc-popup-notdone"
+                      }`}
+                      aria-hidden="true"
+                    ></i>
+                    <p>{statusMessage}</p>
+                    <button className="wc-popup-ok-button" onClick={closePopup}>
+                      OK
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <input
+                      type="password"
+                      placeholder="Old Password"
+                      value={oldPassword}
+                      onChange={(e) => setOldPassword(e.target.value)}
+                    />
+                    <input
+                      type="password"
+                      placeholder="New Password"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                    />
+                    <button
+                      className="wc-popup-ok-button"
+                      onClick={handlePasswordChange}
+                      disabled={loading}
+                    >
+                      {loading ? "Updating..." : "Update"}
+                    </button>
+                  </>
+                )}
               </motion.div>
             )}
           </motion.div>

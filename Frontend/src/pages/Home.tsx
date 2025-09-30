@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
+import axios from "axios";
+
 import Current_Month_Status from "../components/Home/Current_Month_Status/Current_Month_Status";
 import Recent_Applications from "../components/Home/Recent_Applications/Recent_Applications";
 import Profile from "../components/Home/Profile/Profile";
 import User_Profile_Attendance from "../components/Employee/User_Profile_Attendance/User_Profile_Attendance";
 import Popup from "../components/Popup/Popup";
-import axios from "axios";
+
 import { API_BASE_URL } from "../constants/apiBase";
 
 const Home: React.FC = () => {
@@ -27,28 +29,22 @@ const Home: React.FC = () => {
 
         const [recentLeave, userProfile, todaysAttendance, monthStatus] =
           await Promise.all([
-            axios.post(`${API_BASE_URL}recentleaveapplication`, { EmployeeId }),
+            // Pass null to recentLeave if you want empty
+            Promise.resolve(null), 
             axios.post(`${API_BASE_URL}usershortprofile`, { EmployeeId }),
             axios.post(`${API_BASE_URL}todaysattendance`, { EmployeeId }),
             axios.post(`${API_BASE_URL}thismonthstatus`, { EmployeeId }),
           ]);
 
         const allData = {
-          recentLeave: recentLeave.data,
+          recentLeave: recentLeave, // null
           userProfile: userProfile.data,
           todaysAttendance: todaysAttendance.data,
           monthStatus: monthStatus.data,
         };
 
         setHomeData(allData);
-
-        // Store in localStorage for Overview page
         localStorage.setItem("homeData", JSON.stringify(allData));
-
-        console.log("Recent Leave Applications:", recentLeave.data);
-        console.log("User Profile:", userProfile.data);
-        console.log("Today's Attendance:", todaysAttendance.data);
-        console.log("This Month Status:", monthStatus.data);
 
         setLoading(false);
       } catch (err) {
@@ -84,7 +80,8 @@ const Home: React.FC = () => {
           boxSizing: "border-box",
         }}
       >
-        <Current_Month_Status />
+        <Current_Month_Status data={homeData.monthStatus} />
+
         <div
           style={{
             display: "flex",
@@ -94,17 +91,28 @@ const Home: React.FC = () => {
           }}
         >
           <div style={{ width: "35%" }}>
-            <User_Profile_Attendance punchInTime="09:00" totalShiftHours={8} />
+            <User_Profile_Attendance
+              punchInTime={homeData.todaysAttendance?.PunchInTime || "N/A"}
+              totalShiftHours={homeData.todaysAttendance?.TotalShiftHours || 0}
+            />
           </div>
+
           <div style={{ width: "65%" }}>
-            <Recent_Applications />
+            <Recent_Applications data={homeData.recentLeave} />
           </div>
         </div>
       </div>
 
       {/* Right Column */}
       <div style={{ width: "30%", boxSizing: "border-box" }}>
-        <Profile />
+        <Profile
+          data={{
+            ...homeData.userProfile,
+            DepartmentName: homeData.userProfile.DepartmentName,
+            DesignationName: homeData.userProfile.DesignationName,
+            BranchName: homeData.userProfile.BranchName,
+          }}
+        />
       </div>
     </div>
   );

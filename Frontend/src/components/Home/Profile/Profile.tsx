@@ -1,13 +1,27 @@
 import React, { useState } from "react";
-import { FaUserCircle } from "react-icons/fa"; // default icon
+import { FaUserCircle } from "react-icons/fa";
+import Popup from "../../Popup/Popup"; // Adjust path as needed
 import "./Profile.css";
 
-const Profile: React.FC = () => {
-  const [profilePic] = useState<string | null>(null);
+interface ProfileProps {
+  data: {
+    EmployeeName?: string;
+    EmployeeId?: string;
+    DepartmentName?: string;
+    DesignationName?: string;
+    BranchName?: string;
+    Shift?: string;
+    LeaveBalance?: number;
+    ProfilePic?: string | null;
+  };
+}
+
+const Profile: React.FC<ProfileProps> = ({ data }) => {
+  const [profilePic] = useState<string | null>(data?.ProfilePic || null);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
 
   return (
     <div className="profile-container">
-      {/* Profile Picture */}
       <div className="profile-pic">
         {profilePic ? (
           <img src={profilePic} alt="User Profile" />
@@ -16,25 +30,31 @@ const Profile: React.FC = () => {
         )}
       </div>
 
-      {/* User Name */}
-      <h3 className="profile-name">John Doe</h3>
-
+      <h3 className="profile-name">{data?.EmployeeName || "John Doe"}</h3>
       <hr className="profile-divider" />
 
-      {/* User Details */}
       <div className="profile-details">
-        <p><span>User ID:</span> ADMIN</p>
-        <p><span>Department:</span> IT</p>
-        <p><span>Designation:</span> Executive</p>
-        <p><span>Facility:</span> Head Office</p>
-        <p><span>Shift:</span> Day</p>
-        <p><span>Leave Balance:</span> 12 Days</p>
+        <p><span>User ID:</span> {data?.EmployeeId || "ADMIN"}</p>
+        <p><span>Department:</span> {data?.DepartmentName || "N/A"}</p>
+        <p><span>Designation:</span> {data?.DesignationName || "N/A"}</p>
+        <p><span>Facility:</span> {data?.BranchName || "N/A"}</p>
+        <p><span>Shift:</span> {data?.Shift || "N/A"}</p>
+        <p><span>Leave Balance:</span> {data?.LeaveBalance ?? 0} Days</p>
       </div>
 
-      {/* Action Buttons */}
       <div className="profile-actions">
-        <button className="password-btn">Change Password</button>
+        <button className="password-btn" onClick={() => setIsPopupOpen(true)}>
+          Change Password
+        </button>
       </div>
+
+      {/* Change Password Popup */}
+      <Popup
+        isOpen={isPopupOpen}
+        type="changePassword"
+        employeeId={data.EmployeeId}
+        onClose={() => setIsPopupOpen(false)}
+      />
     </div>
   );
 };

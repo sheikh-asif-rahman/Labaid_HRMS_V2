@@ -1,4 +1,3 @@
-// src/components/Current_Month_Status/Current_Month_Status.tsx
 import React from "react";
 import { FaSun, FaCloudSun, FaTimesCircle, FaUmbrellaBeach } from "react-icons/fa";
 import "./Current_Month_Status.css";
@@ -23,17 +22,24 @@ const StatusCard: React.FC<StatusCardProps> = ({ icon, number, title }) => {
   );
 };
 
-const Current_Month_Status: React.FC = () => {
+interface CurrentMonthStatusProps {
+  data: {
+    fullDay: number;
+    halfDay: number;
+    absent: number;
+    leave: number;
+  };
+}
+
+const Current_Month_Status: React.FC<CurrentMonthStatusProps> = ({ data }) => {
   return (
     <div className="current-month-status p-3">
-      {/* Header for this section */}
       <h5 className="status-header mb-3">This Month Status</h5>
-
       <div className="status-cards-row d-flex">
-        <StatusCard icon={<FaSun />} number={8} title="Full Day" />
-        <StatusCard icon={<FaCloudSun />} number={2} title="Half Day" />
-        <StatusCard icon={<FaTimesCircle />} number={1} title="Absent" />
-        <StatusCard icon={<FaUmbrellaBeach />} number={1} title="Leave" />
+        <StatusCard icon={<FaSun />} number={data.fullDay} title="Full Day" />
+        <StatusCard icon={<FaCloudSun />} number={data.halfDay} title="Half Day" />
+        <StatusCard icon={<FaTimesCircle />} number={data.absent} title="Absent" />
+        <StatusCard icon={<FaUmbrellaBeach />} number={data.leave} title="Leave" />
       </div>
     </div>
   );

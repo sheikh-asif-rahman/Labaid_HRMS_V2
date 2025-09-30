@@ -3,7 +3,7 @@ import { PieChart, Pie, Cell } from "recharts";
 import "./User_Profile_Attendance.css";
 
 interface UserProfileAttendanceProps {
-  punchInTime: string; // format "HH:mm", e.g., "09:00"
+  punchInTime: string; // "HH:mm" or "Not Punch Yet"
   totalShiftHours?: number; // default 8h
 }
 
@@ -11,34 +11,48 @@ const User_Profile_Attendance: React.FC<UserProfileAttendanceProps> = ({
   punchInTime,
   totalShiftHours = 8,
 }) => {
-  const [workedHours, setWorkedHours] = useState<number>(0);
+  const [workedMinutes, setWorkedMinutes] = useState<number>(0);
 
-  // Calculate worked hours from punch-in time
   useEffect(() => {
-    const calculateWorkedHours = () => {
+    if (punchInTime === "Not Punch Yet") return;
+
+    const calculateWorkedMinutes = () => {
       const now = new Date();
       const punchIn = new Date();
       const [h, m] = punchInTime.split(":").map(Number);
       punchIn.setHours(h, m, 0, 0);
 
-      const diff = (now.getTime() - punchIn.getTime()) / (1000 * 60 * 60); // hours
-      setWorkedHours(Math.min(diff, totalShiftHours));
+      const diffMinutes = Math.max(0, Math.floor((now.getTime() - punchIn.getTime()) / (1000 * 60)));
+      setWorkedMinutes(diffMinutes);
     };
 
-    calculateWorkedHours();
-    const interval = setInterval(calculateWorkedHours, 60 * 1000); // update every minute
+    calculateWorkedMinutes();
+    const interval = setInterval(calculateWorkedMinutes, 60 * 1000);
 
     return () => clearInterval(interval);
-  }, [punchInTime, totalShiftHours]);
+  }, [punchInTime]);
 
+  const hours = Math.floor(workedMinutes / 60);
+  const minutes = workedMinutes % 60;
   const todayDate = new Date().toLocaleDateString();
 
-  // Data for circular progress
-  const data = [
-    { name: "Worked", value: workedHours },
-    { name: "Remaining", value: Math.max(totalShiftHours - workedHours, 0) },
-  ];
+  if (punchInTime === "Not Punch Yet") {
+    // Show only a centered message
+    return (
+      <div className="attendance-container" style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+        <p style={{ fontSize: "16px", color: "#555", textAlign: "center" }}>
+          Not Punch Yet
+        </p>
+      </div>
+    );
+  }
 
+  // Pie chart data
+  const workedHoursValue = workedMinutes / 60;
+  const data = [
+    { name: "Worked", value: workedHoursValue },
+    { name: "Remaining", value: Math.max(totalShiftHours - workedHoursValue, 0) },
+  ];
   const COLORS = ["#0115a9ff", "#c5c5c5"];
 
   return (
@@ -53,8 +67,8 @@ const User_Profile_Attendance: React.FC<UserProfileAttendanceProps> = ({
             data={data}
             cx="50%"
             cy="50%"
-            innerRadius={40}  // smaller
-            outerRadius={55}  // smaller
+            innerRadius={40}
+            outerRadius={55}
             startAngle={90}
             endAngle={-270}
             paddingAngle={2}
@@ -65,12 +79,14 @@ const User_Profile_Attendance: React.FC<UserProfileAttendanceProps> = ({
             ))}
           </Pie>
         </PieChart>
-        <div className="progress-center-text">
-          <p className="total-hours-label">Total Hours</p>
-          <p className="total-hours-value">
-            {workedHours.toFixed(1)}h / {totalShiftHours}h
-          </p>
-        </div>
+
+<div className="progress-center-text">
+  <p className="total-hours-label">Worked Time</p>
+  <p className="total-hours-value">
+    {punchInTime === "Not Punch Yet" ? "Not Punch Yet" : `${hours}h ${minutes}min`}
+  </p>
+</div>
+
       </div>
 
       <hr className="border-gray-300 my-2" />

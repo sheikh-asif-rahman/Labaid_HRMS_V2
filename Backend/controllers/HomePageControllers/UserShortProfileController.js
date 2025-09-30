@@ -11,7 +11,7 @@ const usershortprofile = async (req, res) => {
     // Connect to DB
     const pool = await sql.connect();
 
-    // Get employee info
+    // Get employee info including ShiftSchedule
     const empResult = await pool.request()
       .input("EmployeeId", sql.NVarChar, EmployeeId)
       .query(`
@@ -20,7 +20,8 @@ const usershortprofile = async (req, res) => {
           EmployeeId,
           DepartmentId,
           DesignationId,
-          BranchId
+          BranchId,
+          ShiftSchedule
         FROM [TA].[dbo].[Employee]
         WHERE EmployeeId = @EmployeeId
       `);
@@ -58,6 +59,24 @@ const usershortprofile = async (req, res) => {
       branchName = branchResult.recordset[0]?.name || null;
     }
 
+    // Calculate today's shift
+    let shift = "Full Day"; // default
+    if (user.ShiftSchedule) {
+      const dayMap = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
+      const todayIndex = new Date().getDay(); // 0=Sun, 1=Mon, ... 6=Sat
+      const todayKey = dayMap[todayIndex];
+
+      // Example ShiftSchedule: SAT[FULLDAY],SUN[FULLDAY],MON[FULLDAY],TUE[FULLDAY],WED[FULLDAY],THU[OFFDAY],FRI[HALFDAY]
+      const regex = new RegExp(`${todayKey}\\[(.*?)\\]`);
+      const match = user.ShiftSchedule.match(regex);
+      if (match && match[1]) {
+        const status = match[1].toUpperCase();
+        if (status === "FULLDAY") shift = "Full Day";
+        else if (status === "OFFDAY") shift = "Off Day";
+        else if (status === "HALFDAY") shift = "Half Day";
+      }
+    }
+
     // Build final response
     const response = {
       EmployeeName: user.EmployeeName,
@@ -65,8 +84,8 @@ const usershortprofile = async (req, res) => {
       DepartmentName: departmentName,
       DesignationName: designationName,
       BranchName: branchName,
-      Shift: "morning",         // default
-      LeaveBalance: 20          // default
+      Shift: shift,
+      LeaveBalance: 20 // default
     };
 
     return res.json(response);

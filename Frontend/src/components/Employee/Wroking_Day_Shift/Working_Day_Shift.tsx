@@ -62,7 +62,7 @@ const scheduleToString = (schedule: Record<Day, { type: DayType }>) => {
   return days.map(day => `${day.toUpperCase()}[${typeMap[schedule[day].type]}]`).join(",");
 };
 
-const Working_Day_Shift: React.FC<ShiftScheduleProps> = ({ shiftSchedule, employeeId, onChange }) => {
+const Working_Day_Shift: React.FC<ShiftScheduleProps> = ({ shiftSchedule, onChange }) => {
   const [schedule, setSchedule] = useState(parseShiftSchedule(shiftSchedule));
   const [activeDay, setActiveDay] = useState<Day | null>(null);
   const [dayType, setDayType] = useState<DayType>("Full Day");
