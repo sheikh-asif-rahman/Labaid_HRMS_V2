@@ -92,6 +92,57 @@ const Report_Preview: React.FC<Props> = ({ reportType, dataFetched, reportData }
     if (page >= 1 && page <= totalPages) setCurrentPage(page);
   };
 
+  const getPagination = () => {
+    const pages = [];
+    if (totalPages <= 1) {
+      pages.push(1);
+    } else if (currentPage === 1) {
+      pages.push(1, "...");
+    } else if (currentPage === totalPages) {
+      pages.push("...", totalPages);
+    } else {
+      pages.push("...", currentPage, "...");
+    }
+    return pages;
+  };
+
+  // Download table as Excel
+  const handleDownload = () => {
+    // Prepare CSV content
+    let csv = columns.join(",") + "\n";
+    data.forEach(row => {
+      const rowData = columns.map(col => {
+        // Map column names to row keys
+        switch (col) {
+          case "SL": return row.sl;
+          case "EmployeeId": return row.id;
+          case "EmployeeName": return row.name;
+          case "BranchName": return row.branch;
+          case "DepartmentName": return row.dept;
+          case "DesignationName": return row.desg;
+          case "Date": return row.date;
+          case "InTime": return row.inTime;
+          case "OutTime": return row.outTime;
+          case "Duration": return row.duration;
+          case "Remark": return row.remark;
+          default: return "";
+        }
+      });
+      csv += rowData.join(",") + "\n";
+    });
+
+    // Create a blob and download as .csv (Excel can open CSV files)
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "report.csv";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="report-preview-container">
       <div className="report-preview-header">
@@ -114,50 +165,41 @@ const Report_Preview: React.FC<Props> = ({ reportType, dataFetched, reportData }
                 </tr>
               </thead>
               <tbody>
-  {displayedData.map((row, rowIndex) => (
-    <tr key={rowIndex}>
-      <td>{row.sl}</td>
-      <td>{row.id}</td>
-      <td>{row.name}</td>
-      <td>{row.branch}</td>
-      <td>{row.dept}</td>
-      <td>{row.desg}</td>
-      <td>{row.date}</td>
-
-      {reportType === "attendance" ? (
-        <>
-          <td>{row.inTime}</td>
-          <td>{row.outTime}</td>
-          <td>{row.duration}</td>
-        </>
-      ) : reportType === "absent" ? (
-        <td>{row.remark}</td>
-      ) : null}
-    </tr>
-  ))}
-</tbody>
-
+                {displayedData.map((row, rowIndex) => (
+                  <tr key={rowIndex}>
+                    <td>{row.sl}</td>
+                    <td>{row.id}</td>
+                    <td>{row.name}</td>
+                    <td>{row.branch}</td>
+                    <td>{row.dept}</td>
+                    <td>{row.desg}</td>
+                    <td>{row.date}</td>
+                    {reportType === "attendance" ? (
+                      <>
+                        <td>{row.inTime}</td>
+                        <td>{row.outTime}</td>
+                        <td>{row.duration}</td>
+                      </>
+                    ) : reportType === "absent" ? (
+                      <td>{row.remark}</td>
+                    ) : null}
+                  </tr>
+                ))}
+              </tbody>
             </table>
           </div>
 
-          <button className="report-preview-download-btn">Download</button>
+          <button className="report-preview-download-btn" onClick={handleDownload}>
+            Download
+          </button>
 
           {totalPages > 1 && (
             <div className="pagination">
               <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
-                &lt;
+                Previous
               </button>
-              {Array.from({ length: totalPages }, (_, i) => (
-                <button
-                  key={i}
-                  className={currentPage === i + 1 ? "active" : ""}
-                  onClick={() => handlePageChange(i + 1)}
-                >
-                  {i + 1}
-                </button>
-              ))}
               <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>
-                &gt;
+                Next
               </button>
             </div>
           )}

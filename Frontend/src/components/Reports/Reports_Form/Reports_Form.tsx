@@ -171,7 +171,23 @@ const Reports_Form: React.FC<Props> = ({
           >
             Get Data
           </button>
-        ) : null}
+        ) : (
+          <button
+            className="reports-form-btn reports-form-btn-secondary"
+            onClick={() => {
+              // Reset all fields and data
+              setReportType("");
+              setDataFetched(false);
+              setFromDate(null);
+              setToDate(null);
+              setSelectedFacility("");
+              setUserId("");
+              setReportData([]);
+            }}
+          >
+            Reset
+          </button>
+        )}
       </div>
     </div>
   );

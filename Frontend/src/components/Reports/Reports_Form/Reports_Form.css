@@ -161,6 +161,16 @@
   background-color: #5a6268;
 }
 
+/* Reset Button (secondary color) */
+.reports-form-btn-secondary {
+  background-color: var(--secondary);
+  color: var(--white);
+}
+
+.reports-form-btn-secondary:hover {
+  background-color: #5a6268;
+}
+
 /* Disabled General Buttons */
 .reports-form-btn:disabled {
   background-color: var(--light);
