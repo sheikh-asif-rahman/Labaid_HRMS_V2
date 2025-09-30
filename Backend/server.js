@@ -23,6 +23,7 @@ const updateEmployeeRoute = require("./routes/EmployeeProfileRoute/EmployeeUpdat
 
 const getAttendanceReport = require("./routes/ReportsRoute/AttendanceReportRoute");
 const getAbsentReport = require("./routes/ReportsRoute/AbsentReportRoute");
+const getEmployeeList = require("./routes/ReportsRoute/EmployeeListRoute");
 
 
 
@@ -58,6 +59,8 @@ app.use("/api", updateEmployeeRoute);
 
 app.use("/api", getAttendanceReport);
 app.use("/api", getAbsentReport);
+app.use("/api", getEmployeeList);
+
 
 
 

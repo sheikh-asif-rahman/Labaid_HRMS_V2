@@ -102,14 +102,14 @@ const getAttendanceReport = async (req, res) => {
             return {
               Date: p.PunchDate,
               In: formatTime(p.InTime),
-              Out: null,
+              Out: "N/A", // <-- Show N/A if no out time
               Duration: null,
             };
           }
           return {
             Date: p.PunchDate,
             In: formatTime(p.InTime),
-            Out: formatTime(p.OutTime),
+            Out: p.OutTime ? formatTime(p.OutTime) : "N/A", // <-- Show N/A if out time missing
             Duration: formatDuration(p.InTime, p.OutTime)
           };
         })

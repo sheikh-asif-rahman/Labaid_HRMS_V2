@@ -43,17 +43,40 @@ interface UserProfileProps {
   onUpdate?: (updatedProfile: any) => void; // <-- add this
 }
 
-const User_Profile: React.FC<UserProfileProps> = ({ employeeData, showEditButton }) => {
+const User_Profile: React.FC<UserProfileProps> = ({
+  employeeData,
+  showEditButton,
+}) => {
   const [isEditing, setIsEditing] = useState(false);
   const [profilePic, setProfilePic] = useState<string | null>(null);
   const [departments, setDepartments] = useState<OptionType[]>([]);
   const [designations, setDesignations] = useState<OptionType[]>([]);
   const [branches, setBranches] = useState<OptionType[]>([]);
-const [popup, setPopup] = useState<{ isOpen: boolean; type: "loading" | "done" | "notdone"; message: string }>({
-  isOpen: false,
-  type: "loading",
-  message: "",
-});
+  const [popup, setPopup] = useState<{
+    isOpen: boolean;
+    type: "loading" | "done" | "notdone";
+    message: string;
+  }>({
+    isOpen: false,
+    type: "loading",
+    message: "",
+  });
+
+  const [specialPermissions, setSpecialPermissions] = useState<string[]>([]);
+
+useEffect(() => {
+  const userData = localStorage.getItem("user");
+  if (userData) {
+    try {
+      const parsed = JSON.parse(userData);
+      const perms = parsed.Permission ? JSON.parse(parsed.Permission) : { Access: [], Special_Permission: [] };
+      setSpecialPermissions(perms.Special_Permission || []);
+    } catch (err) {
+      console.error("Failed to parse permissions:", err);
+      setSpecialPermissions([]);
+    }
+  }
+}, []);
 
 
   const [formData, setFormData] = useState<FormDataType>({
@@ -110,16 +133,35 @@ const [popup, setPopup] = useState<{ isOpen: boolean; type: "loading" | "done" |
     "Others",
   ];
   const genderOptions = ["Select Gender", "Male", "Female", "Other"];
-  const maritalStatusOptions = ["Select Marital Status", "Single", "Married", "Divorced", "Widowed"];
-  const bloodGroupOptions = ["Select Blood Group", "A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
+  const maritalStatusOptions = [
+    "Select Marital Status",
+    "Single",
+    "Married",
+    "Divorced",
+    "Widowed",
+  ];
+  const bloodGroupOptions = [
+    "Select Blood Group",
+    "A+",
+    "A-",
+    "B+",
+    "B-",
+    "AB+",
+    "AB-",
+    "O+",
+    "O-",
+  ];
   const statusOptions = ["Select Status", "Active", "Inactive", "Suspended"];
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      Object.keys(refs).forEach(key => {
+      Object.keys(refs).forEach((key) => {
         const k = key as keyof typeof refs;
-        if (refs[k].current && !refs[k].current.contains(event.target as Node)) {
-          setDropdowns(prev => ({ ...prev, [k]: false }));
+        if (
+          refs[k].current &&
+          !refs[k].current.contains(event.target as Node)
+        ) {
+          setDropdowns((prev) => ({ ...prev, [k]: false }));
         }
       });
     };
@@ -127,40 +169,43 @@ const [popup, setPopup] = useState<{ isOpen: boolean; type: "loading" | "done" |
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-// Fetch Departments
-useEffect(() => {
-  axios.get(`${API_BASE_URL}getDepartmentList`).then(res => {
-    const data = res.data;
-    if (data.success && Array.isArray(data.data)) {
-      setDepartments(data.data
-        .filter((d: any) => d.Status)
-        .map((d: any) => ({ id: d.DepartmentID, name: d.DepartmentName })));
-    }
-  });
-}, []);
+  // Fetch Departments
+  useEffect(() => {
+    axios.get(`${API_BASE_URL}getDepartmentList`).then((res) => {
+      const data = res.data;
+      if (data.success && Array.isArray(data.data)) {
+        setDepartments(
+          data.data
+            .filter((d: any) => d.Status)
+            .map((d: any) => ({ id: d.DepartmentID, name: d.DepartmentName }))
+        );
+      }
+    });
+  }, []);
 
-// Fetch Designations
-useEffect(() => {
-  axios.get(`${API_BASE_URL}getDesignationList`).then(res => {
-    const data = res.data;
-    if (data.success && Array.isArray(data.data)) {
-      setDesignations(data.data
-        .filter((d: any) => d.Status)
-        .map((d: any) => ({ id: d.id, name: d.name })));
-    }
-  });
-}, []);
+  // Fetch Designations
+  useEffect(() => {
+    axios.get(`${API_BASE_URL}getDesignationList`).then((res) => {
+      const data = res.data;
+      if (data.success && Array.isArray(data.data)) {
+        setDesignations(
+          data.data
+            .filter((d: any) => d.Status)
+            .map((d: any) => ({ id: d.id, name: d.name }))
+        );
+      }
+    });
+  }, []);
 
-// Fetch Branches
-useEffect(() => {
-  axios.get(`${API_BASE_URL}facilities`).then(res => {
-    const data = res.data;
-    if (data.success && Array.isArray(data.data)) {
-      setBranches(data.data.map((b: any) => ({ id: b.id, name: b.name })));
-    }
-  });
-}, []);
-
+  // Fetch Branches
+  useEffect(() => {
+    axios.get(`${API_BASE_URL}facilities`).then((res) => {
+      const data = res.data;
+      if (data.success && Array.isArray(data.data)) {
+        setBranches(data.data.map((b: any) => ({ id: b.id, name: b.name })));
+      }
+    });
+  }, []);
 
   // Populate formData when employeeData changes
   useEffect(() => {
@@ -169,13 +214,17 @@ useEffect(() => {
     setFormData({
       employeeId: employeeData.EmployeeId || "",
       name: employeeData.EmployeeName || "",
-      branch: branches.find(b => b.id === employeeData.BranchId)?.name || "",
+      branch: branches.find((b) => b.id === employeeData.BranchId)?.name || "",
       departmentId: employeeData.DepartmentId || "",
       designationId: employeeData.DesignationId || "",
       personalPhone: employeeData.PersonalContactNumber || "",
       officialPhone: employeeData.OfficalContactNumber || "",
-      joiningDate: employeeData.DateOfJoin ? new Date(employeeData.DateOfJoin) : null,
-      resignDate: employeeData.DateOfResign ? new Date(employeeData.DateOfResign) : null,
+      joiningDate: employeeData.DateOfJoin
+        ? new Date(employeeData.DateOfJoin)
+        : null,
+      resignDate: employeeData.DateOfResign
+        ? new Date(employeeData.DateOfResign)
+        : null,
       email: employeeData.Email || "",
       employeeType: employeeData.EmployeeType || "",
       gender: employeeData.Gender || "",
@@ -196,68 +245,88 @@ useEffect(() => {
     if (["personalPhone", "officialPhone", "nid"].includes(name)) {
       if (!/^\d*$/.test(value)) return;
     }
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-const handleSelect = (
-  field: keyof FormDataType,
-  value: any,
-  dropdownKey: keyof typeof dropdowns
-) => {
-  // Update the form value
-  setFormData(prev => ({ ...prev, [field]: value }));
+  const handleSelect = (
+    field: keyof FormDataType,
+    value: any,
+    dropdownKey: keyof typeof dropdowns
+  ) => {
+    // Update the form value
+    setFormData((prev) => ({ ...prev, [field]: value }));
 
-  // Close the dropdown immediately after selection
-  setDropdowns(prev => ({ ...prev, [dropdownKey]: false }));
-};
-
+    // Close the dropdown immediately after selection
+    setDropdowns((prev) => ({ ...prev, [dropdownKey]: false }));
+  };
 
   const handleEdit = () => setIsEditing(true);
 
   // ---------- UPDATED: handleUpdate with API call ----------
-const handleUpdate = async () => {
-  try {
-    const loggedInUser = JSON.parse(localStorage.getItem("user") || "{}");
+  const handleUpdate = async () => {
+    try {
+      const loggedInUser = JSON.parse(localStorage.getItem("user") || "{}");
 
-    const payload = {
-      EmployeeId: formData.employeeId,
-      UserId: loggedInUser.EmployeeId || "ADMIN",
-      EmployeeName: formData.name,
-      DepartmentId: String(formData.departmentId),
-      DesignationId: String(formData.designationId),
-      BranchId: String(branches.find(b => b.name === formData.branch)?.id || ""),
-      DateOfJoin: formData.joiningDate ? formData.joiningDate.toISOString().split("T")[0] : null,
-      DateOfResign: formData.resignDate ? formData.resignDate.toISOString().split("T")[0] : null,
-      NID: formData.nid,
-      PersonalContactNumber: formData.personalPhone,
-      OfficalContactNumber: formData.officialPhone,
-      Email: formData.email,
-      EmployeeType: formData.employeeType,
-      Gender: formData.gender,
-      MaritalStatus: formData.maritalStatus,
-      BloodGroup: formData.bloodGroup,
-      FatherName: formData.fatherName,
-      MotherName: formData.motherName,
-      PresentAddress: formData.presentAddress,
-      PermanentAddress: formData.permanentAddress,
-      Status: formData.status,
-      type: "profile",
-    };
+      const payload = {
+        EmployeeId: formData.employeeId,
+        UserId: loggedInUser.EmployeeId || "ADMIN",
+        EmployeeName: formData.name,
+        DepartmentId: String(formData.departmentId),
+        DesignationId: String(formData.designationId),
+        BranchId: String(
+          branches.find((b) => b.name === formData.branch)?.id || ""
+        ),
+        DateOfJoin: formData.joiningDate
+          ? formData.joiningDate.toISOString().split("T")[0]
+          : null,
+        DateOfResign: formData.resignDate
+          ? formData.resignDate.toISOString().split("T")[0]
+          : null,
+        NID: formData.nid,
+        PersonalContactNumber: formData.personalPhone,
+        OfficalContactNumber: formData.officialPhone,
+        Email: formData.email,
+        EmployeeType: formData.employeeType,
+        Gender: formData.gender,
+        MaritalStatus: formData.maritalStatus,
+        BloodGroup: formData.bloodGroup,
+        FatherName: formData.fatherName,
+        MotherName: formData.motherName,
+        PresentAddress: formData.presentAddress,
+        PermanentAddress: formData.permanentAddress,
+        Status: formData.status,
+        type: "profile",
+      };
 
-    // Show loading popup
-    setPopup({ isOpen: true, type: "loading", message: "Updating profile..." });
+      // Show loading popup
+      setPopup({
+        isOpen: true,
+        type: "loading",
+        message: "Updating profile...",
+      });
 
-    const response = await axios.put(`${API_BASE_URL}employeeupdate`, payload);
-    console.log("Update Response:", response.data);
+      const response = await axios.put(
+        `${API_BASE_URL}employeeupdate`,
+        payload
+      );
+      console.log("Update Response:", response.data);
 
-    // Success popup
-    setPopup({ isOpen: true, type: "done", message: "Profile updated successfully" });
-    setIsEditing(false);
-  } catch (err: any) {
-    console.error("Error updating profile:", err);
-    setPopup({ isOpen: true, type: "notdone", message: "Failed to update profile" });
-  }
-};
+      // Success popup
+      setPopup({
+        isOpen: true,
+        type: "done",
+        message: "Profile updated successfully",
+      });
+      setIsEditing(false);
+    } catch (err: any) {
+      console.error("Error updating profile:", err);
+      setPopup({
+        isOpen: true,
+        type: "notdone",
+        message: "Failed to update profile",
+      });
+    }
+  };
 
   // --------------------------------------------------------
 
@@ -271,11 +340,19 @@ const handleUpdate = async () => {
 
   return (
     <div className="upf-container">
-      <div className="upf-header">
-        <h2>Profile</h2>
-        {showEditButton && !isEditing && <button className="upf-edit-btn" onClick={handleEdit}>Edit</button>}
-        {isEditing && <button className="upf-update-btn" onClick={handleUpdate}>Update</button>}
-      </div>
+<div className="upf-header">
+  <h2>Profile</h2>
+
+  {/* Show edit button only if user has the special permission */}
+  {specialPermissions.includes("Can Access To Edit Employee Profile") && !isEditing && showEditButton && (
+    <button className="upf-edit-btn" onClick={handleEdit}>Edit</button>
+  )}
+
+  {specialPermissions.includes("Can Access To Edit Employee Profile") && isEditing && (
+    <button className="upf-update-btn" onClick={handleUpdate}>Update</button>
+  )}
+</div>
+
 
       <div className="upf-content">
         <div className="upf-left">
@@ -287,7 +364,13 @@ const handleUpdate = async () => {
                 <FaUserCircle size={80} color="#ccc" />
               </div>
             )}
-            {isEditing && <input type="file" accept="image/*" onChange={handleProfilePicChange} />}
+            {isEditing && (
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleProfilePicChange}
+              />
+            )}
           </label>
         </div>
 
@@ -296,28 +379,46 @@ const handleUpdate = async () => {
             {/* Employee ID */}
             <div className="upf-form-group">
               <label>Employee ID</label>
-              <input type="text" name="employeeId" value={formData.employeeId} disabled />
+              <input
+                type="text"
+                name="employeeId"
+                value={formData.employeeId}
+                disabled
+              />
             </div>
 
             {/* Name */}
             <div className="upf-form-group">
               <label>Name</label>
-              <input type="text" name="name" value={formData.name} onChange={handleChange} disabled={!isEditing} />
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                disabled={!isEditing}
+              />
             </div>
 
             {/* Branch Dropdown */}
             <div className="upf-form-group" ref={refs.branch}>
               <label>Branch</label>
-              <div className={`custom-select ${dropdowns.branch ? "open" : ""}`} onClick={() => isEditing && setDropdowns(prev => ({ ...prev, branch: !prev.branch }))}>
+              <div
+                className={`custom-select ${dropdowns.branch ? "open" : ""}`}
+                onClick={() =>
+                  isEditing &&
+                  setDropdowns((prev) => ({ ...prev, branch: !prev.branch }))
+                }
+              >
                 <div className="selected">
-                  {formData.branch || "Select Branch"} <span style={{ float: "right" }}>▾</span>
+                  {formData.branch || "Select Branch"}{" "}
+                  <span style={{ float: "right" }}>▾</span>
                 </div>
                 {dropdowns.branch && (
                   <div className="options">
-                    {branches.map(b => (
+                    {branches.map((b) => (
                       <div
                         key={b.id}
-                        onClick={e => {
+                        onClick={(e) => {
                           e.stopPropagation();
                           handleSelect("branch", b.name, "branch");
                         }}
@@ -333,16 +434,26 @@ const handleUpdate = async () => {
             {/* Department Dropdown */}
             <div className="upf-form-group" ref={refs.dept}>
               <label>Department</label>
-              <div className={`custom-select ${dropdowns.dept ? "open" : ""}`} onClick={() => isEditing && setDropdowns(prev => ({ ...prev, dept: !prev.dept }))}>
+              <div
+                className={`custom-select ${dropdowns.dept ? "open" : ""}`}
+                onClick={() =>
+                  isEditing &&
+                  setDropdowns((prev) => ({ ...prev, dept: !prev.dept }))
+                }
+              >
                 <div className="selected">
-                  {formData.departmentId ? departments.find(d => d.id === formData.departmentId)?.name : "Select..."} <span style={{ float: "right" }}>▾</span>
+                  {formData.departmentId
+                    ? departments.find((d) => d.id === formData.departmentId)
+                        ?.name
+                    : "Select..."}{" "}
+                  <span style={{ float: "right" }}>▾</span>
                 </div>
                 {dropdowns.dept && (
                   <div className="options">
-                    {departments.map(d => (
+                    {departments.map((d) => (
                       <div
                         key={d.id}
-                        onClick={e => {
+                        onClick={(e) => {
                           e.stopPropagation();
                           handleSelect("departmentId", d.id, "dept");
                         }}
@@ -358,16 +469,26 @@ const handleUpdate = async () => {
             {/* Designation Dropdown */}
             <div className="upf-form-group" ref={refs.des}>
               <label>Designation</label>
-              <div className={`custom-select ${dropdowns.des ? "open" : ""}`} onClick={() => isEditing && setDropdowns(prev => ({ ...prev, des: !prev.des }))}>
+              <div
+                className={`custom-select ${dropdowns.des ? "open" : ""}`}
+                onClick={() =>
+                  isEditing &&
+                  setDropdowns((prev) => ({ ...prev, des: !prev.des }))
+                }
+              >
                 <div className="selected">
-                  {formData.designationId ? designations.find(d => d.id === formData.designationId)?.name : "Select..."} <span style={{ float: "right" }}>▾</span>
+                  {formData.designationId
+                    ? designations.find((d) => d.id === formData.designationId)
+                        ?.name
+                    : "Select..."}{" "}
+                  <span style={{ float: "right" }}>▾</span>
                 </div>
                 {dropdowns.des && (
                   <div className="options">
-                    {designations.map(d => (
+                    {designations.map((d) => (
                       <div
                         key={d.id}
-                        onClick={e => {
+                        onClick={(e) => {
                           e.stopPropagation();
                           handleSelect("designationId", d.id, "des");
                         }}
@@ -383,16 +504,23 @@ const handleUpdate = async () => {
             {/* Employee Type Dropdown */}
             <div className="upf-form-group" ref={refs.empType}>
               <label>Employee Type</label>
-              <div className={`custom-select ${dropdowns.empType ? "open" : ""}`} onClick={() => isEditing && setDropdowns(prev => ({ ...prev, empType: !prev.empType }))}>
+              <div
+                className={`custom-select ${dropdowns.empType ? "open" : ""}`}
+                onClick={() =>
+                  isEditing &&
+                  setDropdowns((prev) => ({ ...prev, empType: !prev.empType }))
+                }
+              >
                 <div className="selected">
-                  {formData.employeeType || "Select Employee Type"} <span style={{ float: "right" }}>▾</span>
+                  {formData.employeeType || "Select Employee Type"}{" "}
+                  <span style={{ float: "right" }}>▾</span>
                 </div>
                 {dropdowns.empType && (
                   <div className="options">
                     {employeeTypes.map((type, idx) => (
                       <div
                         key={idx}
-                        onClick={e => {
+                        onClick={(e) => {
                           e.stopPropagation();
                           handleSelect("employeeType", type, "empType");
                         }}
@@ -410,7 +538,9 @@ const handleUpdate = async () => {
               <label>Joining Date</label>
               <DatePicker
                 selected={formData.joiningDate}
-                onChange={date => setFormData(prev => ({ ...prev, joiningDate: date }))}
+                onChange={(date) =>
+                  setFormData((prev) => ({ ...prev, joiningDate: date }))
+                }
                 dateFormat="yyyy-MM-dd"
                 disabled={!isEditing}
                 className="upf-input"
@@ -423,7 +553,9 @@ const handleUpdate = async () => {
               <label>Resign Date</label>
               <DatePicker
                 selected={formData.resignDate}
-                onChange={date => setFormData(prev => ({ ...prev, resignDate: date }))}
+                onChange={(date) =>
+                  setFormData((prev) => ({ ...prev, resignDate: date }))
+                }
                 dateFormat="yyyy-MM-dd"
                 disabled={!isEditing}
                 className="upf-input"
@@ -434,14 +566,23 @@ const handleUpdate = async () => {
             {/* Gender */}
             <div className="upf-form-group" ref={refs.gender}>
               <label>Gender</label>
-              <div className={`custom-select ${dropdowns.gender ? "open" : ""}`} onClick={() => isEditing && setDropdowns(prev => ({ ...prev, gender: !prev.gender }))}>
-                <div className="selected">{formData.gender || "Select Gender"} <span style={{ float: "right" }}>▾</span></div>
+              <div
+                className={`custom-select ${dropdowns.gender ? "open" : ""}`}
+                onClick={() =>
+                  isEditing &&
+                  setDropdowns((prev) => ({ ...prev, gender: !prev.gender }))
+                }
+              >
+                <div className="selected">
+                  {formData.gender || "Select Gender"}{" "}
+                  <span style={{ float: "right" }}>▾</span>
+                </div>
                 {dropdowns.gender && (
                   <div className="options">
                     {genderOptions.map((g, idx) => (
                       <div
                         key={idx}
-                        onClick={e => {
+                        onClick={(e) => {
                           e.stopPropagation();
                           handleSelect("gender", g, "gender");
                         }}
@@ -457,14 +598,28 @@ const handleUpdate = async () => {
             {/* Marital Status */}
             <div className="upf-form-group" ref={refs.maritalStatus}>
               <label>Marital Status</label>
-              <div className={`custom-select ${dropdowns.maritalStatus ? "open" : ""}`} onClick={() => isEditing && setDropdowns(prev => ({ ...prev, maritalStatus: !prev.maritalStatus }))}>
-                <div className="selected">{formData.maritalStatus || "Select Marital Status"} <span style={{ float: "right" }}>▾</span></div>
+              <div
+                className={`custom-select ${
+                  dropdowns.maritalStatus ? "open" : ""
+                }`}
+                onClick={() =>
+                  isEditing &&
+                  setDropdowns((prev) => ({
+                    ...prev,
+                    maritalStatus: !prev.maritalStatus,
+                  }))
+                }
+              >
+                <div className="selected">
+                  {formData.maritalStatus || "Select Marital Status"}{" "}
+                  <span style={{ float: "right" }}>▾</span>
+                </div>
                 {dropdowns.maritalStatus && (
                   <div className="options">
                     {maritalStatusOptions.map((m, idx) => (
                       <div
                         key={idx}
-                        onClick={e => {
+                        onClick={(e) => {
                           e.stopPropagation();
                           handleSelect("maritalStatus", m, "maritalStatus");
                         }}
@@ -480,14 +635,28 @@ const handleUpdate = async () => {
             {/* Blood Group */}
             <div className="upf-form-group" ref={refs.bloodGroup}>
               <label>Blood Group</label>
-              <div className={`custom-select ${dropdowns.bloodGroup ? "open" : ""}`} onClick={() => isEditing && setDropdowns(prev => ({ ...prev, bloodGroup: !prev.bloodGroup }))}>
-                <div className="selected">{formData.bloodGroup || "Select Blood Group"} <span style={{ float: "right" }}>▾</span></div>
+              <div
+                className={`custom-select ${
+                  dropdowns.bloodGroup ? "open" : ""
+                }`}
+                onClick={() =>
+                  isEditing &&
+                  setDropdowns((prev) => ({
+                    ...prev,
+                    bloodGroup: !prev.bloodGroup,
+                  }))
+                }
+              >
+                <div className="selected">
+                  {formData.bloodGroup || "Select Blood Group"}{" "}
+                  <span style={{ float: "right" }}>▾</span>
+                </div>
                 {dropdowns.bloodGroup && (
                   <div className="options">
                     {bloodGroupOptions.map((b, idx) => (
                       <div
                         key={idx}
-                        onClick={e => {
+                        onClick={(e) => {
                           e.stopPropagation();
                           handleSelect("bloodGroup", b, "bloodGroup");
                         }}
@@ -503,14 +672,23 @@ const handleUpdate = async () => {
             {/* Status */}
             <div className="upf-form-group" ref={refs.status}>
               <label>Status</label>
-              <div className={`custom-select ${dropdowns.status ? "open" : ""}`} onClick={() => isEditing && setDropdowns(prev => ({ ...prev, status: !prev.status }))}>
-                <div className="selected">{formData.status || "Select Status"} <span style={{ float: "right" }}>▾</span></div>
+              <div
+                className={`custom-select ${dropdowns.status ? "open" : ""}`}
+                onClick={() =>
+                  isEditing &&
+                  setDropdowns((prev) => ({ ...prev, status: !prev.status }))
+                }
+              >
+                <div className="selected">
+                  {formData.status || "Select Status"}{" "}
+                  <span style={{ float: "right" }}>▾</span>
+                </div>
                 {dropdowns.status && (
                   <div className="options">
                     {statusOptions.map((s, idx) => (
                       <div
                         key={idx}
-                        onClick={e => {
+                        onClick={(e) => {
                           e.stopPropagation();
                           handleSelect("status", s, "status");
                         }}
@@ -525,27 +703,55 @@ const handleUpdate = async () => {
 
             {/* Other fields */}
             {Object.entries(formData).map(([key, value]) => {
-              if ([
-                "employeeId","name","branch","departmentId","designationId","employeeType",
-                "joiningDate","resignDate","gender","maritalStatus","bloodGroup","status"
-              ].includes(key)) return null;
+              if (
+                [
+                  "employeeId",
+                  "name",
+                  "branch",
+                  "departmentId",
+                  "designationId",
+                  "employeeType",
+                  "joiningDate",
+                  "resignDate",
+                  "gender",
+                  "maritalStatus",
+                  "bloodGroup",
+                  "status",
+                ].includes(key)
+              )
+                return null;
               return (
                 <div className="upf-form-group" key={key}>
-                  <label>{key.replace(/([A-Z])/g, " $1").replace(/^./, s => s.toUpperCase())}</label>
-                  <input type={["personalPhone","officialPhone","nid"].includes(key) ? "number" : key==="password"?"password":"text"} name={key} value={value as string | number} onChange={handleChange} disabled={!isEditing}/>
+                  <label>
+                    {key
+                      .replace(/([A-Z])/g, " $1")
+                      .replace(/^./, (s) => s.toUpperCase())}
+                  </label>
+                  <input
+                    type={
+                      ["personalPhone", "officialPhone", "nid"].includes(key)
+                        ? "number"
+                        : key === "password"
+                        ? "password"
+                        : "text"
+                    }
+                    name={key}
+                    value={value as string | number}
+                    onChange={handleChange}
+                    disabled={!isEditing}
+                  />
                 </div>
-              )
+              );
             })}
           </form>
           <Popup
-        isOpen={popup.isOpen}
-        type={popup.type}
-        message={popup.message}
-        onClose={() => setPopup({ ...popup, isOpen: false })}
-      />
+            isOpen={popup.isOpen}
+            type={popup.type}
+            message={popup.message}
+            onClose={() => setPopup({ ...popup, isOpen: false })}
+          />
         </div>
       </div>
-      
     </div>
   );
 };

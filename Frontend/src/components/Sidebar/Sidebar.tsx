@@ -21,28 +21,63 @@ interface SidebarProps {
   onLogout?: () => void;
 }
 
+interface UserPermission {
+  Access: string[];
+  Special_Permission: string[];
+}
+
+// Config for sidebar links
+const sidebarLinks = [
+  { name: "Home", path: "/", icon: <FaHome />, access: null },
+  { name: "Overview", path: "/overview", icon: <FaChartLine />, access: "Overview" },
+  { name: "Reports", path: "/reports", icon: <FaChartBar />, access: "Reports" },
+  { name: "Employee", path: "/employee", icon: <FaUsers />, access: "Employee" },
+  { name: "Leave Management", path: "/leavemanagement", icon: <FaCalendarCheck />, access: "Leave Management" },
+  { name: "Yearly Calendar", path: "/yearlycalander", icon: <FaCalendarAlt />, access: "Yearly Calendar" },
+];
+
+// Admin dropdown config
+const adminLinks = [
+  { name: "Rules & Permission", path: "/rulespermission", icon: <FaLock />, access: "Rules & Permission" },
+  { name: "Leave Approval", path: "/leaveapproval", icon: <FaCalendarCheck />, access: "Leave Approval" },
+  { name: "Designation Setup", path: "/designationsetup", icon: <FaBriefcase />, access: "Designation Setup" },
+  { name: "Department Setup", path: "/departmentsetup", icon: <FaBuilding />, access: "Department Setup" },
+];
+
 const Sidebar: React.FC<SidebarProps> = ({ onLogout }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const adminRef = useRef<HTMLDivElement>(null);
 
-  const adminPaths = [
-    "/rulespermission",
-    "/leaveapproval",
-    "/designationsetup",
-    "/departmentsetup",
-  ];
-
-  const isAdminActive = adminPaths.some((path) =>
-    location.pathname.startsWith(path)
-  );
-
+  const [permissions, setPermissions] = useState<UserPermission>({ Access: [], Special_Permission: [] });
   const [isAdminOpen, setIsAdminOpen] = useState(false);
 
+  // Load user permissions from localStorage
   useEffect(() => {
-    if (isAdminActive) setIsAdminOpen(true);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    const userData = localStorage.getItem("user");
+    if (userData) {
+      try {
+        const parsed = JSON.parse(userData);
+        const perm = parsed.Permission ? JSON.parse(parsed.Permission) : { Access: [], Special_Permission: [] };
+        setPermissions(perm);
+      } catch (err) {
+        console.error("Failed to parse permissions:", err);
+        setPermissions({ Access: [], Special_Permission: [] });
+      }
+    }
+  }, []);
 
+  // Check if any admin link is active
+  const isAdminActive = adminLinks.some((link) => location.pathname.startsWith(link.path));
+
+  // Auto-close admin dropdown if route changes and not on admin links
+  useEffect(() => {
+    if (!isAdminActive) {
+      setIsAdminOpen(false);
+    }
+  }, [location.pathname, isAdminActive]);
+
+  // Close dropdown if clicked outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (adminRef.current && !adminRef.current.contains(e.target as Node)) {
@@ -50,157 +85,93 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout }) => {
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
-    return () =>
-      document.removeEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleDropdownLinkClick = () => setIsAdminOpen(false);
+  // Close dropdown when an admin link is clicked
+  const handleAdminLinkClick = () => setIsAdminOpen(false);
 
   const handleLogoutClick = () => {
     if (onLogout) {
-      onLogout(); // optional parent logout
+      onLogout();
     } else {
-      localStorage.removeItem("user"); // remove login info
-      navigate("/login", { replace: true }); // redirect to login
+      localStorage.removeItem("user");
+      localStorage.removeItem("isLoggedIn");
+      navigate("/login", { replace: true });
     }
   };
 
   return (
     <aside className="sidebar">
       <div className="sidebar-main">
-        <NavLink
-          to="/"
-          end
-          className={({ isActive }) =>
-            `sidebar-link ${isActive ? "active-link" : ""}`
-          }
-        >
-          <FaHome className="sidebar-icon" />
-          <span>Home</span>
-        </NavLink>
+        {/* Render first two links: Home & Overview */}
+        {sidebarLinks.slice(0, 2).map(
+          (link) =>
+            (!link.access || permissions.Access.includes(link.access)) && (
+              <NavLink
+                key={link.path}
+                to={link.path}
+                end
+                className={({ isActive }) => `sidebar-link ${isActive ? "active-link" : ""}`}
+              >
+                {link.icon}
+                <span>{link.name}</span>
+              </NavLink>
+            )
+        )}
 
-        <NavLink
-          to="/overview"
-          className={({ isActive }) =>
-            `sidebar-link ${isActive ? "active-link" : ""}`
-          }
-        >
-          <FaChartLine className="sidebar-icon" />
-          <span>Overview</span>
-        </NavLink>
-
-        {/* Admin dropdown */}
-        <div ref={adminRef}>
-          <button
-            type="button"
-            className={`sidebar-link dropdown ${
-              isAdminActive ? "active-link" : ""
-            }`}
-            onClick={() => setIsAdminOpen(!isAdminOpen)}
-          >
-            <FaUserShield className="sidebar-icon" />
-            <span>Admin</span>
-            {isAdminOpen ? (
-              <FaChevronUp className="chevron" />
-            ) : (
-              <FaChevronDown className="chevron" />
-            )}
-          </button>
-
-          <div className={`dropdown-menu ${isAdminOpen ? "open" : ""}`}>
-            <NavLink
-              to="/rulespermission"
-              onClick={handleDropdownLinkClick}
-              className={({ isActive }) =>
-                `sidebar-sublink ${isActive ? "active-sublink" : ""}`
-              }
+        {/* Admin dropdown at 3rd position */}
+        {adminLinks.some((link) => permissions.Access.includes(link.access)) && (
+          <div ref={adminRef}>
+            <button
+              type="button"
+              className={`sidebar-link dropdown ${isAdminActive ? "active-link" : ""}`}
+              onClick={() => setIsAdminOpen(!isAdminOpen)}
             >
-              <FaLock className="sidebar-icon" />
-              <span>Rules & Permission</span>
-            </NavLink>
+              <FaUserShield className="sidebar-icon" />
+              <span>Admin</span>
+              {isAdminOpen ? <FaChevronUp className="chevron" /> : <FaChevronDown className="chevron" />}
+            </button>
 
-            <NavLink
-              to="/leaveapproval"
-              onClick={handleDropdownLinkClick}
-              className={({ isActive }) =>
-                `sidebar-sublink ${isActive ? "active-sublink" : ""}`
-              }
-            >
-              <FaCalendarCheck className="sidebar-icon" />
-              <span>Leave Approval</span>
-            </NavLink>
-
-            <NavLink
-              to="/designationsetup"
-              onClick={handleDropdownLinkClick}
-              className={({ isActive }) =>
-                `sidebar-sublink ${isActive ? "active-sublink" : ""}`
-              }
-            >
-              <FaBriefcase className="sidebar-icon" />
-              <span>Designation Setup</span>
-            </NavLink>
-
-            <NavLink
-              to="/departmentsetup"
-              onClick={handleDropdownLinkClick}
-              className={({ isActive }) =>
-                `sidebar-sublink ${isActive ? "active-sublink" : ""}`
-              }
-            >
-              <FaBuilding className="sidebar-icon" />
-              <span>Department Setup</span>
-            </NavLink>
+            <div className={`dropdown-menu ${isAdminOpen ? "open" : ""}`}>
+              {adminLinks.map(
+                (link) =>
+                  permissions.Access.includes(link.access) && (
+                    <NavLink
+                      key={link.path}
+                      to={link.path}
+                      onClick={handleAdminLinkClick} // <-- close dropdown on click
+                      className={({ isActive }) => `sidebar-sublink ${isActive ? "active-sublink" : ""}`}
+                    >
+                      {link.icon}
+                      <span>{link.name}</span>
+                    </NavLink>
+                  )
+              )}
+            </div>
           </div>
-        </div>
+        )}
 
-        <NavLink
-          to="/reports"
-          className={({ isActive }) =>
-            `sidebar-link ${isActive ? "active-link" : ""}`
-          }
-        >
-          <FaChartBar className="sidebar-icon" />
-          <span>Reports</span>
-        </NavLink>
-
-        <NavLink
-          to="/employee"
-          className={({ isActive }) =>
-            `sidebar-link ${isActive ? "active-link" : ""}`
-          }
-        >
-          <FaUsers className="sidebar-icon" />
-          <span>Employee</span>
-        </NavLink>
-
-        <NavLink
-          to="/leavemanagement"
-          className={({ isActive }) =>
-            `sidebar-link ${isActive ? "active-link" : ""}`
-          }
-        >
-          <FaCalendarCheck className="sidebar-icon" />
-          <span>Leave Management</span>
-        </NavLink>
-
-        <NavLink
-          to="/yearlycalander"
-          className={({ isActive }) =>
-            `sidebar-link ${isActive ? "active-link" : ""}`
-          }
-        >
-          <FaCalendarAlt className="sidebar-icon" />
-          <span>Yearly Calendar</span>
-        </NavLink>
+        {/* Render remaining links after Admin */}
+        {sidebarLinks.slice(2).map(
+          (link) =>
+            (!link.access || permissions.Access.includes(link.access)) && (
+              <NavLink
+                key={link.path}
+                to={link.path}
+                end
+                className={({ isActive }) => `sidebar-link ${isActive ? "active-link" : ""}`}
+              >
+                {link.icon}
+                <span>{link.name}</span>
+              </NavLink>
+            )
+        )}
       </div>
 
       {/* Logout */}
       <div className="sidebar-footer">
-        <button
-          className="sidebar-link logout-btn"
-          onClick={handleLogoutClick}
-        >
+        <button className="sidebar-link logout-btn" onClick={handleLogoutClick}>
           <FaSignOutAlt className="sidebar-icon" />
           <span>Logout</span>
         </button>

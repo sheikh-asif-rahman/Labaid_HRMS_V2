@@ -3,6 +3,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "./Reports_Form.css";
 import axios from "axios";
+import Popup from "../../Popup/Popup";
 
 type Facility = {
   id: string;
@@ -30,18 +31,28 @@ const Reports_Form: React.FC<Props> = ({
   const [selectedFacility, setSelectedFacility] = useState<string>("");
   const [userId, setUserId] = useState<string>("");
 
+  // Popup state
+  const [popupOpen, setPopupOpen] = useState(false);
+
   // Fetch facilities
   useEffect(() => {
+    setPopupOpen(true); // Show loading while fetching
+
     axios
       .get("http://localhost:3000/api/facilities")
       .then((res) => {
         if (res.data.success && Array.isArray(res.data.data)) {
           setFacilities(res.data.data.map((f: any) => ({ id: f.id, name: f.name })));
+          setPopupOpen(false); // Hide loading on success
         } else {
-          setFacilities([]);
+          // Invalid response → keep loading forever
+          setPopupOpen(true);
         }
       })
-      .catch(() => setFacilities([]));
+      .catch(() => {
+        // API failure → keep loading forever
+        setPopupOpen(true);
+      });
   }, []);
 
   const handleReportChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -59,6 +70,8 @@ const Reports_Form: React.FC<Props> = ({
   };
 
   const handleGetData = async () => {
+    setPopupOpen(true); // Show loading while fetching
+
     const payload: any = {
       facilityId: selectedFacility,
       fromDate: fromDate ? fromDate.toISOString().split("T")[0] : null,
@@ -72,6 +85,8 @@ const Reports_Form: React.FC<Props> = ({
         res = await axios.post("http://localhost:3000/api/attendancereport", payload);
       } else if (reportType === "absent") {
         res = await axios.post("http://localhost:3000/api/absentreport", payload);
+      } else if (reportType === "employee") {
+        res = await axios.post("http://localhost:3000/api/employeelist", { facilityId: selectedFacility });
       } else {
         res = { data: [] };
       }
@@ -79,11 +94,15 @@ const Reports_Form: React.FC<Props> = ({
       if (Array.isArray(res.data)) {
         setReportData(res.data);
         setDataFetched(true);
+        setPopupOpen(false); // Close loading on success
       } else {
         setReportData([]);
+        setPopupOpen(false); // Close loading even if data invalid
       }
     } catch (err) {
+      console.error("API Error:", err);
       setReportData([]);
+      setPopupOpen(false); // Close loading on API error
     }
   };
 
@@ -111,7 +130,7 @@ const Reports_Form: React.FC<Props> = ({
         <div className="reports-form-group">
           <label>Select Facility</label>
           <select
-            disabled={!reportType}
+            disabled={!reportType || facilities.length === 0}
             value={selectedFacility}
             onChange={handleFacilityChange}
           >
@@ -167,7 +186,7 @@ const Reports_Form: React.FC<Props> = ({
           <button
             className="reports-form-btn reports-form-btn-blue"
             onClick={handleGetData}
-            disabled={!reportType || !selectedFacility}
+            disabled={!reportType || !selectedFacility || facilities.length === 0}
           >
             Get Data
           </button>
@@ -175,7 +194,6 @@ const Reports_Form: React.FC<Props> = ({
           <button
             className="reports-form-btn reports-form-btn-secondary"
             onClick={() => {
-              // Reset all fields and data
               setReportType("");
               setDataFetched(false);
               setFromDate(null);
@@ -189,6 +207,12 @@ const Reports_Form: React.FC<Props> = ({
           </button>
         )}
       </div>
+
+      {/* Infinite Loading Popup */}
+      <Popup
+        isOpen={popupOpen}
+        type="loading"
+      />
     </div>
   );
 };

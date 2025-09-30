@@ -67,6 +67,24 @@ const Working_Day_Shift: React.FC<ShiftScheduleProps> = ({ shiftSchedule, employ
   const [activeDay, setActiveDay] = useState<Day | null>(null);
   const [dayType, setDayType] = useState<DayType>("Full Day");
 
+  const [specialPermissions, setSpecialPermissions] = useState<string[]>([]);
+
+useEffect(() => {
+  const userData = localStorage.getItem("user");
+  if (userData) {
+    try {
+      const parsed = JSON.parse(userData);
+      const perms = parsed.Permission ? JSON.parse(parsed.Permission) : { Access: [], Special_Permission: [] };
+      setSpecialPermissions(perms.Special_Permission || []);
+    } catch (err) {
+      console.error("Failed to parse permissions:", err);
+      setSpecialPermissions([]);
+    }
+  }
+}, []);
+
+
+
   useEffect(() => {
     setSchedule(parseShiftSchedule(shiftSchedule));
   }, [shiftSchedule]);
@@ -103,10 +121,15 @@ const Working_Day_Shift: React.FC<ShiftScheduleProps> = ({ shiftSchedule, employ
 
   return (
     <div className="working-day-shift-container">
-      <div className="top-row">
-        <div className="working-days-title">Working Days</div>
-        <button className="update-btn" onClick={handleUpdate}>Update</button>
-      </div>
+<div className="top-row">
+  <div className="working-days-title">Working Days</div>
+
+  {/* Only show Update if user has permission */}
+  {specialPermissions.includes("Can Access To Edit Employee Profile") && (
+    <button className="update-btn" onClick={handleUpdate}>Update</button>
+  )}
+</div>
+
 
       <div className="days-container">
         {days.map(day => (
