@@ -1,8 +1,6 @@
 .custom-navbar {
   height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: center; /* center content horizontally */
+  width: 100%;
   background-color: var(--primary);
   color: var(--white);
   position: fixed;
@@ -10,17 +8,21 @@
   left: 0;
   right: 0;
   z-index: 1000;
-  padding: 0 1rem; /* responsive padding */
-  border-bottom: 3px solid black; /* thin line */
+  padding: 0 1rem;
+  border-bottom: 3px solid black;
+
+  display: flex;
+  justify-content: center; /* center inner container */
+  align-items: center;
 }
 
-/* Inner container to limit width on very wide screens */
+/* Inner container */
 .custom-navbar .navbar-container {
   width: 100%;
-  max-width: 1400px; /* optional: keeps content readable on huge screens */
+  max-width: 1400px;
   display: flex;
+  justify-content: space-between; /* brand left, logout right */
   align-items: center;
-  justify-content: space-between; /* space between brand and menu if needed */
   margin: 0 auto;
 }
 
@@ -29,4 +31,24 @@
   font-size: 1.4rem;
   font-weight: bold;
   color: var(--white);
+}
+
+/* Logout button */
+.custom-navbar .logout-btn {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--white);
+  cursor: pointer;
+  font-size: 1.0rem;
+  padding: 0; /* remove extra padding */
+  width: auto; /* ensure it doesn’t stretch */
+  height: 100%; /* optional: full height of navbar */
+}
+
+.custom-navbar .logout-btn:hover {
+  color: #ff5252;
 }

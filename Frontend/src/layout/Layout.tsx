@@ -9,17 +9,17 @@ interface LayoutProps {
   onLogout?: () => void;
 }
 
-const Layout: React.FC<LayoutProps> = ({ onLogout }) => {
+const Layout: React.FC<LayoutProps> = () => {
   return (
     <div className="layout-container" style={{ position: "relative" }}>
       {/* Persistent background */}
       <Background />
 
-      {/* Navbar */}
+      {/* Navbar (now has logout button) */}
       <Navbar />
 
-      {/* Sidebar */}
-      <Sidebar onLogout={onLogout} />
+      {/* Sidebar (no logout prop anymore) */}
+      <Sidebar />
 
       {/* Content */}
       <main className="layout-content" style={{ position: "relative", zIndex: 1 }}>

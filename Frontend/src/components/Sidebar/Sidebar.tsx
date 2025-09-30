@@ -13,13 +13,10 @@ import {
   FaBuilding,
   FaChartBar,
   FaChartLine,
-  FaSignOutAlt,
 } from "react-icons/fa";
 import "./Sidebar.css";
 
-interface SidebarProps {
-  onLogout?: () => void;
-}
+interface SidebarProps {}
 
 interface UserPermission {
   Access: string[];
@@ -44,9 +41,8 @@ const adminLinks = [
   { name: "Department Setup", path: "/departmentsetup", icon: <FaBuilding />, access: "Department Setup" },
 ];
 
-const Sidebar: React.FC<SidebarProps> = ({ onLogout }) => {
+const Sidebar: React.FC<SidebarProps> = () => {
   const location = useLocation();
-  const navigate = useNavigate();
   const adminRef = useRef<HTMLDivElement>(null);
 
   const [permissions, setPermissions] = useState<UserPermission>({ Access: [], Special_Permission: [] });
@@ -91,92 +87,81 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout }) => {
   // Close dropdown when an admin link is clicked
   const handleAdminLinkClick = () => setIsAdminOpen(false);
 
-  const handleLogoutClick = () => {
-    if (onLogout) {
-      onLogout();
-    } else {
-      localStorage.removeItem("user");
-      localStorage.removeItem("isLoggedIn");
-      navigate("/login", { replace: true });
-    }
-  };
-
   return (
-    <aside className="sidebar">
-      <div className="sidebar-main">
-        {/* Render first two links: Home & Overview */}
-        {sidebarLinks.slice(0, 2).map(
-          (link) =>
-            (!link.access || permissions.Access.includes(link.access)) && (
-              <NavLink
-                key={link.path}
-                to={link.path}
-                end
-                className={({ isActive }) => `sidebar-link ${isActive ? "active-link" : ""}`}
-              >
-                {link.icon}
-                <span>{link.name}</span>
-              </NavLink>
-            )
-        )}
+<aside className="sidebar">
+  <div className="sidebar-main">
+    {/* Render first two links: Home & Overview */}
+    {sidebarLinks.slice(0, 2).map(
+      (link) =>
+        (!link.access || permissions.Access.includes(link.access)) && (
+          <NavLink
+            key={link.path}
+            to={link.path}
+            end
+            className={({ isActive }) => `sidebar-link ${isActive ? "active-link" : ""}`}
+          >
+            {link.icon}
+            <span>{link.name}</span>
+          </NavLink>
+        )
+    )}
 
-        {/* Admin dropdown at 3rd position */}
-        {adminLinks.some((link) => permissions.Access.includes(link.access)) && (
-          <div ref={adminRef}>
-            <button
-              type="button"
-              className={`sidebar-link dropdown ${isAdminActive ? "active-link" : ""}`}
-              onClick={() => setIsAdminOpen(!isAdminOpen)}
-            >
-              <FaUserShield className="sidebar-icon" />
-              <span>Admin</span>
-              {isAdminOpen ? <FaChevronUp className="chevron" /> : <FaChevronDown className="chevron" />}
-            </button>
-
-            <div className={`dropdown-menu ${isAdminOpen ? "open" : ""}`}>
-              {adminLinks.map(
-                (link) =>
-                  permissions.Access.includes(link.access) && (
-                    <NavLink
-                      key={link.path}
-                      to={link.path}
-                      onClick={handleAdminLinkClick} // <-- close dropdown on click
-                      className={({ isActive }) => `sidebar-sublink ${isActive ? "active-sublink" : ""}`}
-                    >
-                      {link.icon}
-                      <span>{link.name}</span>
-                    </NavLink>
-                  )
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Render remaining links after Admin */}
-        {sidebarLinks.slice(2).map(
-          (link) =>
-            (!link.access || permissions.Access.includes(link.access)) && (
-              <NavLink
-                key={link.path}
-                to={link.path}
-                end
-                className={({ isActive }) => `sidebar-link ${isActive ? "active-link" : ""}`}
-              >
-                {link.icon}
-                <span>{link.name}</span>
-              </NavLink>
-            )
-        )}
-      </div>
-
-      {/* Logout */}
-      <div className="sidebar-footer">
-        <button className="sidebar-link logout-btn" onClick={handleLogoutClick}>
-          <FaSignOutAlt className="sidebar-icon" />
-          <span>Logout</span>
+    {/* Admin dropdown at 3rd position */}
+    {adminLinks.some((link) => permissions.Access.includes(link.access)) && (
+      <div ref={adminRef}>
+        <button
+          type="button"
+          className={`sidebar-link dropdown ${isAdminActive ? "active-link" : ""}`}
+          onClick={() => setIsAdminOpen(!isAdminOpen)}
+        >
+          <FaUserShield className="sidebar-icon" />
+          <span>Admin</span>
+          {isAdminOpen ? <FaChevronUp className="chevron" /> : <FaChevronDown className="chevron" />}
         </button>
+
+        <div className={`dropdown-menu ${isAdminOpen ? "open" : ""}`}>
+          {adminLinks.map(
+            (link) =>
+              permissions.Access.includes(link.access) && (
+                <NavLink
+                  key={link.path}
+                  to={link.path}
+                  onClick={handleAdminLinkClick}
+                  className={({ isActive }) => `sidebar-sublink ${isActive ? "active-sublink" : ""}`}
+                >
+                  {link.icon}
+                  <span>{link.name}</span>
+                </NavLink>
+              )
+          )}
+        </div>
       </div>
-    </aside>
+    )}
+
+    {/* Render remaining links after Admin */}
+    {sidebarLinks.slice(2).map(
+      (link) =>
+        (!link.access || permissions.Access.includes(link.access)) && (
+          <NavLink
+            key={link.path}
+            to={link.path}
+            end
+            className={({ isActive }) => `sidebar-link ${isActive ? "active-link" : ""}`}
+          >
+            {link.icon}
+            <span>{link.name}</span>
+          </NavLink>
+        )
+    )}
+  </div>
+
+  {/* Footer */}
+  <div className="sidebar-footer">
+    <span>DEVELOPED BY LABAID IT TEAM</span>
+    <span>@SHEIKH_ASIF_RAHMAN &nbsp; @YOUSUF_MD_RIYAD</span>
+  </div>
+</aside>
+
   );
 };
 

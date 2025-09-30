@@ -7,6 +7,7 @@ import Profile from "../components/Home/Profile/Profile";
 import User_Profile_Attendance from "../components/Employee/User_Profile_Attendance/User_Profile_Attendance";
 import Popup from "../components/Popup/Popup";
 
+
 import { API_BASE_URL } from "../constants/apiBase";
 
 const Home: React.FC = () => {
@@ -114,7 +115,9 @@ const Home: React.FC = () => {
           }}
         />
       </div>
+
     </div>
+    
   );
 };
 

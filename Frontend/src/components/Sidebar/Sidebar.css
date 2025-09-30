@@ -23,11 +23,33 @@
   gap: 0.25rem;
 }
 
-/* Sidebar footer (logout area) */
+/* Sidebar footer (developer credits) */
 .sidebar-footer {
-  margin-top: auto; /* ensures it's stuck at the bottom */
-  padding: 0.5rem;
+  margin-top: auto; /* stick to bottom */
+  padding: 1.0rem 0rem;
   border-top: 1px solid rgba(255, 255, 255, 0.15);
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  line-height: 0.9rem;
+}
+
+/* Footer main line */
+.sidebar-footer span:first-child {
+  display: block;
+  margin-bottom: 0.2rem;
+  font-size: 0.75rem; /* main text size */
+}
+
+/* Footer usernames line */
+.sidebar-footer span:last-child {
+  display: flex;
+  gap: 0.4rem;        /* small space between usernames */
+  font-size: 0.65rem; /* smaller font for usernames */
+  justify-content: center;
 }
 
 /* Top-level links and dropdown button */
@@ -35,18 +57,18 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 0.8rem 1rem; /* padding inside links */
-  margin: 2px 4px; /* spacing around links */
+  padding: 0.8rem 1rem;
+  margin: 2px 4px;
   color: var(--white);
   text-decoration: none;
-  border-radius: 6px; /* rounded corners */
+  border-radius: 6px;
   background: transparent;
   border: none;
   cursor: pointer;
   transition: background-color 0.2s ease, font-weight 0.2s;
   white-space: nowrap;
   font-size: 0.95rem;
-  width: calc(100% - 8px); /* full width minus margin */
+  width: calc(100% - 8px);
   box-sizing: border-box;
 }
 
@@ -94,16 +116,16 @@
 .sidebar-sublink {
   display: flex;
   align-items: center;
-  gap: 10px; /* spacing between icon and text */
+  gap: 10px;
   color: var(--dark);
-  padding: 0.8rem 1.2rem; /* nice padding inside dropdown */
-  margin: 2px 6px; /* small spacing around each dropdown item */
+  padding: 0.8rem 1.2rem;
+  margin: 2px 6px;
   text-decoration: none;
-  border-radius: 6px; /* rounded corners */
+  border-radius: 6px;
   transition: all 0.2s ease;
   white-space: nowrap;
   font-size: 0.9rem;
-  width: calc(100% - 12px); /* match sidebar width minus margin */
+  width: calc(100% - 12px);
   box-sizing: border-box;
 }
 
@@ -127,7 +149,7 @@
   color: var(--white) !important;
 }
 
-/* Logout button */
+/* Logout button (if needed) */
 .logout-btn {
   width: 100%;
   text-align: left;
