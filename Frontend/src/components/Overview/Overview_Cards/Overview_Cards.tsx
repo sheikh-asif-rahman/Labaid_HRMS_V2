@@ -4,7 +4,7 @@ import "./Overview_Cards.css";
 
 interface Facility {
   deviceId: string;
-  deviceName: string;
+  deviceName: string; // branch/facility name
   totalEmployees: number;
   presentCount: number;
   absentCount: number;
@@ -13,14 +13,14 @@ interface Facility {
 
 interface OverviewCardsProps {
   facilities: Facility[];
-  highlightBranchId?: string;
+  userBranchName?: string; // user branch from profile API
 }
 
 const COLORS = ["#0115a9ff", "#9b59b6", "#ff3399", "#c5c5c5"];
 
 const Overview_Cards: React.FC<OverviewCardsProps> = ({
   facilities,
-  highlightBranchId,
+  userBranchName,
 }) => {
   return (
     <div className="overview-container">
@@ -38,7 +38,12 @@ const Overview_Cards: React.FC<OverviewCardsProps> = ({
           { name: "Remaining", value: remaining },
         ];
 
-        const isHighlighted = highlightBranchId === facility.deviceId;
+        // Highlight user's branch safely
+        const isHighlighted =
+          userBranchName &&
+          facility.deviceName &&
+          facility.deviceName.trim().toLowerCase() ===
+            userBranchName.trim().toLowerCase();
 
         return (
           <div
@@ -62,7 +67,10 @@ const Overview_Cards: React.FC<OverviewCardsProps> = ({
                   paddingAngle={2}
                 >
                   {chartData.map((_, i) => (
-                    <Cell key={`cell-${i}`} fill={COLORS[i % COLORS.length]} />
+                    <Cell
+                      key={`cell-${i}`}
+                      fill={COLORS[i % COLORS.length]}
+                    />
                   ))}
                 </Pie>
               </PieChart>

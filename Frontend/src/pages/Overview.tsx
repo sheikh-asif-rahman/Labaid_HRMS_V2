@@ -5,7 +5,7 @@ import Popup from "../components/Popup/Popup";
 
 interface FacilityAPI {
   deviceId: string;
-  deviceName: string;
+  deviceName: string; // branch/facility name
   totalEmployees: number;
   presentCount: number;
   absentCount: number;
@@ -14,7 +14,7 @@ interface FacilityAPI {
 
 const Overview: React.FC = () => {
   const [facilities, setFacilities] = useState<FacilityAPI[]>([]);
-  const [employeeBranchId, setEmployeeBranchId] = useState<string>("");
+  const [employeeBranchName, setEmployeeBranchName] = useState<string>("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -23,26 +23,29 @@ const Overview: React.FC = () => {
       if (!homeDataStr) return;
 
       const homeData = JSON.parse(homeDataStr);
-      const branchId = homeData.userProfile?.BranchId || "";
-      setEmployeeBranchId(branchId);
+      const branchName = homeData.userProfile?.BranchName || "";
+      setEmployeeBranchName(branchName);
 
       try {
         const res = await fetch(`${API_BASE_URL}overview`);
         const result = await res.json();
 
         if (result.success && Array.isArray(result.data)) {
-          // Move matched branch to first
+          // Move user's branch to first position
           const sortedFacilities = [...result.data].sort((a, b) => {
-            if (a.deviceId === branchId) return -1;
-            if (b.deviceId === branchId) return 1;
+            if (a.deviceName.trim().toLowerCase() === branchName.trim().toLowerCase())
+              return -1;
+            if (b.deviceName.trim().toLowerCase() === branchName.trim().toLowerCase())
+              return 1;
             return 0;
           });
 
           setFacilities(sortedFacilities);
-          setLoading(false); // Only stop loading if fetch succeeds
+          setLoading(false);
         }
       } catch (err) {
-        // API failed: loading stays true, popup continues
+        console.error("Error fetching overview data:", err);
+        // Keep loading true if fetch fails
       }
     };
 
@@ -55,7 +58,7 @@ const Overview: React.FC = () => {
       {!loading && facilities.length > 0 && (
         <Overview_Cards
           facilities={facilities}
-          highlightBranchId={employeeBranchId}
+          userBranchName={employeeBranchName} // highlight by branch name
         />
       )}
     </>

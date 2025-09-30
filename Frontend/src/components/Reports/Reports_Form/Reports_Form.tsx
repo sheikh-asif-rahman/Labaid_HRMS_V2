@@ -5,10 +5,7 @@ import "./Reports_Form.css";
 import axios from "axios";
 import Popup from "../../Popup/Popup";
 
-type Facility = {
-  id: string;
-  name: string;
-};
+type Facility = { id: string; name: string };
 
 type Props = {
   reportType: string;
@@ -33,25 +30,30 @@ const Reports_Form: React.FC<Props> = ({
 
   // Popup state
   const [popupOpen, setPopupOpen] = useState(false);
+  const [popupType, setPopupType] = useState<"loading" | "notdone">("loading");
+  const [popupMessage, setPopupMessage] = useState("");
 
   // Fetch facilities
   useEffect(() => {
-    setPopupOpen(true); // Show loading while fetching
+    setPopupOpen(true);
+    setPopupType("loading");
 
     axios
       .get("http://localhost:3000/api/facilities")
       .then((res) => {
         if (res.data.success && Array.isArray(res.data.data)) {
           setFacilities(res.data.data.map((f: any) => ({ id: f.id, name: f.name })));
-          setPopupOpen(false); // Hide loading on success
+          setPopupOpen(false); // Close on success
         } else {
-          // Invalid response → keep loading forever
-          setPopupOpen(true);
+          setPopupType("notdone");
+          setPopupMessage("Failed to load facilities");
+          setPopupOpen(true); // Keep open
         }
       })
       .catch(() => {
-        // API failure → keep loading forever
-        setPopupOpen(true);
+        setPopupType("notdone");
+        setPopupMessage("Server unavailable. Cannot load facilities.");
+        setPopupOpen(true); // Keep open infinitely
       });
   }, []);
 
@@ -65,46 +67,56 @@ const Reports_Form: React.FC<Props> = ({
     setReportData([]);
   };
 
-  const handleFacilityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedFacility(e.target.value);
+const handleGetData = async () => {
+  // Validate date range first
+  if (fromDate && toDate && fromDate > toDate) {
+    setPopupType("notdone");
+    setPopupMessage("Invalid date range: 'From Date' cannot be after 'To Date'.");
+    setPopupOpen(true);
+    return; // Stop API call
+  }
+
+  // Show loading
+  setPopupOpen(true);
+  setPopupType("loading");
+
+  const payload: any = {
+    facilityId: selectedFacility,
+    fromDate: fromDate ? fromDate.toISOString().split("T")[0] : null,
+    toDate: toDate ? toDate.toISOString().split("T")[0] : null,
   };
+  if (userId.trim()) payload.userId = userId;
 
-  const handleGetData = async () => {
-    setPopupOpen(true); // Show loading while fetching
-
-    const payload: any = {
-      facilityId: selectedFacility,
-      fromDate: fromDate ? fromDate.toISOString().split("T")[0] : null,
-      toDate: toDate ? toDate.toISOString().split("T")[0] : null,
-    };
-    if (userId.trim()) payload.userId = userId;
-
-    try {
-      let res;
-      if (reportType === "attendance") {
-        res = await axios.post("http://localhost:3000/api/attendancereport", payload);
-      } else if (reportType === "absent") {
-        res = await axios.post("http://localhost:3000/api/absentreport", payload);
-      } else if (reportType === "employee") {
-        res = await axios.post("http://localhost:3000/api/employeelist", { facilityId: selectedFacility });
-      } else {
-        res = { data: [] };
-      }
-
-      if (Array.isArray(res.data)) {
-        setReportData(res.data);
-        setDataFetched(true);
-        setPopupOpen(false); // Close loading on success
-      } else {
-        setReportData([]);
-        setPopupOpen(false); // Close loading even if data invalid
-      }
-    } catch (err) {
-      console.error("API Error:", err);
-      setReportData([]);
-      setPopupOpen(false); // Close loading on API error
+  try {
+    let res;
+    if (reportType === "attendance") {
+      res = await axios.post("http://localhost:3000/api/attendancereport", payload);
+    } else if (reportType === "absent") {
+      res = await axios.post("http://localhost:3000/api/absentreport", payload);
+    } else if (reportType === "employee") {
+      res = await axios.post("http://localhost:3000/api/employeelist", { facilityId: selectedFacility });
+    } else {
+      res = { data: [] };
     }
-  };
+
+    if (Array.isArray(res.data)) {
+      setReportData(res.data);
+      setDataFetched(true);
+      setPopupOpen(false); // Close on success
+    } else {
+      setPopupType("notdone");
+      setPopupMessage("Invalid response from server.");
+      setPopupOpen(true);
+    }
+  } catch (err: any) {
+    setPopupType("notdone");
+    setPopupMessage(
+      err?.response?.data?.message || "Server unreachable. Please try again later."
+    );
+    setPopupOpen(true);
+  }
+};
+
 
   const isGeneralReport = reportType === "attendance" || reportType === "absent";
 
@@ -132,7 +144,7 @@ const Reports_Form: React.FC<Props> = ({
           <select
             disabled={!reportType || facilities.length === 0}
             value={selectedFacility}
-            onChange={handleFacilityChange}
+            onChange={(e) => setSelectedFacility(e.target.value)}
           >
             <option value="">Select Facility</option>
             {facilities.map((facility) =>
@@ -208,10 +220,12 @@ const Reports_Form: React.FC<Props> = ({
         )}
       </div>
 
-      {/* Infinite Loading Popup */}
+      {/* Popup */}
       <Popup
         isOpen={popupOpen}
-        type="loading"
+        type={popupType}
+        message={popupMessage}
+        onClose={() => setPopupOpen(false)}
       />
     </div>
   );
