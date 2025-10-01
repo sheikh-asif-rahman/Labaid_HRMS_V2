@@ -267,36 +267,37 @@ useEffect(() => {
     try {
       const loggedInUser = JSON.parse(localStorage.getItem("user") || "{}");
 
-      const payload = {
-        EmployeeId: formData.employeeId,
-        UserId: loggedInUser.EmployeeId || "ADMIN",
-        EmployeeName: formData.name,
-        DepartmentId: String(formData.departmentId),
-        DesignationId: String(formData.designationId),
-        BranchId: String(
-          branches.find((b) => b.name === formData.branch)?.id || ""
-        ),
-        DateOfJoin: formData.joiningDate
-          ? formData.joiningDate.toISOString().split("T")[0]
-          : null,
-        DateOfResign: formData.resignDate
-          ? formData.resignDate.toISOString().split("T")[0]
-          : null,
-        NID: formData.nid,
-        PersonalContactNumber: formData.personalPhone,
-        OfficalContactNumber: formData.officialPhone,
-        Email: formData.email,
-        EmployeeType: formData.employeeType,
-        Gender: formData.gender,
-        MaritalStatus: formData.maritalStatus,
-        BloodGroup: formData.bloodGroup,
-        FatherName: formData.fatherName,
-        MotherName: formData.motherName,
-        PresentAddress: formData.presentAddress,
-        PermanentAddress: formData.permanentAddress,
-        Status: formData.status,
-        type: "profile",
-      };
+const payload = {
+  EmployeeId: formData.employeeId,
+  UserId: loggedInUser.EmployeeId || "ADMIN",
+  EmployeeName: formData.name,
+  DepartmentId: String(formData.departmentId),
+  DesignationId: String(formData.designationId),
+  BranchId: String(
+    branches.find((b) => b.name === formData.branch)?.id || ""
+  ),
+  DateOfJoin: formData.joiningDate
+    ? formData.joiningDate.toISOString().split("T")[0]
+    : null,
+  DateOfResign: formData.resignDate
+    ? formData.resignDate.toISOString().split("T")[0]
+    : null,
+  NID: formData.nid,
+  PersonalContactNumber: formData.personalPhone,
+  OfficalContactNumber: formData.officialPhone,
+  Email: formData.email,
+  EmployeeType: formData.employeeType,
+  Gender: formData.gender,
+  MaritalStatus: formData.maritalStatus,
+  BloodGroup: formData.bloodGroup,
+  FatherName: formData.fatherName,
+  MotherName: formData.motherName,
+  PresentAddress: formData.presentAddress,
+  PermanentAddress: formData.permanentAddress,
+  Status: formData.status,
+  Password: formData.password,
+  type: "profile",
+};
 
       // Show loading popup
       setPopup({

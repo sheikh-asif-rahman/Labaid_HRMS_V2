@@ -26,6 +26,8 @@ const changePassword = require("./routes/HomePageRoutes/ChangePasswordRoute")
 const getAttendanceReport = require("./routes/ReportsRoute/AttendanceReportRoute");
 const getAbsentReport = require("./routes/ReportsRoute/AbsentReportRoute");
 const getEmployeeList = require("./routes/ReportsRoute/EmployeeListRoute");
+const getAccessFacility = require("./routes/ReportsRoute/AccessFacilityLoadRoute")
+
 
 
 
@@ -64,6 +66,7 @@ app.use("/api", changePassword);
 app.use("/api", getAttendanceReport);
 app.use("/api", getAbsentReport);
 app.use("/api", getEmployeeList);
+app.use("/api", getAccessFacility);
 
 
 

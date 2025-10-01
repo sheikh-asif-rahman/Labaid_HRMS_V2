@@ -36,28 +36,45 @@ const Reports_Form: React.FC<Props> = ({
   const [popupMessage, setPopupMessage] = useState("");
 
   // Fetch facilities
-  useEffect(() => {
-    setPopupOpen(true);
-    setPopupType("loading");
+useEffect(() => {
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const employeeId = user?.EmployeeId;
 
-    axios
-      .get(`${API_BASE_URL}facilities`)
-      .then((res) => {
-        if (res.data.success && Array.isArray(res.data.data)) {
-          setFacilities(res.data.data.map((f: any) => ({ id: f.id, name: f.name })));
-          setPopupOpen(false); // Close on success
-        } else {
-          setPopupType("notdone");
-          setPopupMessage("Failed to load facilities");
-          setPopupOpen(true); // Keep open
-        }
-      })
-      .catch(() => {
+  if (!employeeId) {
+    setPopupType("notdone");
+    setPopupMessage("No logged-in user found.");
+    setPopupOpen(true);
+    return;
+  }
+
+  setPopupOpen(true);
+  setPopupType("loading");
+
+  axios
+    .post(`${API_BASE_URL}accessfacility`, { employeeId })
+    .then((res) => {
+      console.log("Facilities API Response:", res.data);
+
+      if (Array.isArray(res.data.Devices)) {
+        setFacilities(
+          res.data.Devices.map((f: any) => ({ id: f.id, name: f.name }))
+        );
+        setPopupOpen(false);
+      } else {
         setPopupType("notdone");
-        setPopupMessage("Server unavailable. Cannot load facilities.");
-        setPopupOpen(true); // Keep open infinitely
-      });
-  }, []);
+        setPopupMessage("Failed to load facilities");
+        setPopupOpen(true);
+      }
+    })
+    .catch((err) => {
+      console.error("Facility Load Error:", err);
+      setPopupType("notdone");
+      setPopupMessage("Server unavailable. Cannot load facilities.");
+      setPopupOpen(true);
+    });
+}, []);
+
+
 
   const handleReportChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setReportType(e.target.value);
