@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import "./Working_Day_Shift.css";
+import Popup from "../../Popup/Popup";
+import { API_BASE_URL } from "../../../constants/apiBase";
 
 type Day = "Sat" | "Sun" | "Mon" | "Tue" | "Wed" | "Thu" | "Fri";
 type DayType = "Full Day" | "Half Day" | "Off Day";
@@ -7,18 +10,18 @@ type DayType = "Full Day" | "Half Day" | "Off Day";
 const days: Day[] = ["Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri"];
 
 const dayColors: Record<DayType, string> = {
-  "Full Day": "#3b82f6",  // Blue
-  "Half Day": "#facc15",  // Yellow
-  "Off Day": "#9ca3af",   // Gray
+  "Full Day": "#3b82f6",
+  "Half Day": "#facc15",
+  "Off Day": "#9ca3af",
 };
 
 interface ShiftScheduleProps {
-  shiftSchedule: string; // e.g., "SAT[FULLDAY],SUN[HALFDAY]"
-  employeeId?: string;   // optional, for API updates
+  shiftSchedule: string;
+  employeeId: string;
   onChange?: (updatedSchedule: string) => void;
 }
 
-// Parse string like "SAT[FULLDAY],SUN[HALFDAY]" into state
+// parse "SAT[FULLDAY]" string into state
 const parseShiftSchedule = (shiftString: string) => {
   const schedule: Record<Day, { type: DayType }> = {
     Sat: { type: "Off Day" },
@@ -38,7 +41,7 @@ const parseShiftSchedule = (shiftString: string) => {
   entries.forEach((entry) => {
     const match = entry.match(/^([A-Z]+)\[([^\]]+)\]$/);
     if (!match) return;
-    const [_, dayStr, typeStr] = match;
+    const [, dayStr, typeStr] = match;
     const day = (dayStr.charAt(0) + dayStr.slice(1).toLowerCase()) as Day;
     const typeMap: Record<string, DayType> = {
       FULLDAY: "Full Day",
@@ -46,93 +49,134 @@ const parseShiftSchedule = (shiftString: string) => {
       OFFDAY: "Off Day",
       NILL: "Off Day",
     };
-    schedule[day] = { type: typeMap[typeStr.toUpperCase()] || "Off Day" };
+    if (schedule[day]) schedule[day] = { type: typeMap[typeStr.toUpperCase()] || "Off Day" };
   });
 
   return schedule;
 };
 
-// Convert schedule state back to string for API
+// convert back to "SAT[FULLDAY],SUN[OFFDAY]" string
 const scheduleToString = (schedule: Record<Day, { type: DayType }>) => {
   const typeMap: Record<DayType, string> = {
     "Full Day": "FULLDAY",
     "Half Day": "HALFDAY",
     "Off Day": "OFFDAY",
   };
-  return days.map(day => `${day.toUpperCase()}[${typeMap[schedule[day].type]}]`).join(",");
+  return days.map((day) => `${day.toUpperCase()}[${typeMap[schedule[day].type]}]`).join(",");
 };
 
-const Working_Day_Shift: React.FC<ShiftScheduleProps> = ({ shiftSchedule, onChange }) => {
+const Working_Day_Shift: React.FC<ShiftScheduleProps> = ({ shiftSchedule, employeeId }) => {
   const [schedule, setSchedule] = useState(parseShiftSchedule(shiftSchedule));
   const [activeDay, setActiveDay] = useState<Day | null>(null);
   const [dayType, setDayType] = useState<DayType>("Full Day");
-
   const [specialPermissions, setSpecialPermissions] = useState<string[]>([]);
+  const [popupOpen, setPopupOpen] = useState(false);
+const [popupType, setPopupType] = useState<"loading" | "notdone" | "done">("loading");
+  const [popupMessage, setPopupMessage] = useState("");
 
-useEffect(() => {
-  const userData = localStorage.getItem("user");
-  if (userData) {
-    try {
-      const parsed = JSON.parse(userData);
-      const perms = parsed.Permission ? JSON.parse(parsed.Permission) : { Access: [], Special_Permission: [] };
-      setSpecialPermissions(perms.Special_Permission || []);
-    } catch (err) {
-      console.error("Failed to parse permissions:", err);
-      setSpecialPermissions([]);
+  useEffect(() => {
+    const userData = localStorage.getItem("user");
+    if (userData) {
+      try {
+        const parsed = JSON.parse(userData);
+        const perms = parsed.Permission ? JSON.parse(parsed.Permission) : { Access: [], Special_Permission: [] };
+        setSpecialPermissions(perms.Special_Permission || []);
+      } catch (err) {
+        console.error("Failed to parse permissions:", err);
+      }
     }
-  }
-}, []);
-
-
+  }, []);
 
   useEffect(() => {
     setSchedule(parseShiftSchedule(shiftSchedule));
   }, [shiftSchedule]);
 
-  // Clicking a day highlights it and sets the dropdown
   const handleDayClick = (day: Day) => {
     setActiveDay(day);
     setDayType(schedule[day].type);
   };
 
-  // Dropdown change updates schedule immediately
   const handleDayTypeChange = (newType: DayType) => {
     if (!activeDay) return;
-
-    setSchedule(prev => ({
-      ...prev,
-      [activeDay]: { type: newType }
-    }));
-
+    setSchedule((prev) => ({ ...prev, [activeDay]: { type: newType } }));
     setDayType(newType);
   };
 
-  // Update button propagates current schedule to parent
-  const handleUpdate = () => {
-    if (onChange) {
-      onChange(scheduleToString(schedule));
-    }
+
+const handleUpdate = async () => {
+  if (!specialPermissions.includes("Can Access To Edit Employee Profile")) {
+    setPopupType("notdone");
+    setPopupMessage("You don't have permission to edit employee profile.");
+    setPopupOpen(true);
+    return;
+  }
+
+  const rawUser = localStorage.getItem("user");
+  let userObj: any = {};
+  try {
+    if (rawUser) userObj = JSON.parse(rawUser);
+  } catch {}
+
+  const userId = (userObj?.UserId || userObj?.EmployeeId || "ADMIN").toString();
+  const scheduleString = scheduleToString(schedule);
+
+  const payload = {
+    EmployeeId: String(employeeId),
+    UserId: userId,
+    ShiftSchedule: scheduleString,
+    type: "shift",
   };
 
+  console.log("🛰️ PUT payload:", payload);
+
+  const endpoint = `${API_BASE_URL}employeeupdate`;
+
+  // Show loading popup only once
+  setPopupType("loading");
+  setPopupMessage("Updating shift schedule...");
+  setPopupOpen(true);
+
+  try {
+    const response = await axios.put(endpoint, payload, {
+      headers: { "Content-Type": "application/json" },
+      timeout: 15000,
+    });
+
+    console.log("PUT success:", response.status, response.data);
+
+    // Update same popup (don’t reopen)
+    setPopupType("done");
+    setPopupMessage(" Shift schedule updated successfully.");
+  } catch (error: any) {
+    console.error("❌ PUT failed:", error.response?.data || error.message);
+    const msg =
+      error.response?.data?.message ||
+      error.message ||
+      "Failed to update shift schedule";
+
+    // Update same popup (don’t reopen)
+    setPopupType("notdone");
+    setPopupMessage(`❌ ${msg}`);
+  }
+};
+
+
   const getCardColor = (day: Day) => {
-    if (activeDay === day) return "#22c55e"; // active day green
+    if (activeDay === day) return "#22c55e";
     return dayColors[schedule[day].type];
   };
 
   return (
     <div className="working-day-shift-container">
-<div className="top-row">
-  <div className="working-days-title">Working Days</div>
-
-  {/* Only show Update if user has permission */}
-  {specialPermissions.includes("Can Access To Edit Employee Profile") && (
-    <button className="update-btn" onClick={handleUpdate}>Update</button>
-  )}
-</div>
-
+      <div className="top-row">
+        <div className="working-days-title">Working Days</div>
+        {specialPermissions.includes("Can Access To Edit Employee Profile") && (
+          <button className="update-btn" onClick={handleUpdate}>Update</button>
+        )}
+      </div>
 
       <div className="days-container">
-        {days.map(day => (
+        {days.map((day) => (
           <div
             key={day}
             className="day-card"
@@ -156,6 +200,13 @@ useEffect(() => {
           <option value="Off Day">Off Day</option>
         </select>
       </div>
+
+      <Popup
+        isOpen={popupOpen}
+        type={popupType}
+        message={popupMessage}
+        onClose={() => setPopupOpen(false)}
+      />
     </div>
   );
 };

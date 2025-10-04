@@ -5,7 +5,9 @@ function generateDateRange(from, to) {
   const dates = [];
   let current = new Date(from);
   const end = new Date(to);
+  current.setHours(0, 0, 0, 0);
   end.setHours(0, 0, 0, 0);
+
   while (current <= end) {
     dates.push(new Date(current));
     current.setDate(current.getDate() + 1);
@@ -13,9 +15,13 @@ function generateDateRange(from, to) {
   return dates;
 }
 
-// helper: format YYYY-MM-DD
+// ✅ format date as local YYYY-MM-DD (no UTC conversion)
 function formatDateLocal(date) {
-  return date.toISOString().split("T")[0];
+  const d = new Date(date);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 }
 
 // map JS getDay() to abbreviations
@@ -50,7 +56,8 @@ const getAbsentReport = async (req, res) => {
     if (userId) empRequest.input("userId", sql.NVarChar, userId);
 
     const employeeResult = await empRequest.query(employeeQuery);
-    if (employeeResult.recordset.length === 0) return res.status(404).json({ message: "No employees found" });
+    if (employeeResult.recordset.length === 0)
+      return res.status(404).json({ message: "No employees found" });
 
     const employeeIds = employeeResult.recordset.map(emp => emp.EmployeeId);
 
@@ -74,7 +81,8 @@ const getAbsentReport = async (req, res) => {
     // make map of punches
     const punchMap = {};
     punchResult.recordset.forEach(p => {
-      punchMap[`${p.EmployeeId}_${formatDateLocal(p.PunchDate)}`] = true;
+      const dateKey = formatDateLocal(p.PunchDate);
+      punchMap[`${p.EmployeeId}_${dateKey}`] = true;
     });
 
     const allDates = generateDateRange(new Date(fromDate), new Date(toDate));
@@ -90,16 +98,17 @@ const getAbsentReport = async (req, res) => {
         });
       }
 
-      const absentDays = allDates.filter(d => {
-        const dayAbbr = weekdayMap[d.getDay()];
-        const schedule = shiftMap[dayAbbr];
+      const absentDays = allDates
+        .filter(d => {
+          const dayAbbr = weekdayMap[d.getDay()];
+          const schedule = shiftMap[dayAbbr];
+          if (!schedule) return false;
+          if (schedule === "OFFDAY" || schedule === "HALFDAY") return false;
 
-        if (!schedule) return false;        // skip if no schedule defined
-        if (schedule === "OFFDAY" || schedule === "HALFDAY") return false; // skip off/half days
-
-        const punchKey = `${emp.EmployeeId}_${formatDateLocal(d)}`;
-        return !punchMap[punchKey]; // absent only if no punch
-      }).map(d => ({ Date: formatDateLocal(d), Status: "Absent" }));
+          const punchKey = `${emp.EmployeeId}_${formatDateLocal(d)}`;
+          return !punchMap[punchKey];
+        })
+        .map(d => ({ Date: formatDateLocal(d), Status: "Absent" }));
 
       return {
         EmployeeId: emp.EmployeeId,
@@ -107,12 +116,11 @@ const getAbsentReport = async (req, res) => {
         DepartmentName: emp.DepartmentName || null,
         DesignationName: emp.DesignationName || null,
         BranchName: emp.BranchName || null,
-        AbsentDays: absentDays
+        AbsentDays: absentDays,
       };
     });
 
     return res.json(finalData);
-
   } catch (error) {
     console.error("Error fetching absent report:", error);
     res.status(500).json({ message: "Internal server error", error });

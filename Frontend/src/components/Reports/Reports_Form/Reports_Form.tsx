@@ -6,7 +6,6 @@ import axios from "axios";
 import Popup from "../../Popup/Popup";
 import { API_BASE_URL } from "../../../constants/apiBase";
 
-
 type Facility = { id: string; name: string };
 
 type Props = {
@@ -36,45 +35,43 @@ const Reports_Form: React.FC<Props> = ({
   const [popupMessage, setPopupMessage] = useState("");
 
   // Fetch facilities
-useEffect(() => {
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
-  const employeeId = user?.EmployeeId;
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    const employeeId = user?.EmployeeId;
 
-  if (!employeeId) {
-    setPopupType("notdone");
-    setPopupMessage("No logged-in user found.");
-    setPopupOpen(true);
-    return;
-  }
-
-  setPopupOpen(true);
-  setPopupType("loading");
-
-  axios
-    .post(`${API_BASE_URL}accessfacility`, { employeeId })
-    .then((res) => {
-      console.log("Facilities API Response:", res.data);
-
-      if (Array.isArray(res.data.Devices)) {
-        setFacilities(
-          res.data.Devices.map((f: any) => ({ id: f.id, name: f.name }))
-        );
-        setPopupOpen(false);
-      } else {
-        setPopupType("notdone");
-        setPopupMessage("Failed to load facilities");
-        setPopupOpen(true);
-      }
-    })
-    .catch((err) => {
-      console.error("Facility Load Error:", err);
+    if (!employeeId) {
       setPopupType("notdone");
-      setPopupMessage("Server unavailable. Cannot load facilities.");
+      setPopupMessage("No logged-in user found.");
       setPopupOpen(true);
-    });
-}, []);
+      return;
+    }
 
+    setPopupOpen(true);
+    setPopupType("loading");
 
+    axios
+      .post(`${API_BASE_URL}accessfacility`, { employeeId })
+      .then((res) => {
+        console.log("Facilities API Response:", res.data);
+
+        if (Array.isArray(res.data.Devices)) {
+          setFacilities(
+            res.data.Devices.map((f: any) => ({ id: f.id, name: f.name }))
+          );
+          setPopupOpen(false);
+        } else {
+          setPopupType("notdone");
+          setPopupMessage("Failed to load facilities");
+          setPopupOpen(true);
+        }
+      })
+      .catch((err) => {
+        console.error("Facility Load Error:", err);
+        setPopupType("notdone");
+        setPopupMessage("Server unavailable. Cannot load facilities.");
+        setPopupOpen(true);
+      });
+  }, []);
 
   const handleReportChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setReportType(e.target.value);
@@ -86,58 +83,80 @@ useEffect(() => {
     setReportData([]);
   };
 
-const handleGetData = async () => {
-  // Validate date range first
-  if (fromDate && toDate && fromDate > toDate) {
-    setPopupType("notdone");
-    setPopupMessage("Invalid date range: 'From Date' cannot be after 'To Date'.");
-    setPopupOpen(true);
-    return; // Stop API call
-  }
-
-  // Show loading
-  setPopupOpen(true);
-  setPopupType("loading");
-
-  const payload: any = {
-    facilityId: selectedFacility,
-    fromDate: fromDate ? fromDate.toISOString().split("T")[0] : null,
-    toDate: toDate ? toDate.toISOString().split("T")[0] : null,
+  // ✅ Local date formatter (no UTC shift)
+  const formatLocalDate = (date: Date | null): string | null => {
+    if (!date) return null;
+    return date.toLocaleDateString("en-CA"); // yyyy-MM-dd, local timezone
   };
-  if (userId.trim()) payload.userId = userId;
 
-  try {
-    let res;
-    if (reportType === "attendance") {
-      res = await axios.post(`${API_BASE_URL}attendancereport`, payload);
-    } else if (reportType === "absent") {
-      res = await axios.post(`${API_BASE_URL}absentreport`, payload);
-    } else if (reportType === "employee") {
-      res = await axios.post(`${API_BASE_URL}employeelist`, { facilityId: selectedFacility });
-    } else {
-      res = { data: [] };
+  const handleGetData = async () => {
+    // Validate date range first
+    if (fromDate && toDate && fromDate > toDate) {
+      setPopupType("notdone");
+      setPopupMessage("Invalid date range: 'From Date' cannot be after 'To Date'.");
+      setPopupOpen(true);
+      return;
     }
 
-    if (Array.isArray(res.data)) {
-      setReportData(res.data);
-      setDataFetched(true);
-      setPopupOpen(false); // Close on success
-    } else {
+    setPopupOpen(true);
+    setPopupType("loading");
+
+    // ✅ Correct local date payload
+    const payload: any = {
+      facilityId: selectedFacility,
+      fromDate: formatLocalDate(fromDate),
+      toDate: formatLocalDate(toDate),
+    };
+    if (userId.trim()) payload.userId = userId;
+
+    console.log("📤 Sending Payload:", payload, "➡️ Report Type:", reportType);
+
+    try {
+      let res;
+      if (reportType === "attendance") {
+        res = await axios.post(`${API_BASE_URL}attendancereport`, payload);
+      } else if (reportType === "absent") {
+        res = await axios.post(`${API_BASE_URL}absentreport`, payload);
+      } else if (reportType === "employee") {
+        res = await axios.post(`${API_BASE_URL}employeelist`, {
+          facilityId: selectedFacility,
+        });
+      } else {
+        res = { data: [] };
+      }
+
+      console.log("📥 API Response:", res.data);
+
+      if (Array.isArray(res.data)) {
+        const mappedData = res.data.map((emp: any) => ({
+          ...emp,
+          Branch: emp.Branch || emp.branch || "",
+          Department: emp.Department || emp.department || "",
+          Designation: emp.Designation || emp.designation || "",
+        }));
+
+        setReportData(mappedData);
+        setDataFetched(true);
+        console.log("📤 Sending Data to Report Overview:", mappedData);
+        setPopupOpen(false);
+      } else {
+        setPopupType("notdone");
+        setPopupMessage("Invalid response from server.");
+        setPopupOpen(true);
+      }
+    } catch (err: any) {
+      console.error("❌ API Error:", err?.response?.data || err.message);
       setPopupType("notdone");
-      setPopupMessage("Invalid response from server.");
+      setPopupMessage(
+        err?.response?.data?.message ||
+          "Server unreachable. Please try again later."
+      );
       setPopupOpen(true);
     }
-  } catch (err: any) {
-    setPopupType("notdone");
-    setPopupMessage(
-      err?.response?.data?.message || "Server unreachable. Please try again later."
-    );
-    setPopupOpen(true);
-  }
-};
+  };
 
-
-  const isGeneralReport = reportType === "attendance" || reportType === "absent";
+  const isGeneralReport =
+    reportType === "attendance" || reportType === "absent";
 
   return (
     <div className="reports-form-container">

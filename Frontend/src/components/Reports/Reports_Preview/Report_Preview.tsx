@@ -13,128 +13,131 @@ const Report_Preview: React.FC<Props> = ({ reportType, dataFetched, reportData }
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 15;
 
-  useEffect(() => {
-    if (!dataFetched) {
-      setColumns([]);
-      setData([]);
-      setCurrentPage(1);
-      return;
-    }
+useEffect(() => {
+  if (!dataFetched) {
+    setColumns([]);
+    setData([]);
+    setCurrentPage(1);
+    return;
+  }
 
-    if (reportType === "attendance") {
-      setColumns([
-        "SL",
-        "EmployeeId",
-        "EmployeeName",
-        "Branch",
-        "Department",
-        "Designation",
-        "Date",
-        "InTime",
-        "OutTime",
-        "Duration",
-      ]);
+  const rows: any[] = [];
 
-      const rows: any[] = [];
-      reportData.forEach((emp) => {
-        emp.Attendance.forEach((att: any) => {
-          rows.push({
-            sl: rows.length + 1,
-            id: emp.EmployeeId,
-            name: emp.EmployeeName,
-            branch: emp.Branch,
-            dept: emp.Department,
-            desg: emp.Designation,
-            date: att.Date.split("T")[0],
-            inTime: att.In,
-            outTime: att.Out,
-            duration: att.Duration,
-          });
-        });
+  if (reportType === "attendance") {
+    setColumns([
+      "SL",
+      "EmployeeId",
+      "EmployeeName",
+      "Branch",
+      "Department",
+      "Designation",
+      "Date",
+      "InTime",
+      "OutTime",
+      "Duration",
+    ]);
+
+    reportData.forEach((emp) => {
+      emp.Attendance.forEach((att: any) => {
+rows.push({
+  sl: rows.length + 1,
+  id: emp.EmployeeId,
+  name: emp.EmployeeName,
+  branch: emp.BranchName || emp.Branch || emp.branch || "",
+  dept: emp.DepartmentName || emp.Department || emp.department || "",
+  desg: emp.DesignationName || emp.Designation || emp.designation || "",
+  date: att.Date.split("T")[0],
+  inTime: att.In,
+  outTime: att.Out,
+  duration: att.Duration,
+});
+
       });
-      setData(rows);
+    });
 
-    } else if (reportType === "absent") {
-      setColumns([
-        "SL",
-        "EmployeeId",
-        "EmployeeName",
-        "Branch",
-        "Department",
-        "Designation",
-        "Date",
-        "Remark",
-      ]);
+  } else if (reportType === "absent") {
+    setColumns([
+      "SL",
+      "EmployeeId",
+      "EmployeeName",
+      "Branch",
+      "Department",
+      "Designation",
+      "Date",
+      "Remark",
+    ]);
 
-      const rows: any[] = [];
-      reportData.forEach((emp) => {
-        emp.AbsentDays.forEach((abs: any) => {
-          rows.push({
-            sl: rows.length + 1,
-            id: emp.EmployeeId,
-            name: emp.EmployeeName,
-            branch: emp.Branch,
-            dept: emp.Department,
-            desg: emp.Designation,
-            date: abs.Date.split("T")[0],
-            remark: "Absent",
-          });
-        });
+    reportData.forEach((emp) => {
+      emp.AbsentDays.forEach((abs: any) => {
+rows.push({
+  sl: rows.length + 1,
+  id: emp.EmployeeId,
+  name: emp.EmployeeName,
+  branch: emp.BranchName || emp.Branch || emp.branch || "",
+  dept: emp.DepartmentName || emp.Department || emp.department || "",
+  desg: emp.DesignationName || emp.Designation || emp.designation || "",
+  date: abs.Date.split("T")[0],
+  remark: "Absent",
+});
+
       });
-      setData(rows);
+    });
 
-    } else if (reportType === "employee") {
-      setColumns([
-        "SL",
-        "EmployeeId",
-        "EmployeeName",
-        "Branch",
-        "Department",
-        "Designation",
-        "DateOfJoin",
-        "DateOfResign",
-        "NID",
-        "PersonalContactNumber",
-        "OfficalContactNumber",
-        "Email",
-        "EmployeeType",
-        "Gender",
-        "MaritalStatus",
-        "BloodGroup",
-        "FatherName",
-        "MotherName",
-        "PresentAddress",
-        "PermanentAddress",
-        "ShiftSchedule",
-      ]);
+  } else if (reportType === "employee") {
+    setColumns([
+      "SL",
+      "EmployeeId",
+      "EmployeeName",
+      "Branch",
+      "Department",
+      "Designation",
+      "DateOfJoin",
+      "DateOfResign",
+      "NID",
+      "PersonalContactNumber",
+      "OfficalContactNumber",
+      "Email",
+      "EmployeeType",
+      "Gender",
+      "MaritalStatus",
+      "BloodGroup",
+      "FatherName",
+      "MotherName",
+      "PresentAddress",
+      "PermanentAddress",
+      "ShiftSchedule",
+    ]);
 
-      const rows: any[] = reportData.map((emp: any, index: number) => ({
+    reportData.forEach((emp, index) => {
+      rows.push({
         sl: index + 1,
         id: emp.EmployeeId,
         name: emp.EmployeeName,
-        branch: emp.Branch,
-        dept: emp.Department,
-        desg: emp.Designation,
+        branch: emp.Branch || emp.branch || "",
+        dept: emp.Department || emp.department || "",
+        desg: emp.Designation || emp.designation || "",
         dateOfJoin: emp.DateOfJoin ? emp.DateOfJoin.split("T")[0] : "",
         dateOfResign: emp.DateOfResign ? emp.DateOfResign.split("T")[0] : "",
-        nid: emp.NID,
-        personalContact: emp.PersonalContactNumber,
-        officialContact: emp.OfficalContactNumber,
-        email: emp.Email,
-        type: emp.EmployeeType,
-        gender: emp.Gender,
-        maritalStatus: emp.MaritalStatus,
-        bloodGroup: emp.BloodGroup,
-        fatherName: emp.FatherName,
-        motherName: emp.MotherName,
-        presentAddress: emp.PresentAddress,
-        permanentAddress: emp.PermanentAddress,
-        shift: emp.ShiftSchedule,
-      }));
+        nid: emp.NID || emp.nid || "",
+        personalContact: emp.PersonalContactNumber || emp.personalContact || "",
+        officialContact: emp.OfficalContactNumber || emp.officialContact || "",
+        email: emp.Email || emp.email || "",
+        type: emp.EmployeeType || emp.type || "",
+        gender: emp.Gender || emp.gender || "",
+        maritalStatus: emp.MaritalStatus || emp.maritalStatus || "",
+        bloodGroup: emp.BloodGroup || emp.bloodGroup || "",
+        fatherName: emp.FatherName || emp.fatherName || "",
+        motherName: emp.MotherName || emp.motherName || "",
+        presentAddress: emp.PresentAddress || emp.presentAddress || "",
+        permanentAddress: emp.PermanentAddress || emp.permanentAddress || "",
+        shift: emp.ShiftSchedule || emp.shift || "",
+      });
+    });
+  }
 
-      setData(rows);
-    }
-  }, [reportType, dataFetched, reportData]);
+  console.log("Mapped preview rows:", rows); // debug
+  setData(rows);
+}, [reportType, dataFetched, reportData]);
 
   const totalPages = Math.ceil(data.length / rowsPerPage);
   const displayedData = data.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
