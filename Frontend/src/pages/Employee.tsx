@@ -10,14 +10,12 @@ import { API_BASE_URL } from "../constants/apiBase";
 
 const Employee: React.FC = () => {
   const [employeeData, setEmployeeData] = useState<any>(null);
+  const [attendanceData, setAttendanceData] = useState<any>(null);
   const [last7DaysStatus, setLast7DaysStatus] = useState<any[]>([]);
   const [showEdit, setShowEdit] = useState(false);
-
-  // Popup state
   const [popupType, setPopupType] = useState<"loading" | "done" | "notdone" | null>(null);
   const [popupMessage, setPopupMessage] = useState<string>("");
 
-  // --- SEARCH EMPLOYEE ---
   const handleSearch = async (query: string) => {
     if (!query) return;
 
@@ -25,13 +23,38 @@ const Employee: React.FC = () => {
     setPopupMessage("Fetching employee...");
 
     try {
-      const response = await axios.post(`${API_BASE_URL}employeesearch`, { employeeId: query });
+      // 🧩 Fetch employee info + today's attendance in parallel
+      const [employeeRes, attendanceRes] = await Promise.all([
+        axios.post(`${API_BASE_URL}employeesearch`, { employeeId: query }),
+        axios.post(`${API_BASE_URL}todaysattendance`, { EmployeeId: query }),
+      ]);
 
-      if (response.data?.data) {
-        setEmployeeData(response.data.data);
+      const empResponse = employeeRes.data;
+      const attResponse = attendanceRes.data;
 
-        // last 7 days calculation
-        const last7Days = (response.data.last7DaysPunch || []).map((day: any) => {
+      console.log("🔍 Employee API response:", empResponse);
+      console.log("🕒 Attendance API response:", attResponse);
+
+      if (empResponse?.data) {
+        // ✅ Merge employee info
+        const emp = {
+          ...empResponse.data,
+          PunchInTime:
+            attResponse?.data?.PunchInTime ||
+            attResponse?.PunchInTime ||
+            "N/A",
+          TotalShiftHours:
+            attResponse?.data?.TotalShiftHours ||
+            attResponse?.TotalShiftHours ||
+            8,
+        };
+
+        console.log("✅ Final merged employee data:", emp);
+        setEmployeeData(emp);
+        setAttendanceData(attResponse?.data || attResponse);
+
+        // ✅ Prepare last 7 days status
+        const last7Days = (empResponse.last7DaysPunch || []).map((day: any) => {
           let hoursWorked = 0;
           if (day.duration) {
             const match = day.duration.match(/(\d+)\s*hrs?\s*(\d+)?\s*mins?/);
@@ -48,20 +71,21 @@ const Employee: React.FC = () => {
         });
 
         setLast7DaysStatus(last7Days);
-
         setPopupType("done");
         setPopupMessage("Employee found!");
         setShowEdit(true);
       } else {
         setEmployeeData(null);
+        setAttendanceData(null);
         setLast7DaysStatus([]);
         setPopupType("notdone");
         setPopupMessage("Employee not found!");
         setShowEdit(false);
       }
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      console.error("❌ Error fetching employee:", err);
       setEmployeeData(null);
+      setAttendanceData(null);
       setLast7DaysStatus([]);
       setPopupType("notdone");
       setPopupMessage("Error fetching employee data!");
@@ -71,78 +95,81 @@ const Employee: React.FC = () => {
 
   const handleNew = () => {
     setEmployeeData(null);
+    setAttendanceData(null);
     setLast7DaysStatus([]);
     setShowEdit(false);
   };
 
-  // --- PROFILE UPDATE ---
   const handleProfileUpdate = async (updatedProfile: any) => {
     try {
       setPopupType("loading");
       setPopupMessage("Updating profile...");
-
-
-
-      // update local state
-      setEmployeeData({
-        ...employeeData,
-        ...updatedProfile
-      });
-
+      setEmployeeData({ ...employeeData, ...updatedProfile });
       setPopupType("done");
       setPopupMessage("Profile updated successfully!");
-    } catch (error) {
-      console.error("Profile update error:", error);
+    } catch {
       setPopupType("notdone");
       setPopupMessage("Profile update failed!");
     }
   };
 
-  // --- SHIFT UPDATE ---
   const handleShiftUpdate = async (updatedSchedule: string) => {
     if (!employeeData?.EmployeeId) return;
-
     try {
       setPopupType("loading");
       setPopupMessage("Updating shift...");
-
-
-
-      setEmployeeData({
-        ...employeeData,
-        ShiftSchedule: updatedSchedule
-      });
-
+      setEmployeeData({ ...employeeData, ShiftSchedule: updatedSchedule });
       setPopupType("done");
       setPopupMessage("Shift schedule updated successfully!");
-    } catch (error) {
-      console.error("Shift update error:", error);
+    } catch {
       setPopupType("notdone");
       setPopupMessage("Shift schedule update failed!");
     }
   };
 
+  console.log("👀 employeeData before render:", employeeData);
+
   return (
-    <div style={{ minHeight: "100vh", width: "100%", padding: "20px", display: "flex", flexDirection: "column", gap: "20px", boxSizing: "border-box" }}>
-      {/* Search */}
+    <div
+      style={{
+        minHeight: "100vh",
+        width: "100%",
+        padding: "20px",
+        display: "flex",
+        flexDirection: "column",
+        gap: "20px",
+        boxSizing: "border-box",
+      }}
+    >
       <Search placeholder="Search employees..." onSearch={handleSearch} onNew={handleNew} />
 
-      {/* Profile */}
       <User_Profile
         employeeData={employeeData}
         showEditButton={showEdit}
-        onUpdate={handleProfileUpdate} // <-- now works
+        onUpdate={handleProfileUpdate}
       />
 
-      {/* Row: Attendance, Last 7 Days, Working Shift */}
       {employeeData && (
-        <div style={{ display: "flex", flexDirection: "row", gap: "20px", flexWrap: "nowrap", padding: "10px 0" }}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            gap: "20px",
+            flexWrap: "nowrap",
+            padding: "10px 0",
+          }}
+        >
           <div style={{ flex: 1 }}>
-            <User_Profile_Attendance punchInTime={employeeData?.firstPunchToday || "N/A"} totalShiftHours={8} />
+            <User_Profile_Attendance
+              punchInTime={attendanceData?.PunchInTime || "N/A"}
+              totalShiftHours={attendanceData?.TotalShiftHours || 8}
+            />
           </div>
+
           <div style={{ flex: 1 }}>
             <Last7_Days_Status data={last7DaysStatus} />
           </div>
+
           <div style={{ flex: 1 }}>
             <Working_Day_Shift
               shiftSchedule={employeeData?.ShiftSchedule || ""}
@@ -153,7 +180,6 @@ const Employee: React.FC = () => {
         </div>
       )}
 
-      {/* Popup */}
       {popupType && (
         <Popup
           isOpen={true}

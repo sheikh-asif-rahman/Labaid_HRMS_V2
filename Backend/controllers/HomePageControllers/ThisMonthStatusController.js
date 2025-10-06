@@ -10,14 +10,14 @@ const thismonthstatus = async (req, res) => {
     }
 
     const startOfMonth = moment().startOf("month").format("YYYY-MM-DD");
-    const endOfMonth = moment().endOf("month").format("YYYY-MM-DD");
+    const today = moment().format("YYYY-MM-DD"); // Only up to today
 
     // Connect to DB
     const pool = await sql.connect();
     const result = await pool.request()
       .input("EmployeeId", sql.NVarChar, EmployeeId)
       .input("startOfMonth", sql.Date, startOfMonth)
-      .input("endOfMonth", sql.Date, endOfMonth)
+      .input("today", sql.Date, today)
       .query(`
         SELECT 
           CAST(devdt AS DATE) AS punchDate,
@@ -26,19 +26,19 @@ const thismonthstatus = async (req, res) => {
           COUNT(*) AS punchCount
         FROM [TA].[dbo].[punchlog]
         WHERE user_id = @EmployeeId
-          AND CAST(devdt AS DATE) BETWEEN @startOfMonth AND @endOfMonth
+          AND CAST(devdt AS DATE) BETWEEN @startOfMonth AND @today
         GROUP BY CAST(devdt AS DATE)
         ORDER BY punchDate
       `);
 
     const punchData = result.recordset;
 
-    // Generate all dates of current month
-    const daysInMonth = [];
+    // Generate all dates from start of month to today
+    const daysInMonthSoFar = [];
     const current = moment(startOfMonth);
-    const last = moment(endOfMonth);
+    const last = moment(today);
     while (current <= last) {
-      daysInMonth.push(current.format("YYYY-MM-DD"));
+      daysInMonthSoFar.push(current.format("YYYY-MM-DD"));
       current.add(1, "day");
     }
 
@@ -46,11 +46,11 @@ const thismonthstatus = async (req, res) => {
     let fullDay = 0;
     let halfDay = 0;
     let absent = 0;
-    let leave = 0; // default 0
+    let leave = 0; // update if you track leaves separately
 
-    daysInMonth.forEach((day) => {
+    daysInMonthSoFar.forEach((day) => {
       const punch = punchData.find(
-        (p) => p.punchDate.toISOString().split("T")[0] === day
+        (p) => moment(p.punchDate).format("YYYY-MM-DD") === day
       );
 
       if (!punch) {
@@ -60,15 +60,13 @@ const thismonthstatus = async (req, res) => {
         const outTime = moment(punch.lastOut);
         let duration = moment.duration(outTime.diff(inTime)).asHours();
 
-        // If there is only one punch (or 0 hours), count as full day
-        if (duration === 0 && punch.punchCount >= 1) {
-          fullDay++;
-        } else if (duration >= 6) {
+        // Full day >=6 hours, Half day <6 hours
+        if (duration >= 6) {
           fullDay++;
         } else if (duration > 0 && duration < 6) {
           halfDay++;
         } else {
-          // safety fallback
+          // If only 1 punch or zero duration
           halfDay++;
         }
       }

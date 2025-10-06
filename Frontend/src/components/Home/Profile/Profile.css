@@ -2,10 +2,11 @@
   background-color: #ffffff;
   border-radius: 8px;
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  padding: 20px;
+  padding: 12px;
   text-align: center;
-  border: 1px solid #ddd; 
-
+  border: 1px solid #ddd;
+  box-sizing: border-box;
+  margin: 0;
 }
 
 .profile-pic {
@@ -58,6 +59,7 @@
   font-weight: 600;
   color: #333;
 }
+
 .profile-actions {
   display: flex;
   justify-content: space-between;
@@ -67,16 +69,15 @@
 
 .profile-actions button {
   flex: 1;
-  padding: 6px 10px;       /* smaller height */
+  padding: 6px 10px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  font-size: 12px;         /* smaller font */
+  font-size: 12px;
   font-weight: 500;
   transition: background-color 0.3s;
 }
 
-/* Edit button */
 .edit-btn {
   background-color: #007bff;
   color: white;
@@ -86,7 +87,6 @@
   background-color: #0056b3;
 }
 
-/* Change Password button */
 .password-btn {
   background-color: #6c757d;
   color: white;
