@@ -34,6 +34,26 @@ const Reports_Form: React.FC<Props> = ({
   const [popupType, setPopupType] = useState<"loading" | "notdone">("loading");
   const [popupMessage, setPopupMessage] = useState("");
 
+  // Permissions state
+  const [specialPermissions, setSpecialPermissions] = useState<string[]>([]);
+
+  // Fetch special permissions from localStorage on mount
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    let permissions: string[] = [];
+
+    try {
+      if (user.Permission) {
+        const permObj = JSON.parse(user.Permission);
+        permissions = permObj.Special_Permission || [];
+      }
+    } catch (e) {
+      console.error("Failed to parse permissions", e);
+    }
+
+    setSpecialPermissions(permissions);
+  }, []);
+
   // Fetch facilities
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
@@ -52,8 +72,6 @@ const Reports_Form: React.FC<Props> = ({
     axios
       .post(`${API_BASE_URL}accessfacility`, { employeeId })
       .then((res) => {
-        console.log("Facilities API Response:", res.data);
-
         if (Array.isArray(res.data.Devices)) {
           setFacilities(
             res.data.Devices.map((f: any) => ({ id: f.id, name: f.name }))
@@ -73,6 +91,17 @@ const Reports_Form: React.FC<Props> = ({
       });
   }, []);
 
+  // Permission checks for dropdown options
+  const canAccessAttendance = specialPermissions.includes(
+    "Can Access Attendance Report"
+  );
+  const canAccessAbsent = specialPermissions.includes(
+    "Can Access Absent Report"
+  );
+  const canAccessEmployeeList = specialPermissions.includes(
+    "Can Access Employee List"
+  );
+
   const handleReportChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setReportType(e.target.value);
     setDataFetched(false);
@@ -83,17 +112,18 @@ const Reports_Form: React.FC<Props> = ({
     setReportData([]);
   };
 
-  // ✅ Local date formatter (no UTC shift)
+  // Local date formatter (no UTC shift)
   const formatLocalDate = (date: Date | null): string | null => {
     if (!date) return null;
     return date.toLocaleDateString("en-CA"); // yyyy-MM-dd, local timezone
   };
 
   const handleGetData = async () => {
-    // Validate date range first
     if (fromDate && toDate && fromDate > toDate) {
       setPopupType("notdone");
-      setPopupMessage("Invalid date range: 'From Date' cannot be after 'To Date'.");
+      setPopupMessage(
+        "Invalid date range: 'From Date' cannot be after 'To Date'."
+      );
       setPopupOpen(true);
       return;
     }
@@ -101,15 +131,12 @@ const Reports_Form: React.FC<Props> = ({
     setPopupOpen(true);
     setPopupType("loading");
 
-    // ✅ Correct local date payload
     const payload: any = {
       facilityId: selectedFacility,
       fromDate: formatLocalDate(fromDate),
       toDate: formatLocalDate(toDate),
     };
     if (userId.trim()) payload.userId = userId;
-
-    console.log("📤 Sending Payload:", payload, "➡️ Report Type:", reportType);
 
     try {
       let res;
@@ -125,8 +152,6 @@ const Reports_Form: React.FC<Props> = ({
         res = { data: [] };
       }
 
-      console.log("📥 API Response:", res.data);
-
       if (Array.isArray(res.data)) {
         const mappedData = res.data.map((emp: any) => ({
           ...emp,
@@ -137,7 +162,6 @@ const Reports_Form: React.FC<Props> = ({
 
         setReportData(mappedData);
         setDataFetched(true);
-        console.log("📤 Sending Data to Report Overview:", mappedData);
         setPopupOpen(false);
       } else {
         setPopupType("notdone");
@@ -145,7 +169,6 @@ const Reports_Form: React.FC<Props> = ({
         setPopupOpen(true);
       }
     } catch (err: any) {
-      console.error("❌ API Error:", err?.response?.data || err.message);
       setPopupType("notdone");
       setPopupMessage(
         err?.response?.data?.message ||
@@ -169,9 +192,13 @@ const Reports_Form: React.FC<Props> = ({
           onChange={handleReportChange}
         >
           <option value="">Select Report Type</option>
-          <option value="attendance">Attendance Report</option>
-          <option value="absent">Absent Report</option>
-          <option value="employee">Employee List</option>
+          {canAccessAttendance && (
+            <option value="attendance">Attendance Report</option>
+          )}
+          {canAccessAbsent && <option value="absent">Absent Report</option>}
+          {canAccessEmployeeList && (
+            <option value="employee">Employee List</option>
+          )}
         </select>
       </div>
 
@@ -236,7 +263,9 @@ const Reports_Form: React.FC<Props> = ({
           <button
             className="reports-form-btn reports-form-btn-blue"
             onClick={handleGetData}
-            disabled={!reportType || !selectedFacility || facilities.length === 0}
+            disabled={
+              !reportType || !selectedFacility || facilities.length === 0
+            }
           >
             Get Data
           </button>
