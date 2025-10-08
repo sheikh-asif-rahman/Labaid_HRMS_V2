@@ -168,6 +168,7 @@ const updateEmployee = async (req, res) => {
               PresentAddress = @PresentAddress,
               PermanentAddress = @PermanentAddress,
               Status = @Status,
+              Password = @Password,
               UpdatedBy = @UpdatedBy,
               UpdatedDate = @UpdatedDate
             WHERE EmployeeId = @EmployeeId

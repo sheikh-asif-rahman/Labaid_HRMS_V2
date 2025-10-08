@@ -260,74 +260,82 @@ useEffect(() => {
     setDropdowns((prev) => ({ ...prev, [dropdownKey]: false }));
   };
 
-  const handleEdit = () => setIsEditing(true);
-
-  // ---------- UPDATED: handleUpdate with API call ----------
-  const handleUpdate = async () => {
-    try {
-      const loggedInUser = JSON.parse(localStorage.getItem("user") || "{}");
-
-const payload = {
-  EmployeeId: formData.employeeId,
-  UserId: loggedInUser.EmployeeId || "ADMIN",
-  EmployeeName: formData.name,
-  DepartmentId: String(formData.departmentId),
-  DesignationId: String(formData.designationId),
-  BranchId: String(
-    branches.find((b) => b.name === formData.branch)?.id || ""
-  ),
-  DateOfJoin: formData.joiningDate
-    ? formData.joiningDate.toISOString().split("T")[0]
-    : null,
-  DateOfResign: formData.resignDate
-    ? formData.resignDate.toISOString().split("T")[0]
-    : null,
-  NID: formData.nid,
-  PersonalContactNumber: formData.personalPhone,
-  OfficalContactNumber: formData.officialPhone,
-  Email: formData.email,
-  EmployeeType: formData.employeeType,
-  Gender: formData.gender,
-  MaritalStatus: formData.maritalStatus,
-  BloodGroup: formData.bloodGroup,
-  FatherName: formData.fatherName,
-  MotherName: formData.motherName,
-  PresentAddress: formData.presentAddress,
-  PermanentAddress: formData.permanentAddress,
-  Status: formData.status,
-  Password: formData.password,
-  type: "profile",
+const handleEdit = () => {
+  setIsEditing(true);
+  setFormData((prev) => ({
+    ...prev,
+    password: "", // clear password when entering edit mode
+  }));
 };
 
-      // Show loading popup
-      setPopup({
-        isOpen: true,
-        type: "loading",
-        message: "Updating profile...",
-      });
 
-      const response = await axios.put(
-        `${API_BASE_URL}employeeupdate`,
-        payload
-      );
-      console.log("Update Response:", response.data);
+  // ---------- UPDATED: handleUpdate with API call ----------
+const handleUpdate = async () => {
+  try {
+    const loggedInUser = JSON.parse(localStorage.getItem("user") || "{}");
 
-      // Success popup
-      setPopup({
-        isOpen: true,
-        type: "done",
-        message: "Profile updated successfully",
-      });
-      setIsEditing(false);
-    } catch (err: any) {
-      console.error("Error updating profile:", err);
-      setPopup({
-        isOpen: true,
-        type: "notdone",
-        message: "Failed to update profile",
-      });
+    const payload: any = {
+      EmployeeId: formData.employeeId,
+      UserId: loggedInUser.EmployeeId || "ADMIN",
+      EmployeeName: formData.name,
+      DepartmentId: String(formData.departmentId),
+      DesignationId: String(formData.designationId),
+      BranchId: String(
+        branches.find((b) => b.name === formData.branch)?.id || ""
+      ),
+      DateOfJoin: formData.joiningDate
+        ? new Date(formData.joiningDate).toISOString().split("T")[0]
+        : null,
+      DateOfResign: formData.resignDate
+        ? new Date(formData.resignDate).toISOString().split("T")[0]
+        : null,
+      NID: formData.nid,
+      PersonalContactNumber: formData.personalPhone,
+      OfficalContactNumber: formData.officialPhone,
+      Email: formData.email,
+      EmployeeType: formData.employeeType,
+      Gender: formData.gender,
+      MaritalStatus: formData.maritalStatus,
+      BloodGroup: formData.bloodGroup,
+      FatherName: formData.fatherName,
+      MotherName: formData.motherName,
+      PresentAddress: formData.presentAddress,
+      PermanentAddress: formData.permanentAddress,
+      Status: formData.status,
+      type: "profile",
+    };
+
+    // ✅ Only include Password if user entered something
+    if (formData.password && formData.password.trim() !== "") {
+      payload.Password = formData.password;
     }
-  };
+
+    setPopup({
+      isOpen: true,
+      type: "loading",
+      message: "Updating profile...",
+    });
+
+    const response = await axios.put(`${API_BASE_URL}employeeupdate`, payload);
+    console.log("Update Response:", response.data);
+
+    setPopup({
+      isOpen: true,
+      type: "done",
+      message: "Profile updated successfully",
+    });
+
+    setIsEditing(false);
+  } catch (err: any) {
+    console.error("Error updating profile:", err);
+    setPopup({
+      isOpen: true,
+      type: "notdone",
+      message: "Failed to update profile",
+    });
+  }
+};
+
 
   // --------------------------------------------------------
 
@@ -728,19 +736,21 @@ const payload = {
                       .replace(/([A-Z])/g, " $1")
                       .replace(/^./, (s) => s.toUpperCase())}
                   </label>
-                  <input
-                    type={
-                      ["personalPhone", "officialPhone", "nid"].includes(key)
-                        ? "number"
-                        : key === "password"
-                        ? "password"
-                        : "text"
-                    }
-                    name={key}
-                    value={value as string | number}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                  />
+                 <input
+  type={
+    ["personalPhone", "officialPhone", "nid"].includes(key)
+      ? "number"
+      : key === "password"
+      ? "password"
+      : "text"
+  }
+  name={key}
+  placeholder={key === "password" ? "Enter Password" : ""}
+  value={key === "password" ? formData.password || "" : (value as string | number)}
+  onChange={handleChange}
+  disabled={!isEditing}
+/>
+
                 </div>
               );
             })}
