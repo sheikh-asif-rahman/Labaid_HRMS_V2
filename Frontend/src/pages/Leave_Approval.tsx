@@ -8,7 +8,7 @@ const Leave_Approval_Page: React.FC = () => {
   return (
     <div>
       <Leave_Approval />
-      <Popup isOpen={true} type="underdev" />
+      {/* <Popup isOpen={true} type="underdev" /> */}
 
     </div>
   );

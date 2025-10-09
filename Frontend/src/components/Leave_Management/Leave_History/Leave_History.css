@@ -1,127 +1,165 @@
+/* Container styling similar to Report_Preview */
 .leave-history-container {
-  width: 100%;
+  margin: 20px auto;
+  padding: 10px;
   background: #ffffff;
-  padding: 20px;
-  box-sizing: border-box;
-  color: #000000;
-  font-family: Arial, sans-serif;
-  border-radius: 12px;
-  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
-  margin-top: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  font-family: "Segoe UI", sans-serif;
+  font-size: 11px;
+  color: #212529;
+  border: 1px solid #ddd;
+  width: 100%;
+  max-width: 100%;
+  position: relative;
+}
+
+/* Header styling */
+.leave-history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
 }
 
 .leave-history-header h2 {
-  margin: 0 0 15px 0;
-  font-size: 16px;
+  margin: 0;
+  font-size: 1rem;
+  color: #333;
 }
 
+/* Table wrapper with scroll */
 .table-wrapper {
   overflow-x: auto;
+  max-width: 100%;
+  margin-top: 20px;
 }
 
+/* Futuristic-style table like Report_Preview */
 .leave-history-table {
   width: 100%;
-  border-collapse: collapse;
-  font-size: 11px; /* smaller font */
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 6px;
+  font-size: 11px;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
 }
 
 .leave-history-table th,
 .leave-history-table td {
-  border: 1px solid #ccc;
   padding: 4px 6px;
   text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.leave-history-table th {
-  background-color: #f1f1f1;
-  font-weight: bold;
+.leave-history-table thead {
+  background: linear-gradient(90deg, #0115a9, #2a33c7);
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 11px;
 }
 
-.leave-history-table tr:hover {
-  background-color: #f9f9f9;
+.leave-history-table tbody tr {
+  background: #f8f9fa;
+  transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
+  border-bottom: 1px solid #ddd;
 }
 
-/* Make Purpose column wider */
-.leave-history-table th:nth-child(3),
-.leave-history-table td:nth-child(3) {
-  min-width: 200px;
+.leave-history-table tbody tr:hover {
+  background-color: #e0e7ff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
 }
 
-/* Status styles */
+/* Status badge colors */
 .status {
   font-weight: bold;
   padding: 2px 6px;
   border-radius: 4px;
   font-size: 10px;
+  text-transform: capitalize;
 }
+
 .status.approved {
   background-color: #d4edda;
   color: #155724;
 }
+
 .status.rejected {
   background-color: #f8d7da;
   color: #721c24;
 }
+
 .status.pending {
   background-color: #fff3cd;
   color: #856404;
 }
 
-/* Download button styles */
+/* Download button */
 .download-btn {
   background-color: #0115a9;
   color: #fff;
   border: none;
-  padding: 2px 6px;
-  border-radius: 3px;
+  padding: 4px 10px;
+  border-radius: 4px;
   cursor: pointer;
   font-size: 10px;
+  transition: all 0.2s;
 }
 
 .download-btn:hover {
-  background-color: #00008b;
+  background-color: #010f8c;
 }
 
-/* Disabled state */
 .download-btn.disabled,
 .download-btn:disabled {
   background-color: #ccc;
   color: #666;
-  cursor: not-allowed; /* 🚫 cursor */
-}
-
-/* Pagination styles */
-.pagination {
-  display: flex;
-  justify-content: center;
-  margin-top: 12px;
-  gap: 4px;
-  font-size: 12px;
-}
-
-.pagination button {
-  background: #f1f1f1;
-  border: 1px solid #ccc;
-  padding: 2px 6px;
-  cursor: pointer;
-  border-radius: 4px;
-}
-
-.pagination button:hover {
-  background: #ddd;
-}
-
-.pagination button.active {
-  background: #0115a9;
-  color: #fff;
-  font-weight: bold;
-}
-
-.pagination button:disabled {
-  background: #eee;
   cursor: not-allowed;
 }
 
-.pagination .dots {
-  padding: 2px 6px;
+/* Pagination styling (like Report_Preview) */
+.pagination {
+  margin-top: 8px;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+  font-size: 11px;
+}
+
+.pagination button {
+  padding: 4px 12px;
+  border-radius: 50px;
+  border: 1px solid #6c757d;
+  background: #ffffff;
+  cursor: pointer;
+  font-size: 11px;
+  color: #212529;
+  transition: all 0.2s;
+}
+
+.pagination button:hover:not(:disabled) {
+  background-color: #0115a9;
+  color: #ffffff;
+}
+
+.pagination button:disabled {
+  background-color: #f0f0f0;
+  color: #6c757d;
+  cursor: not-allowed;
+}
+
+.page-indicator {
+  font-weight: bold;
+  font-size: 12px;
+  color: #333;
+}
+
+/* Highlight Purpose column (optional width tweak) */
+.leave-history-table th:nth-child(3),
+.leave-history-table td:nth-child(3) {
+  min-width: 200px;
 }

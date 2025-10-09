@@ -28,6 +28,11 @@ const getAbsentReport = require("./routes/ReportsRoute/AbsentReportRoute");
 const getEmployeeList = require("./routes/ReportsRoute/EmployeeListRoute");
 const getAccessFacility = require("./routes/ReportsRoute/AccessFacilityLoadRoute")
 
+const getLeaveFormData = require("./routes/LeaveManagementRoute/LeaveFormDataRoute")
+const getLeaveHistory = require("./routes/LeaveManagementRoute/LeaveHistoryDataRoute")
+const saveLeaveApplication = require("./routes/LeaveManagementRoute/LeaveApplicationSaveRoute")
+
+
 
 
 
@@ -67,6 +72,13 @@ app.use("/api", getAttendanceReport);
 app.use("/api", getAbsentReport);
 app.use("/api", getEmployeeList);
 app.use("/api", getAccessFacility);
+
+
+
+app.use("/api", getLeaveFormData);
+app.use("/api", getLeaveHistory);
+app.use("/api", saveLeaveApplication);
+
 
 
 

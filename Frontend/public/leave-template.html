@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leave Form</title>
+    <style>
+        
+        /* A4 Page Size */
+        @page {
+            size: A4;
+            margin: 0;
+        }
+        @media print {
+            body {
+                margin: 0;
+            }
+        }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            width: 210mm;
+            height: 297mm;
+            box-sizing: border-box;
+            position: relative;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+        }
+        table, th, td {
+            border: none; /* Remove all borders */
+        }
+        th, td {
+            padding: 5px;
+            text-align: left;
+            font-size: 12px;
+        }
+        .header {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .section {
+            margin-bottom: 10px;
+        }
+        .signature {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .signature table {
+            width: 100%; /* Full width of the page */
+            margin: 0 auto;
+            border: none; /* Remove outer border */
+        }
+        .signature td {
+            border: none; /* Remove inner borders */
+            text-align: left; /* Align text to the left */
+            width: 50%; /* Equal width for both columns */
+        }
+        .signature .right-align {
+            text-align: right; /* Align text to the right */
+        }
+        .office-use {
+            position: absolute;
+            bottom: 20px; /* Position at the footer */
+            width: 100%;
+        }
+        .office-use hr {
+            border: 1px solid black; /* Horizontal line */
+            margin: 10px auto;
+	     
+        }
+        .office-use table {
+            width: 100%; /* Full width of the page */
+            margin: 0 auto;
+            border: none; /* Remove outer border */
+        }
+        .office-use td {
+            border: none; /* Remove inner borders */
+            text-align: left; /* Align text to the left */
+            width: 50%; /* Equal width for both columns */
+        }
+        .office-use .right-align {
+            text-align: right; /* Align text to the right */
+        }
+        .leave-table th, .leave-table td {
+            text-align: center;
+        }
+        .leave-table th {
+            background-color: #f2f2f2;
+        }
+        .leave-table td {
+            padding: 5px;
+        }
+        .leave-table .leave-type {
+            text-align: left;
+        }
+        .purpose {
+            margin-top: 10px;
+        }
+        .purpose p {
+            margin: 5px 0;
+        }
+
+        /* First table styling */
+        .first-table {
+            border: 1px solid black; /* Outer border */
+        }
+        .first-table td {
+            border: none; /* Remove all inner borders */
+        }
+        .first-table tr {
+            border-bottom: none; /* Remove row borders */
+        }
+        .first-table .joining-date {
+            text-align: center; /* Center "Joining date" */
+            vertical-align: top; /* Align to the top */
+        }
+
+        /* Second table styling */
+        .second-table {
+            border: 1px solid black; /* Outer border */
+        }
+        .second-table td {
+            border: none; /* Remove all inner borders */
+        }
+        .second-table tr {
+            border-bottom: none; /* Remove row borders */
+        }
+        .second-table .vertical-border {
+            border-right: 1px solid black; /* Vertical border between columns */
+        }
+
+        /* Third table styling */
+        .third-table {
+            border: 1px solid black; /* Outer border */
+        }
+        .third-table th, .third-table td {
+            border: 1px solid black; /* Inner borders */
+        }
+        .third-table .no-inner-border {
+            border-right: none; /* Remove vertical border inside "Leave Type Days" */
+        }
+        .third-table .leave-enjoyed {
+            text-align: center; /* Center "Leave Enjoyed" */
+        }
+        .third-table .reason-no-border {
+            border-bottom: none; /* Remove horizontal border below "Reason" */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        LABAID GROUP
+        <br>
+        Leave/Attendance Application Form
+    </div>
+
+    <!-- First Table -->
+    <div class="section">
+        <table class="first-table">
+            <tr>
+                <td>Emp. Code : <span id="emp-code">{{empCode}}</span></td>
+                <td rowspan="4" class="joining-date">Joining date : <span id="joining-date">{{joiningDate}}</span></td>
+            </tr>
+            <tr>
+                <td>Emp. Name : <span id="emp-name">{{empName}}</span></td>
+            </tr>
+            <tr>
+                <td>Designation : <span id="designation">{{designation}}</span></td>
+            </tr>
+            <tr>
+                <td>Department : <span id="department">{{department}}</span></td>
+            </tr>
+        </table>
+    </div>
+
+<!-- Second Table -->
+<div class="section">
+    <table class="second-table">
+        <tr>
+            <td>Duty Hours</td>
+            <td class="vertical-border">9</td>
+            <td>Total Leave:</td>
+            <td>20 Days</td>
+            <td> Hrs.</td>
+            <td> Min.</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Total Working Days</td>
+            <td class="vertical-border">0</td>
+            <td>Leave enjoyed:</td>
+            <td>{{leaveEnjoyed}} Days</td>
+            <td> Hrs.</td>
+            <td> Min.</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Total Present Days</td>
+            <td class="vertical-border">0</td>
+            <td>Leave Balance:</td>
+            <td>{{leaveBalance}} Days</td>
+            <td> Hrs.</td>
+            <td> Min.</td>
+            <td></td>
+        </tr>
+    </table>
+</div>
+
+
+
+    <!-- Third Table -->
+    <div class="section">
+        <table class="third-table">
+            <tr>
+                <th colspan="2">Leave Approved</th>
+                <th colspan="6" class="leave-enjoyed">Leave Enjoyed</th>
+                <th>Reason</th>
+            </tr>
+            <tr>
+                <th class="no-inner-border">Leave Type</th>
+                <th>Days</th>
+                <th>From Date</th>
+                <th>To Date</th>
+                <th>Fr.Time</th>
+                <th>To Time</th>
+                <th>Days</th>
+                <th>Time</th>
+                <th class="reason-no-border"></th>
+            </tr>
+            <tr>
+                <td class="leave-type no-inner-border">Annual Leave</td>
+                <td>20</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>0</td>
+                <td>00</td>
+                <td>Opening</td>
+            </tr>
+            <tr>
+                <td class="leave-type no-inner-border">Out of Office</td>
+                <td>0</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>0</td>
+                <td>00</td>
+                <td>Opening</td>
+            </tr>
+            <tr>
+                <td class="leave-type no-inner-border">Casual Leave</td>
+                <td>0</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>0</td>
+                <td>00</td>
+                <td>Opening</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Leave Required and Purpose of Leave -->
+    <div class="purpose">
+        <p>Leave Required: <span id="leave-required">{{leaveRequired}}</span> Day (From: <span id="from-date">{{fromDate}}</span> To: <span id="to-date">{{toDate}}</span>)</p>
+        <p>Purpose of Leave: <span id="purpose">{{purpose}}</span></p>
+        <p>Alternative Person: Mr/Mrs <span id="alternative-person">{{alternativePerson}}</span> Will take the charge during leave.</p>
+    </div>
+
+    <!-- Empty 3 Lines -->
+    <div style="margin-top: 30px;">
+        <br><br><br> <!-- 3 empty lines -->
+    </div>
+
+    <!-- Signature Section -->
+    <div class="signature">
+        <table>
+            <tr>
+                <td>________________________</td>
+                <td class="right-align">________________________</td>
+            </tr>
+            <tr>
+                <td>Applicant’s Signature</td>
+                <td class="right-align">Dept. In-Charge</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Office Use Section -->
+    <div class="office-use">
+        <p>OFFICE USER ONLY</p>
+        <hr> <!-- Horizontal line -->
+        <p>Leave Sanctioned .................. day(s) from ........../........../............ to .........../.........../............</p>
+        <div class="signature">
+        <table>
+            <tr>
+                <td>________________________</td>
+                <td class="right-align">________________________</td>
+            </tr>
+            <tr>
+                <td>(Admin Officer)</td>
+                <td class="right-align">Branch Manager</td>
+            </tr>
+        </table>
+    </div>
+    </div>
+
+</body>
+</html>
