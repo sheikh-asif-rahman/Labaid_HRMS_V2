@@ -4,7 +4,6 @@ import { API_BASE_URL } from "../constants/apiBase";
 
 import Leave_Application from "../components/Leave_Management/Leave_Application/Leave_Application";
 import Leave_History from "../components/Leave_Management/Leave_History/Leave_History";
-import Popup from "../components/Popup/Popup";
 
 interface EmployeeData {
   EmployeeId: string;

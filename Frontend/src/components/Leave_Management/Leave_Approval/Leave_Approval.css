@@ -4,8 +4,7 @@
 .leave-approval-card {
   background: var(--white);
   padding: 12px;
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
   font-family: "Segoe UI", sans-serif;
   font-size: 11px; /* smaller overall font */
   color: var(--dark);
@@ -35,13 +34,11 @@
 .leave-approval-actions input[type="date"] {
   padding: 2px 6px;
   font-size: 11px;
-  border-radius: 6px;
   border: 1px solid var(--secondary);
 }
 
 .leave-approval-actions select {
   padding: 2px 6px; /* reduced padding */
-  border-radius: 6px;
   border: 1px solid var(--secondary);
   background: var(--light);
   font-size: 11px; /* smaller font */
@@ -51,7 +48,6 @@
 
 .leave-approval-actions button {
   padding: 2px 8px; /* smaller button padding */
-  border-radius: 6px;
   border: none;
   cursor: pointer;
   font-weight: 500;
@@ -88,9 +84,8 @@
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  border-radius: 8px;
   font-size: 11px; /* smaller table font */
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .leave-approval-table th,
@@ -110,13 +105,18 @@
   background: var(--light);
   transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
   border-bottom: 1px solid #ddd;
-  cursor: default;
+  cursor: pointer;
+}
+.leave-approval-table tbody tr.clickable-row:hover {
+  background-color: #e0e7ff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
 }
 
 .leave-approval-table tbody tr:hover {
   background-color: #e0e7ff;
   transform: translateY(-1px);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
 }
 
 /* Checkbox Styling */
@@ -127,7 +127,6 @@
   width: 14px; /* smaller */
   height: 14px; /* smaller */
   border: 2px solid var(--secondary);
-  border-radius: 4px;
   background-color: var(--white);
   cursor: pointer;
   position: relative;
@@ -156,28 +155,45 @@
 }
 
 /* -----------------------------
-   Pagination
+   Pagination (like Leave_History)
    ----------------------------- */
-.leave-approval-pagination {
-  margin-top: 12px;
+.pagination {
+  margin-top: 8px;
   display: flex;
-  justify-content: center; /* center horizontally */
-  gap: 6px;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
   font-size: 11px;
 }
 
-.leave-approval-pagination button {
-  padding: 2px 6px; /* smaller buttons */
-  border-radius: 50px;
-  border: 1px solid var(--secondary);
-  background: var(--white);
+.pagination button {
+  padding: 4px 12px;
+  border: 1px solid #6c757d;
+  background: #ffffff;
   cursor: pointer;
-  transition: 0.2s;
-  font-size: 10px; /* smaller font */
-  color: var(--dark);
+  font-size: 11px;
+  color: #212529;
+  transition: all 0.2s;
 }
 
-.leave-approval-pagination button:hover {
-  background: var(--primary);
-  color: var(--white);
+.pagination button:hover:not(:disabled) {
+  background-color: #0115a9;
+  color: #ffffff;
+}
+
+.pagination button:disabled {
+  background-color: #f0f0f0;
+  color: #6c757d;
+  cursor: not-allowed;
+}
+
+.page-indicator {
+  font-weight: bold;
+  font-size: 12px;
+  color: #333;
+}
+
+/* Optional: smaller button for approve/reject table header */
+.leave-approval-actions button {
+  min-width: 60px;
 }

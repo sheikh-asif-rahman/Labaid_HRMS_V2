@@ -63,6 +63,8 @@
   background: #f8f9fa;
   transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
   border-bottom: 1px solid #ddd;
+  cursor: pointer;
+
 }
 
 .futuristic-table tbody tr:hover {
