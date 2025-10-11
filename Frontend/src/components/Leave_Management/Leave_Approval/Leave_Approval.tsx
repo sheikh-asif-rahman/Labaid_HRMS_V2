@@ -1,4 +1,5 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
+import axios from "axios";
 import "./Leave_Approval.css";
 
 interface LeaveForm {
@@ -8,54 +9,81 @@ interface LeaveForm {
   facility: string;
   department: string;
   designation: string;
-  leaveBalance: number;
-  leaveEnjoyed: number;
-  leaveRequired: string;
+  leaveRequired?: string;
   fromDate: string;
   toDate: string;
   purpose: string;
   alternativePerson: string;
   status: "Pending" | "Approved" | "Rejected";
   approvedBy?: string;
+  approvedDate?: string;
   rejectedBy?: string;
-  actionDate?: string;
+  rejectedDate?: string;
 }
 
 const Leave_Approval: React.FC = () => {
-  // --- Sample data ---
-  const [leaveForms] = useState<LeaveForm[]>(
-    Array.from({ length: 35 }, (_, i) => ({
-      id: i + 1,
-      employeeId: `EMP00${i + 1}`,
-      employeeName: `Employee ${i + 1}`,
-      facility: "Main Facility",
-      department: `Dept ${((i % 3) + 1)}`,
-      designation: `Desig ${((i % 4) + 1)}`,
-      leaveBalance: 20 - (i % 10),
-      leaveEnjoyed: i % 10,
-      leaveRequired: `${(i % 5) + 1} Days`,
-      fromDate: `2025-10-${(i % 30) + 1}`,
-      toDate: `2025-10-${(i % 30) + 2}`,
-      purpose: `Personal/Medical\nNeeds rest`,
-      alternativePerson: `Employee ${(i % 10) + 1}`,
-      status: i % 3 === 0 ? "Pending" : i % 3 === 1 ? "Approved" : "Rejected",
-      approvedBy: i % 3 === 1 ? "Manager A" : undefined,
-      rejectedBy: i % 3 === 2 ? "Manager B" : undefined,
-      actionDate: i % 3 === 0 ? undefined : "2025-09-19",
-    }))
-  );
-
-  // --- State ---
+  const [leaveForms, setLeaveForms] = useState<LeaveForm[]>([]);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [filterStatus, setFilterStatus] = useState<"Pending" | "Approved" | "Rejected">("Pending");
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 10;
+
+  // --- Fetch data from API ---
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const user = localStorage.getItem("user");
+        const employeeId = user ? JSON.parse(user).EmployeeId : "";
+
+        if (!employeeId) return;
+
+        const res = await axios.post("http://localhost:3000/api/leave-approve-reject", { EmployeeId: employeeId });
+
+        if (res.data.success) {
+          const mappedData: LeaveForm[] = res.data.data.map((item: any, idx: number) => {
+            const normalizedStatus =
+              item.Status?.toLowerCase() === "approved"
+                ? "Approved"
+                : item.Status?.toLowerCase() === "rejected"
+                ? "Rejected"
+                : "Pending";
+
+            return {
+              id: idx + 1,
+              employeeId: item.EmployeeId,
+              employeeName: item.EmployeeName,
+              facility: item.BranchName,
+              department: item.DepartmentName,
+              designation: item.DesignationName,
+              fromDate: item.FromDate.split("T")[0],
+              toDate: item.ToDate.split("T")[0],
+              purpose: item.Purpose,
+              alternativePerson: item.AlternativePerson,
+              status: normalizedStatus,
+              approvedBy: normalizedStatus === "Approved" ? item["Approved/Rejected By"] : undefined,
+              approvedDate: normalizedStatus === "Approved" ? item["Approved/Rejected Date"]?.split("T")[0] : undefined,
+              rejectedBy: normalizedStatus === "Rejected" ? item["Approved/Rejected By"] : undefined,
+              rejectedDate: normalizedStatus === "Rejected" ? item["Approved/Rejected Date"]?.split("T")[0] : undefined,
+              leaveRequired: `${item.TotalLeave} Day${item.TotalLeave > 1 ? "s" : ""}`,
+            };
+          });
+
+          setLeaveForms(mappedData);
+        }
+      } catch (err) {
+        console.error("Error fetching leave data", err);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   // --- Computed values ---
   const filteredForms = useMemo(
     () => leaveForms.filter(f => f.status === filterStatus),
     [leaveForms, filterStatus]
   );
+
   const totalPages = Math.ceil(filteredForms.length / rowsPerPage);
   const displayedForms = useMemo(
     () =>
@@ -113,77 +141,76 @@ const Leave_Approval: React.FC = () => {
         <table className="leave-approval-table">
           <thead>
             <tr>
-              {filterStatus === "Pending" && (
-                <th>
-                  <input
-                    type="checkbox"
-                    onChange={toggleSelectAll}
-                    checked={displayedForms.every(f => selectedIds.includes(f.id))}
-                  />
-                </th>
-              )}
+              {filterStatus === "Pending" && <th><input type="checkbox" onChange={toggleSelectAll} checked={displayedForms.every(f => selectedIds.includes(f.id))} /></th>}
               <th>SL</th>
               <th>Employee ID</th>
               <th>Employee Name</th>
               <th>Facility</th>
               <th>Department</th>
               <th>Designation</th>
-              <th>Leave Balance</th>
-              <th>Leave Enjoyed</th>
               <th>Leave Required</th>
               <th>From Date</th>
               <th>To Date</th>
               <th>Purpose</th>
               <th>Alternative Person</th>
-              {filterStatus === "Approved" && <th>Approved By</th>}
-              {filterStatus === "Rejected" && <th>Rejected By</th>}
+              {filterStatus === "Approved" && <>
+                <th>Approved By</th>
+                <th>Approved Date</th>
+              </>}
+              {filterStatus === "Rejected" && <>
+                <th>Rejected By</th>
+                <th>Rejected Date</th>
+              </>}
               <th>Status</th>
             </tr>
           </thead>
           <tbody>
-            {displayedForms.map((f, i) => {
-              const isPending = filterStatus === "Pending";
-              const handleRowClick = () => {
-                if (isPending) toggleSelectOne(f.id);
-              };
-
-              return (
-                <tr
-                  key={f.id}
-                  className={isPending ? "clickable-row" : ""}
-                  onClick={handleRowClick}
-                >
-                  {isPending && (
-                    <td>
-                      <input
-                        type="checkbox"
-                        checked={selectedIds.includes(f.id)}
-                        onChange={() => toggleSelectOne(f.id)}
-                        onClick={e => e.stopPropagation()}
-                      />
-                    </td>
-                  )}
-                  <td>{(currentPage - 1) * rowsPerPage + i + 1}</td>
-                  <td>{f.employeeId}</td>
-                  <td>{f.employeeName}</td>
-                  <td>{f.facility}</td>
-                  <td>{f.department}</td>
-                  <td>{f.designation}</td>
-                  <td>{f.leaveBalance}</td>
-                  <td>{f.leaveEnjoyed}</td>
-                  <td>{f.leaveRequired}</td>
-                  <td>{f.fromDate}</td>
-                  <td>{f.toDate}</td>
-                  <td style={{ whiteSpace: "pre-wrap" }}>{f.purpose}</td>
-                  <td>{f.alternativePerson}</td>
-                  {filterStatus === "Approved" && <td>{f.approvedBy}</td>}
-                  {filterStatus === "Rejected" && <td>{f.rejectedBy}</td>}
-                  <td>
-                    <span className={`status ${f.status.toLowerCase()}`}>{f.status}</span>
-                  </td>
-                </tr>
-              );
-            })}
+            {displayedForms.length > 0 ? (
+              displayedForms.map((f, i) => {
+                const isPending = filterStatus === "Pending";
+                const handleRowClick = () => { if (isPending) toggleSelectOne(f.id); };
+                return (
+                  <tr key={f.id} className={isPending ? "clickable-row" : ""} onClick={handleRowClick}>
+                    {isPending && (
+                      <td>
+                        <input
+                          type="checkbox"
+                          checked={selectedIds.includes(f.id)}
+                          onChange={() => toggleSelectOne(f.id)}
+                          onClick={e => e.stopPropagation()}
+                        />
+                      </td>
+                    )}
+                    <td>{(currentPage - 1) * rowsPerPage + i + 1}</td>
+                    <td>{f.employeeId}</td>
+                    <td>{f.employeeName}</td>
+                    <td>{f.facility}</td>
+                    <td>{f.department}</td>
+                    <td>{f.designation}</td>
+                    <td>{f.leaveRequired}</td>
+                    <td>{f.fromDate}</td>
+                    <td>{f.toDate}</td>
+                    <td style={{ whiteSpace: "pre-wrap" }}>{f.purpose}</td>
+                    <td>{f.alternativePerson}</td>
+                    {filterStatus === "Approved" && <>
+                      <td>{f.approvedBy}</td>
+                      <td>{f.approvedDate}</td>
+                    </>}
+                    {filterStatus === "Rejected" && <>
+                      <td>{f.rejectedBy}</td>
+                      <td>{f.rejectedDate}</td>
+                    </>}
+                    <td><span className={`status ${f.status.toLowerCase()}`}>{f.status}</span></td>
+                  </tr>
+                );
+              })
+            ) : (
+              <tr>
+                <td colSpan={filterStatus === "Pending" ? 16 : 17} style={{ textAlign: "center", padding: "20px", fontStyle: "italic", color: "#555" }}>
+                  No data found
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
@@ -191,23 +218,9 @@ const Leave_Approval: React.FC = () => {
       {/* Pagination */}
       {totalPages > 1 && (
         <div className="pagination">
-          <button
-            onClick={() => handlePageChange("prev")}
-            disabled={currentPage === 1}
-          >
-            ⬅ Previous
-          </button>
-
-          <span className="page-indicator">
-            Page {currentPage} of {totalPages}
-          </span>
-
-          <button
-            onClick={() => handlePageChange("next")}
-            disabled={currentPage === totalPages}
-          >
-            Next ➡
-          </button>
+          <button onClick={() => handlePageChange("prev")} disabled={currentPage === 1}>⬅ Previous</button>
+          <span className="page-indicator">Page {currentPage} of {totalPages}</span>
+          <button onClick={() => handlePageChange("next")} disabled={currentPage === totalPages}>Next ➡</button>
         </div>
       )}
     </div>

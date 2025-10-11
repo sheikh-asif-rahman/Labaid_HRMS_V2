@@ -34,10 +34,7 @@ const getLeaveApproveRejectData = async (req, res) => {
       });
     }
 
-    // Parse AccessToBranchId list into array
     const accessibleBranches = accessData.split(",").map((id) => id.trim());
-
-    // Convert to SQL-safe IN clause string
     const branchList = accessibleBranches.map((id) => `'${id}'`).join(",");
 
     // 2️⃣ Fetch all leave applications filtered by accessible branches
@@ -50,7 +47,9 @@ const getLeaveApproveRejectData = async (req, res) => {
         L.[From Date] AS FromDate,
         L.[To Date] AS ToDate,
         L.[Alternative Person] AS AlternativePerson,
-        L.[Status]
+        L.[Status],
+        L.[Approved/Rejected By],
+        L.[Approved/Rejected Date]
       FROM [TA].[dbo].[leave] L
       INNER JOIN [TA].[dbo].[Employee] E ON L.[EmployeeId] = E.[EmployeeId]
       WHERE E.[BranchId] IN (${branchList})
@@ -68,16 +67,11 @@ const getLeaveApproveRejectData = async (req, res) => {
 
     const leaves = leaveResult.recordset;
 
-    // 3️⃣ Enrich each record
+    // 3️⃣ Enrich each record with employee, branch, dept, and designation info
     const enrichedData = await Promise.all(
       leaves.map(async (leave) => {
-        // Employee info
         const empQuery = `
-          SELECT 
-            EmployeeName, 
-            DepartmentId, 
-            DesignationId, 
-            BranchId
+          SELECT EmployeeName, DepartmentId, DesignationId, BranchId
           FROM [TA].[dbo].[Employee]
           WHERE EmployeeId = '${leave.EmployeeId}'
         `;
@@ -94,7 +88,6 @@ const getLeaveApproveRejectData = async (req, res) => {
           };
         }
 
-        // Name lookups (parallel)
         const [branchRes, deptRes, desigRes] = await Promise.all([
           sql.query(
             `SELECT name AS BranchName FROM [TA].[dbo].[device] WHERE id = '${employee.BranchId}'`
@@ -124,6 +117,8 @@ const getLeaveApproveRejectData = async (req, res) => {
           ToDate: leave.ToDate,
           AlternativePerson: leave.AlternativePerson,
           Status: leave.Status,
+          "Approved/Rejected By": leave["Approved/Rejected By"] || null,
+          "Approved/Rejected Date": leave["Approved/Rejected Date"] || null,
         };
       })
     );
