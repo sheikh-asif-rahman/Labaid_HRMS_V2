@@ -31,6 +31,7 @@ const getAccessFacility = require("./routes/ReportsRoute/AccessFacilityLoadRoute
 const getLeaveFormData = require("./routes/LeaveManagementRoute/LeaveFormDataRoute")
 const getLeaveHistory = require("./routes/LeaveManagementRoute/LeaveHistoryDataRoute")
 const saveLeaveApplication = require("./routes/LeaveManagementRoute/LeaveApplicationSaveRoute")
+const LeaveApproveRejectRoute = require("./routes/LeaveManagementRoute/LeaveApproveRejectRoute")
 
 
 
@@ -78,6 +79,7 @@ app.use("/api", getAccessFacility);
 app.use("/api", getLeaveFormData);
 app.use("/api", getLeaveHistory);
 app.use("/api", saveLeaveApplication);
+app.use("/api", LeaveApproveRejectRoute);
 
 
 

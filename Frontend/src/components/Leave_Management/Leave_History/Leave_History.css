@@ -28,6 +28,29 @@
   color: #333;
 }
 
+/* Empty Template button (top right) */
+.empty-template-btn {
+  background: linear-gradient(135deg, #0115a9, #2a33c7);
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease-in-out;
+}
+
+.empty-template-btn:hover {
+  background: linear-gradient(135deg, #010f8c, #1c25aa);
+  transform: translateY(-1px);
+}
+
+.empty-template-btn:active {
+  transform: scale(0.98);
+}
+
 /* Table wrapper with scroll */
 .table-wrapper {
   overflow-x: auto;
@@ -66,7 +89,6 @@
   transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
   border-bottom: 1px solid #ddd;
   cursor: pointer;
-
 }
 
 .leave-history-table tbody tr:hover {

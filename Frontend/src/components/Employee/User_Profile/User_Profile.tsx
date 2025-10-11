@@ -42,7 +42,6 @@ interface UserProfileProps {
   showEditButton: boolean;
   onUpdate?: (updatedProfile: any) => void; // <-- add this
 }
-
 const User_Profile: React.FC<UserProfileProps> = ({
   employeeData,
   showEditButton,
@@ -61,24 +60,22 @@ const User_Profile: React.FC<UserProfileProps> = ({
     type: "loading",
     message: "",
   });
-
   const [specialPermissions, setSpecialPermissions] = useState<string[]>([]);
-
-useEffect(() => {
-  const userData = localStorage.getItem("user");
-  if (userData) {
-    try {
-      const parsed = JSON.parse(userData);
-      const perms = parsed.Permission ? JSON.parse(parsed.Permission) : { Access: [], Special_Permission: [] };
-      setSpecialPermissions(perms.Special_Permission || []);
-    } catch (err) {
-      console.error("Failed to parse permissions:", err);
-      setSpecialPermissions([]);
+  useEffect(() => {
+    const userData = localStorage.getItem("user");
+    if (userData) {
+      try {
+        const parsed = JSON.parse(userData);
+        const perms = parsed.Permission
+          ? JSON.parse(parsed.Permission)
+          : { Access: [], Special_Permission: [] };
+        setSpecialPermissions(perms.Special_Permission || []);
+      } catch (err) {
+        console.error("Failed to parse permissions:", err);
+        setSpecialPermissions([]);
+      }
     }
-  }
-}, []);
-
-
+  }, []);
   const [formData, setFormData] = useState<FormDataType>({
     employeeId: "",
     name: "",
@@ -113,7 +110,6 @@ useEffect(() => {
     bloodGroup: false,
     status: false,
   });
-
   const refs = {
     dept: useRef<HTMLDivElement>(null),
     des: useRef<HTMLDivElement>(null),
@@ -124,7 +120,6 @@ useEffect(() => {
     bloodGroup: useRef<HTMLDivElement>(null),
     status: useRef<HTMLDivElement>(null),
   };
-
   const employeeTypes = [
     "Select Employee Type",
     "Full Time",
@@ -151,8 +146,7 @@ useEffect(() => {
     "O+",
     "O-",
   ];
-  const statusOptions = ["Select Status", "Active", "Inactive", "Suspended"];
-
+  const statusOptions = ["active", "inactive"];
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       Object.keys(refs).forEach((key) => {
@@ -168,7 +162,6 @@ useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-
   // Fetch Departments
   useEffect(() => {
     axios.get(`${API_BASE_URL}getDepartmentList`).then((res) => {
@@ -182,7 +175,6 @@ useEffect(() => {
       }
     });
   }, []);
-
   // Fetch Designations
   useEffect(() => {
     axios.get(`${API_BASE_URL}getDesignationList`).then((res) => {
@@ -196,7 +188,6 @@ useEffect(() => {
       }
     });
   }, []);
-
   // Fetch Branches
   useEffect(() => {
     axios.get(`${API_BASE_URL}facilities`).then((res) => {
@@ -260,82 +251,83 @@ useEffect(() => {
     setDropdowns((prev) => ({ ...prev, [dropdownKey]: false }));
   };
 
-const handleEdit = () => {
-  setIsEditing(true);
-  setFormData((prev) => ({
-    ...prev,
-    password: "", // clear password when entering edit mode
-  }));
-};
-
+  const handleEdit = () => {
+    setIsEditing(true);
+    setFormData((prev) => ({
+      ...prev,
+      password: "", // clear password when entering edit mode
+    }));
+  };
 
   // ---------- UPDATED: handleUpdate with API call ----------
-const handleUpdate = async () => {
-  try {
-    const loggedInUser = JSON.parse(localStorage.getItem("user") || "{}");
+  const handleUpdate = async () => {
+    try {
+      const loggedInUser = JSON.parse(localStorage.getItem("user") || "{}");
 
-    const payload: any = {
-      EmployeeId: formData.employeeId,
-      UserId: loggedInUser.EmployeeId || "ADMIN",
-      EmployeeName: formData.name,
-      DepartmentId: String(formData.departmentId),
-      DesignationId: String(formData.designationId),
-      BranchId: String(
-        branches.find((b) => b.name === formData.branch)?.id || ""
-      ),
-      DateOfJoin: formData.joiningDate
-        ? new Date(formData.joiningDate).toISOString().split("T")[0]
-        : null,
-      DateOfResign: formData.resignDate
-        ? new Date(formData.resignDate).toISOString().split("T")[0]
-        : null,
-      NID: formData.nid,
-      PersonalContactNumber: formData.personalPhone,
-      OfficalContactNumber: formData.officialPhone,
-      Email: formData.email,
-      EmployeeType: formData.employeeType,
-      Gender: formData.gender,
-      MaritalStatus: formData.maritalStatus,
-      BloodGroup: formData.bloodGroup,
-      FatherName: formData.fatherName,
-      MotherName: formData.motherName,
-      PresentAddress: formData.presentAddress,
-      PermanentAddress: formData.permanentAddress,
-      Status: formData.status,
-      type: "profile",
-    };
+      const payload: any = {
+        EmployeeId: formData.employeeId,
+        UserId: loggedInUser.EmployeeId || "ADMIN",
+        EmployeeName: formData.name,
+        DepartmentId: String(formData.departmentId),
+        DesignationId: String(formData.designationId),
+        BranchId: String(
+          branches.find((b) => b.name === formData.branch)?.id || ""
+        ),
+        DateOfJoin: formData.joiningDate
+          ? new Date(formData.joiningDate).toISOString().split("T")[0]
+          : null,
+        DateOfResign: formData.resignDate
+          ? new Date(formData.resignDate).toISOString().split("T")[0]
+          : null,
+        NID: formData.nid,
+        PersonalContactNumber: formData.personalPhone,
+        OfficalContactNumber: formData.officialPhone,
+        Email: formData.email,
+        EmployeeType: formData.employeeType,
+        Gender: formData.gender,
+        MaritalStatus: formData.maritalStatus,
+        BloodGroup: formData.bloodGroup,
+        FatherName: formData.fatherName,
+        MotherName: formData.motherName,
+        PresentAddress: formData.presentAddress,
+        PermanentAddress: formData.permanentAddress,
+        Status: formData.status,
+        type: "profile",
+      };
 
-    // ✅ Only include Password if user entered something
-    if (formData.password && formData.password.trim() !== "") {
-      payload.Password = formData.password;
+      // ✅ Only include Password if user entered something
+      if (formData.password && formData.password.trim() !== "") {
+        payload.Password = formData.password;
+      }
+
+      setPopup({
+        isOpen: true,
+        type: "loading",
+        message: "Updating profile...",
+      });
+
+      const response = await axios.put(
+        `${API_BASE_URL}employeeupdate`,
+        payload
+      );
+      console.log("Update Response:", response.data);
+
+      setPopup({
+        isOpen: true,
+        type: "done",
+        message: "Profile updated successfully",
+      });
+
+      setIsEditing(false);
+    } catch (err: any) {
+      console.error("Error updating profile:", err);
+      setPopup({
+        isOpen: true,
+        type: "notdone",
+        message: "Failed to update profile",
+      });
     }
-
-    setPopup({
-      isOpen: true,
-      type: "loading",
-      message: "Updating profile...",
-    });
-
-    const response = await axios.put(`${API_BASE_URL}employeeupdate`, payload);
-    console.log("Update Response:", response.data);
-
-    setPopup({
-      isOpen: true,
-      type: "done",
-      message: "Profile updated successfully",
-    });
-
-    setIsEditing(false);
-  } catch (err: any) {
-    console.error("Error updating profile:", err);
-    setPopup({
-      isOpen: true,
-      type: "notdone",
-      message: "Failed to update profile",
-    });
-  }
-};
-
+  };
 
   // --------------------------------------------------------
 
@@ -349,19 +341,25 @@ const handleUpdate = async () => {
 
   return (
     <div className="upf-container">
-<div className="upf-header">
-  <h2>Profile</h2>
+      <div className="upf-header">
+        <h2>Profile</h2>
 
-  {/* Show edit button only if user has the special permission */}
-  {specialPermissions.includes("Can Access To Edit Employee Profile") && !isEditing && showEditButton && (
-    <button className="upf-edit-btn" onClick={handleEdit}>Edit</button>
-  )}
+        {/* Show edit button only if user has the special permission */}
+        {specialPermissions.includes("Can Access To Edit Employee Profile") &&
+          !isEditing &&
+          showEditButton && (
+            <button className="upf-edit-btn" onClick={handleEdit}>
+              Edit
+            </button>
+          )}
 
-  {specialPermissions.includes("Can Access To Edit Employee Profile") && isEditing && (
-    <button className="upf-update-btn" onClick={handleUpdate}>Update</button>
-  )}
-</div>
-
+        {specialPermissions.includes("Can Access To Edit Employee Profile") &&
+          isEditing && (
+            <button className="upf-update-btn" onClick={handleUpdate}>
+              Update
+            </button>
+          )}
+      </div>
 
       <div className="upf-content">
         <div className="upf-left">
@@ -677,7 +675,6 @@ const handleUpdate = async () => {
                 )}
               </div>
             </div>
-
             {/* Status */}
             <div className="upf-form-group" ref={refs.status}>
               <label>Status</label>
@@ -709,7 +706,6 @@ const handleUpdate = async () => {
                 )}
               </div>
             </div>
-
             {/* Other fields */}
             {Object.entries(formData).map(([key, value]) => {
               if (
@@ -736,21 +732,24 @@ const handleUpdate = async () => {
                       .replace(/([A-Z])/g, " $1")
                       .replace(/^./, (s) => s.toUpperCase())}
                   </label>
-                 <input
-  type={
-    ["personalPhone", "officialPhone", "nid"].includes(key)
-      ? "number"
-      : key === "password"
-      ? "password"
-      : "text"
-  }
-  name={key}
-  placeholder={key === "password" ? "Enter Password" : ""}
-  value={key === "password" ? formData.password || "" : (value as string | number)}
-  onChange={handleChange}
-  disabled={!isEditing}
-/>
-
+                  <input
+                    type={
+                      ["personalPhone", "officialPhone", "nid"].includes(key)
+                        ? "number"
+                        : key === "password"
+                        ? "password"
+                        : "text"
+                    }
+                    name={key}
+                    placeholder={key === "password" ? "Enter Password" : ""}
+                    value={
+                      key === "password"
+                        ? formData.password || ""
+                        : (value as string | number)
+                    }
+                    onChange={handleChange}
+                    disabled={!isEditing}
+                  />
                 </div>
               );
             })}

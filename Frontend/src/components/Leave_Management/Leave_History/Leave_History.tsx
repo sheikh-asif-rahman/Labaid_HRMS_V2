@@ -90,25 +90,24 @@ const Leave_History: React.FC<LeaveHistoryProps> = ({
     let templateHtml = await response.text();
 
     // Replace placeholders in HTML template
-templateHtml = templateHtml
-  .replace(/{{empCode}}/g, employeeData.EmployeeId)
-  .replace(/{{empName}}/g, employeeData.EmployeeName)
-  .replace(/{{designation}}/g, employeeData.DesignationName)
-  .replace(/{{department}}/g, employeeData.DepartmentName)
-  .replace(
-    /{{joiningDate}}/g,
-    new Date(employeeData.DateOfJoin).toLocaleDateString()
-  )
-  // TOTAL LEAVE for Leave Required
-  .replace(/{{leaveRequired}}/g, item.TotalLeave.toString())
-  .replace(/20 Days/g, `${item.TotalLeave} Days`) // Total Leave in second table
-  .replace(/{{leaveEnjoyed}}/g, employeeData.LeaveEnjoyed.toString())
-  .replace(/{{leaveBalance}}/g, employeeData.LeaveBalance.toString())
-  .replace(/{{fromDate}}/g, item.FromDate)
-  .replace(/{{toDate}}/g, item.ToDate)
-  .replace(/{{purpose}}/g, item.Purpose)
-  .replace(/{{alternativePerson}}/g, item.AlternativePerson);
-
+    templateHtml = templateHtml
+      .replace(/{{empCode}}/g, employeeData.EmployeeId)
+      .replace(/{{empName}}/g, employeeData.EmployeeName)
+      .replace(/{{designation}}/g, employeeData.DesignationName)
+      .replace(/{{department}}/g, employeeData.DepartmentName)
+      .replace(
+        /{{joiningDate}}/g,
+        new Date(employeeData.DateOfJoin).toLocaleDateString()
+      )
+      // TOTAL LEAVE for Leave Required
+      .replace(/{{leaveRequired}}/g, item.TotalLeave.toString())
+      .replace(/20 Days/g, `${item.TotalLeave} Days`) // Total Leave in second table
+      .replace(/{{leaveEnjoyed}}/g, employeeData.LeaveEnjoyed.toString())
+      .replace(/{{leaveBalance}}/g, employeeData.LeaveBalance.toString())
+      .replace(/{{fromDate}}/g, item.FromDate)
+      .replace(/{{toDate}}/g, item.ToDate)
+      .replace(/{{purpose}}/g, item.Purpose)
+      .replace(/{{alternativePerson}}/g, item.AlternativePerson);
 
     // Create hidden iframe to print
     const iframe = document.createElement("iframe");
@@ -131,11 +130,57 @@ templateHtml = templateHtml
     }, 1000);
   };
 
+  // ---------------- Empty Template Print ----------------
+  const handleEmptyTemplate = async () => {
+    if (!employeeData) return;
+
+    const response = await fetch("/blank-leave-template.html");
+    let templateHtml = await response.text();
+
+    // Replace placeholders with employee info
+    templateHtml = templateHtml
+      .replace(/{{empCode}}/g, employeeData.EmployeeId)
+      .replace(/{{empName}}/g, employeeData.EmployeeName)
+      .replace(/{{designation}}/g, employeeData.DesignationName)
+      .replace(/{{department}}/g, employeeData.DepartmentName)
+      .replace(
+        /{{joiningDate}}/g,
+        new Date(employeeData.DateOfJoin).toLocaleDateString()
+      )
+      .replace(/{{leaveEnjoyed}}/g, employeeData.LeaveEnjoyed.toString())
+      .replace(/{{leaveBalance}}/g, employeeData.LeaveBalance.toString());
+
+    // Create hidden iframe for print
+    const iframe = document.createElement("iframe");
+    iframe.style.position = "absolute";
+    iframe.style.width = "0";
+    iframe.style.height = "0";
+    iframe.style.border = "0";
+    document.body.appendChild(iframe);
+
+    const doc = iframe.contentWindow!.document;
+    doc.open();
+    doc.write(templateHtml);
+    doc.close();
+
+    iframe.contentWindow!.focus();
+    iframe.contentWindow!.print();
+
+    setTimeout(() => {
+      document.body.removeChild(iframe);
+    }, 1000);
+  };
+
+
   return (
     <div className="report-preview-container">
-      <div className="report-preview-header">
-        <h2>Leave History</h2>
-      </div>
+<div className="leave-history-header">
+  <h2>Leave History</h2>
+  <button className="empty-template-btn" onClick={handleEmptyTemplate}>
+    Empty Template
+  </button>
+</div>
+
 
       <div className="table-wrapper-scroll">
         <table className="futuristic-table">

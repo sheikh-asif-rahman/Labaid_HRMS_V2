@@ -55,7 +55,7 @@ const updateEmployee = async (req, res) => {
       insertRequest.input("MotherName", sql.NVarChar, data.MotherName || null);
       insertRequest.input("PresentAddress", sql.NVarChar, data.PresentAddress || null);
       insertRequest.input("PermanentAddress", sql.NVarChar, data.PermanentAddress || null);
-      insertRequest.input("Status", sql.NVarChar, data.Status || "Active");
+      insertRequest.input("Status", sql.NVarChar, data.Status || "active");
 
       // Hash password if provided
       const hashedPassword = data.Password ? hashPassword(data.Password) : null;
