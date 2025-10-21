@@ -1,11 +1,10 @@
 import React from "react";
+import ReactApexChart from "react-apexcharts";
 import "./Last7_Days_Status.css";
 
 interface DailyAttendance {
-  day: string;
-  hoursWorked: number;
-  firstPunch?: string;
-  lastPunch?: string;
+  day: string; // YYYY-MM-DD
+  hoursWorked: number; // fractional hours
 }
 
 interface Last7_Days_StatusProps {
@@ -13,26 +12,55 @@ interface Last7_Days_StatusProps {
 }
 
 const Last7_Days_Status: React.FC<Last7_Days_StatusProps> = ({ data }) => {
+  const maxHours = Math.max(...data.map((d) => d.hoursWorked), 8);
+
+  const series = [
+    {
+      name: "Hours Worked",
+      data: data.map((d) => ({
+        x: d.day,
+        y: parseFloat(d.hoursWorked.toFixed(2)),
+        goals: [
+          {
+            name: "Expected",
+            value: 8,
+            strokeHeight: 4,
+            strokeColor: "#775DD0",
+          },
+        ],
+      })),
+    },
+  ];
+
+  const options: ApexCharts.ApexOptions = {
+    chart: { type: "bar", height: 300, toolbar: { show: false } },
+    plotOptions: { bar: { columnWidth: "50%" } },
+    colors: ["#0115a9ff"],
+    dataLabels: { enabled: false },
+    legend: {
+      show: true,
+      showForSingleSeries: true,
+      customLegendItems: ["Hours Worked", "Expected"],
+      markers: { fillColors: ["#0115a9ff", "#775DD0"] },
+    },
+    xaxis: {
+      categories: data.map((d) => d.day),
+      labels: { rotate: -45, rotateAlways: true, style: { fontSize: "12px", colors: "#333" } },
+    },
+    yaxis: {
+      min: 0,
+      max: Math.ceil(maxHours) + 1,
+      tickAmount: Math.ceil(maxHours) + 1,
+      labels: { formatter: (val) => val.toString() },
+      title: { text: "Hours Worked" },
+    },
+    grid: { borderColor: "#eee" },
+  };
+
   return (
     <div className="last7_days_status_container">
       <h3 className="title">Last 7 Days Status</h3>
-      <div className="attendance_list">
-        {data.map((dayData) => {
-          const percentage = Math.min((dayData.hoursWorked / 8) * 100, 100);
-          return (
-            <div key={dayData.day} className="attendance_row">
-              <div className="day_label">{dayData.day}</div>
-              <div className="progress_bar">
-                <div
-                  className="progress_fill"
-                  style={{ width: `${percentage}%` }}
-                ></div>
-              </div>
-              <div className="hours_label">{dayData.hoursWorked}h</div>
-            </div>
-          );
-        })}
-      </div>
+      <ReactApexChart options={options} series={series} type="bar" height={300} />
     </div>
   );
 };

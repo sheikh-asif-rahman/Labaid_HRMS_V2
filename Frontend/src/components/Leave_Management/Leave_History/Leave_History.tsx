@@ -14,6 +14,7 @@ export interface EmployeeData {
 
 export interface LeaveHistoryItem {
   sl?: number;
+  ApplicationId: string;
   EmployeeId: string;
   ApplicationDate: string;
   Purpose: string;
@@ -21,7 +22,6 @@ export interface LeaveHistoryItem {
   FromDate: string;
   ToDate: string;
   AlternativePerson: string;
-  Status: "Approved" | "Rejected" | "Pending";
 }
 
 interface LeaveHistoryProps {
@@ -47,7 +47,6 @@ const Leave_History: React.FC<LeaveHistoryProps> = ({
       "From Date",
       "To Date",
       "Alternative Person",
-      "Status",
       "Download",
     ]);
 
@@ -82,14 +81,12 @@ const Leave_History: React.FC<LeaveHistoryProps> = ({
       setCurrentPage(currentPage + 1);
   };
 
-  // ---------------- Download & Print ----------------
   const handleDownload = async (item: LeaveHistoryItem) => {
     if (!employeeData) return;
 
     const response = await fetch("/leave-template.html");
     let templateHtml = await response.text();
 
-    // Replace placeholders in HTML template
     templateHtml = templateHtml
       .replace(/{{empCode}}/g, employeeData.EmployeeId)
       .replace(/{{empName}}/g, employeeData.EmployeeName)
@@ -99,9 +96,8 @@ const Leave_History: React.FC<LeaveHistoryProps> = ({
         /{{joiningDate}}/g,
         new Date(employeeData.DateOfJoin).toLocaleDateString()
       )
-      // TOTAL LEAVE for Leave Required
       .replace(/{{leaveRequired}}/g, item.TotalLeave.toString())
-      .replace(/20 Days/g, `${item.TotalLeave} Days`) // Total Leave in second table
+      .replace(/20 Days/g, `${item.TotalLeave} Days`)
       .replace(/{{leaveEnjoyed}}/g, employeeData.LeaveEnjoyed.toString())
       .replace(/{{leaveBalance}}/g, employeeData.LeaveBalance.toString())
       .replace(/{{fromDate}}/g, item.FromDate)
@@ -109,7 +105,6 @@ const Leave_History: React.FC<LeaveHistoryProps> = ({
       .replace(/{{purpose}}/g, item.Purpose)
       .replace(/{{alternativePerson}}/g, item.AlternativePerson);
 
-    // Create hidden iframe to print
     const iframe = document.createElement("iframe");
     iframe.style.position = "absolute";
     iframe.style.width = "0";
@@ -130,14 +125,12 @@ const Leave_History: React.FC<LeaveHistoryProps> = ({
     }, 1000);
   };
 
-  // ---------------- Empty Template Print ----------------
   const handleEmptyTemplate = async () => {
     if (!employeeData) return;
 
     const response = await fetch("/blank-leave-template.html");
     let templateHtml = await response.text();
 
-    // Replace placeholders with employee info
     templateHtml = templateHtml
       .replace(/{{empCode}}/g, employeeData.EmployeeId)
       .replace(/{{empName}}/g, employeeData.EmployeeName)
@@ -150,7 +143,6 @@ const Leave_History: React.FC<LeaveHistoryProps> = ({
       .replace(/{{leaveEnjoyed}}/g, employeeData.LeaveEnjoyed.toString())
       .replace(/{{leaveBalance}}/g, employeeData.LeaveBalance.toString());
 
-    // Create hidden iframe for print
     const iframe = document.createElement("iframe");
     iframe.style.position = "absolute";
     iframe.style.width = "0";
@@ -171,16 +163,14 @@ const Leave_History: React.FC<LeaveHistoryProps> = ({
     }, 1000);
   };
 
-
   return (
     <div className="report-preview-container">
-<div className="leave-history-header">
-  <h2>Leave History</h2>
-  <button className="empty-template-btn" onClick={handleEmptyTemplate}>
-    Empty Template
-  </button>
-</div>
-
+      <div className="leave-history-header">
+        <h2>Leave History</h2>
+        <button className="empty-template-btn" onClick={handleEmptyTemplate}>
+          Empty Template
+        </button>
+      </div>
 
       <div className="table-wrapper-scroll">
         <table className="futuristic-table">
@@ -192,11 +182,9 @@ const Leave_History: React.FC<LeaveHistoryProps> = ({
             </tr>
           </thead>
           <tbody>
-            {displayedData.map((item, index) => {
+            {displayedData.map((item) => {
               const isGlobalFirst =
-                (currentPage - 1) * rowsPerPage + index === 0;
-
-              const canDownload = isGlobalFirst && item.Status === "Approved";
+                displayedData.indexOf(item) === 0;
 
               return (
                 <tr key={item.sl}>
@@ -208,20 +196,13 @@ const Leave_History: React.FC<LeaveHistoryProps> = ({
                   <td>{item.ToDate}</td>
                   <td>{item.AlternativePerson}</td>
                   <td>
-                    <span className={`status ${item.Status.toLowerCase()}`}>
-                      {item.Status}
-                    </span>
-                  </td>
-                  <td>
                     <button
-                      className={`download-btn ${!canDownload ? "disabled" : ""}`}
-                      onClick={() => canDownload && handleDownload(item)}
-                      disabled={!canDownload}
+                      className={`download-btn ${!isGlobalFirst ? "disabled" : ""}`}
+                      onClick={() => isGlobalFirst && handleDownload(item)}
+                      disabled={!isGlobalFirst}
                       title={
-                        !canDownload
-                          ? isGlobalFirst
-                            ? "Only approved records can be downloaded"
-                            : "Only the newest record can be downloaded"
+                        !isGlobalFirst
+                          ? "Only the newest record can be downloaded"
                           : ""
                       }
                     >

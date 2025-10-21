@@ -61,17 +61,17 @@ const getLeaveFormData = async (req, res) => {
     const DesignationName = designationResult.recordset[0]?.DesignationName || null;
     const DepartmentName = departmentResult.recordset[0]?.DepartmentName || null;
 
-    // 3. Fetch Leave Data (Current Year) – Only Approved Leaves
+    // 3. Fetch Leave Data (Current Year) – All leaves
     const currentYear = new Date().getFullYear();
     const startDate = `${currentYear}-01-01`;
     const endDate = `${currentYear}-12-31`;
 
     const leaveQuery = `
-      SELECT [Total Leave]
+      SELECT [ApplicationId], [ApplicationDate], [Purpose], [Total Leave], [From Date], [To Date], [Alternative Person]
       FROM [TA].[dbo].[leave]
       WHERE EmployeeId = '${EmployeeId}'
-        AND Status = 'Approved'
-        AND ApplicationDate BETWEEN '${startDate}' AND '${endDate}'
+        AND [ApplicationDate] BETWEEN '${startDate}' AND '${endDate}'
+      ORDER BY [ApplicationDate] DESC
     `;
     const leaveResult = await sql.query(leaveQuery);
 
@@ -96,6 +96,7 @@ const getLeaveFormData = async (req, res) => {
         DateOfJoin: employee.DateOfJoin,
         LeaveEnjoyed: totalLeavesTaken,
         LeaveBalance: leaveBalance,
+        Leaves: leaveResult.recordset, // send full leave list
       },
     });
   } catch (error) {

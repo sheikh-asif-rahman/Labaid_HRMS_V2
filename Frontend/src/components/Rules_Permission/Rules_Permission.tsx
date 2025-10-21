@@ -19,7 +19,6 @@ const Rules_Permission: React.FC<Rules_PermissionProps> = ({ employeeData }) => 
   const accessList = [
     "Overview",
     "Rules & Permission",
-    "Leave Approval",
     "Designation Setup",
     "Department Setup",
     "Reports",

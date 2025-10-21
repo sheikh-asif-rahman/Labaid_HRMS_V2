@@ -13,21 +13,21 @@ const getLeaveHistory = async (req, res) => {
 
     const query = `
       SELECT 
+        [ApplicationId],
         [EmployeeId],
         [ApplicationDate],
         [Purpose],
         [Total Leave] AS TotalLeave,
         [From Date] AS FromDate,
         [To Date] AS ToDate,
-        [Alternative Person] AS AlternativePerson,
-        [Status]
+        [Alternative Person] AS AlternativePerson
       FROM [TA].[dbo].[leave]
       WHERE [EmployeeId] = @EmployeeId
       ORDER BY [ApplicationDate] DESC
     `;
 
     const request = new sql.Request();
-    request.input("EmployeeId", sql.NVarChar, EmployeeId); // assuming EmployeeId is NVARCHAR
+    request.input("EmployeeId", sql.NVarChar, EmployeeId);
     const result = await request.query(query);
 
     res.status(200).json({

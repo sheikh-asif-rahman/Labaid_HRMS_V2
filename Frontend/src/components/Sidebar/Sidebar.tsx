@@ -36,7 +36,6 @@ const sidebarLinks = [
 // Admin dropdown config
 const adminLinks = [
   { name: "Rules & Permission", path: "/rulespermission", icon: <FaLock />, access: "Rules & Permission" },
-  { name: "Leave Approval", path: "/leaveapproval", icon: <FaCalendarCheck />, access: "Leave Approval" },
   { name: "Designation Setup", path: "/designationsetup", icon: <FaBriefcase />, access: "Designation Setup" },
   { name: "Department Setup", path: "/departmentsetup", icon: <FaBuilding />, access: "Department Setup" },
 ];

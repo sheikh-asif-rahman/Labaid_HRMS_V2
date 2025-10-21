@@ -2,17 +2,22 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 
 import Current_Month_Status from "../components/Home/Current_Month_Status/Current_Month_Status";
-import Recent_Applications from "../components/Home/Recent_Applications/Recent_Applications";
 import Profile from "../components/Home/Profile/Profile";
 import User_Profile_Attendance from "../components/Employee/User_Profile_Attendance/User_Profile_Attendance";
 import Popup from "../components/Popup/Popup";
-
+import Last7_Days_Status from "../components/Employee/Last7_Days_Status/Last7_Days_Status";
 
 import { API_BASE_URL } from "../constants/apiBase";
+
+interface Last7Day {
+  day: string; // YYYY-MM-DD
+  hoursWorked: number; // fractional hours
+}
 
 const Home: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [homeData, setHomeData] = useState<any>(null);
+  const [last7DaysData, setLast7DaysData] = useState<Last7Day[]>([]);
   const calledRef = useRef(false);
 
   useEffect(() => {
@@ -28,17 +33,17 @@ const Home: React.FC = () => {
       try {
         setLoading(true);
 
-        const [recentLeave, userProfile, todaysAttendance, monthStatus] =
+        const [recentLeave, userProfile, todaysAttendance, monthStatus, last7Days] =
           await Promise.all([
-            // Pass null to recentLeave if you want empty
-            Promise.resolve(null), 
+            Promise.resolve(null),
             axios.post(`${API_BASE_URL}usershortprofile`, { EmployeeId }),
             axios.post(`${API_BASE_URL}todaysattendance`, { EmployeeId }),
             axios.post(`${API_BASE_URL}thismonthstatus`, { EmployeeId }),
+            axios.post(`${API_BASE_URL}employeesearch`, { employeeId: EmployeeId }),
           ]);
 
         const allData = {
-          recentLeave: recentLeave, // null
+          recentLeave,
           userProfile: userProfile.data,
           todaysAttendance: todaysAttendance.data,
           monthStatus: monthStatus.data,
@@ -47,6 +52,22 @@ const Home: React.FC = () => {
         setHomeData(allData);
         localStorage.setItem("homeData", JSON.stringify(allData));
 
+        // map last7DaysPunch to chart format with fractional hours & YYYY-MM-DD date
+        const mappedLast7Days: Last7Day[] = last7Days.data.last7DaysPunch.map((p: any) => {
+          const [hrsStr, , minsStr] = p.duration.split(" "); // "8 hrs 34 mins"
+          const hours = parseInt(hrsStr) || 0;
+          const minutes = parseInt(minsStr) || 0;
+          const fractionalHours = hours + minutes / 60;
+
+          const date = new Date(p.date);
+          const formattedDate = `${date.getFullYear()}-${("0" + (date.getMonth() + 1)).slice(-2)}-${(
+            "0" + date.getDate()
+          ).slice(-2)}`;
+
+          return { day: formattedDate, hoursWorked: fractionalHours };
+        });
+
+        setLast7DaysData(mappedLast7Days);
         setLoading(false);
       } catch (err) {
         console.error("Error fetching home APIs:", err);
@@ -99,7 +120,7 @@ const Home: React.FC = () => {
           </div>
 
           <div style={{ width: "65%" }}>
-            <Recent_Applications data={homeData.recentLeave} />
+            <Last7_Days_Status data={last7DaysData} />
           </div>
         </div>
       </div>
@@ -115,9 +136,7 @@ const Home: React.FC = () => {
           }}
         />
       </div>
-
     </div>
-    
   );
 };
 
